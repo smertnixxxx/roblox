@@ -38,8 +38,15 @@ end
 pcall(function()
     local cg = game:GetService("CoreGui")
     for _, g in ipairs(cg:GetChildren()) do
-        if g.Name:find("Fishy Hub") then
+        if g.Name:find("Fishy Hub") or g.Name == "FishyStatsHUD" or g.Name == "FishyGpuAfkScreen" then
             g:Destroy()
+        end
+    end
+    if gethui then
+        for _, g in ipairs(gethui():GetChildren()) do
+            if g.Name:find("Fishy Hub") or g.Name == "FishyStatsHUD" or g.Name == "FishyGpuAfkScreen" then
+                g:Destroy()
+            end
         end
     end
 end)
@@ -66,6 +73,37 @@ local Window = WindUI:CreateWindow({
         Draggable = true,
     }
 })
+
+-- Предварительные ссылки на экраны для управления слоями
+local gpuScreenGui = nil
+local statsHudGui = nil
+
+-- Гарантия приоритета слоев: WindUI (верх) > HUD (середина) > 3D бекдроп (низ)
+local function ensureGuiLayering()
+    pcall(function()
+        if WindUI then
+            if WindUI.ScreenGui then
+                WindUI.ScreenGui.DisplayOrder = 500
+            end
+            if WindUI.NotificationGui then
+                WindUI.NotificationGui.DisplayOrder = 600
+            end
+            if WindUI.DropdownGui then
+                WindUI.DropdownGui.DisplayOrder = 601
+            end
+            if WindUI.TooltipGui then
+                WindUI.TooltipGui.DisplayOrder = 602
+            end
+        end
+        if statsHudGui then
+            statsHudGui.DisplayOrder = 200
+        end
+        if gpuScreenGui then
+            gpuScreenGui.DisplayOrder = -1000000
+        end
+    end)
+end
+ensureGuiLayering()
 
 -- Надежный глобальный бинд открытия/закрытия GUI (Insert, RightShift, RightControl, F4)
 local toggleKeys = {
@@ -253,7 +291,6 @@ local function applyClearFog(enable)
 end
 
 -- 🥔 0% GPU AFK Режим с настраиваемым цветом экрана (RGB Палетка)
-local gpuScreenGui = nil
 local gpuScreenFrame = nil
 local gpuScreenColor = Color3.fromRGB(15, 15, 22)
 local gpuAfkEnabled = false
@@ -263,47 +300,54 @@ local function setGpuAfkMode(enable)
     pcall(function()
         RunService:Set3dRenderingEnabled(not enable)
     end)
+    ensureGuiLayering()
     if enable then
         if not gpuScreenGui then
             gpuScreenGui = Instance.new("ScreenGui")
             gpuScreenGui.Name = "FishyGpuAfkScreen"
-            gpuScreenGui.DisplayOrder = -1 -- ниже окна меню WindUI чтобы оно оставалось активным
+            gpuScreenGui.DisplayOrder = -1000000 -- Гарантированно самый нижний слой под меню и HUD
             gpuScreenGui.IgnoreGuiInset = true
             gpuScreenGui.ResetOnSpawn = false
 
+            local targetParent = nil
             pcall(function()
-                if gethui then
-                    gpuScreenGui.Parent = gethui()
+                if WindUI and WindUI.ScreenGui and WindUI.ScreenGui.Parent then
+                    targetParent = WindUI.ScreenGui.Parent
+                elseif gethui then
+                    targetParent = gethui()
                 elseif syn and syn.protect_gui then
                     syn.protect_gui(gpuScreenGui)
-                    gpuScreenGui.Parent = game:GetService("CoreGui")
+                    targetParent = game:GetService("CoreGui")
                 else
-                    gpuScreenGui.Parent = game:GetService("CoreGui")
+                    targetParent = game:GetService("CoreGui")
                 end
             end)
-            if not gpuScreenGui.Parent then
-                gpuScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+            if not targetParent then
+                targetParent = LocalPlayer:WaitForChild("PlayerGui")
             end
+            gpuScreenGui.Parent = targetParent
 
             gpuScreenFrame = Instance.new("Frame")
             gpuScreenFrame.Size = UDim2.fromScale(1, 1)
             gpuScreenFrame.BackgroundColor3 = gpuScreenColor
             gpuScreenFrame.BorderSizePixel = 0
+            gpuScreenFrame.ZIndex = 0
             gpuScreenFrame.Parent = gpuScreenGui
 
             local lbl = Instance.new("TextLabel")
             lbl.Name = "AfkStatusLabel"
-            lbl.Size = UDim2.new(1, 0, 0, 40)
-            lbl.Position = UDim2.new(0, 0, 0.92, 0)
+            lbl.Size = UDim2.new(1, 0, 0, 30)
+            lbl.Position = UDim2.new(0, 0, 0.94, 0)
             lbl.BackgroundTransparency = 1
-            lbl.Text = "⚡ GPU 0% Potato AFK Active | 3D Rendering Disabled"
-            lbl.TextColor3 = Color3.fromRGB(220, 220, 220)
-            lbl.TextTransparency = 0.4
+            lbl.Text = "GPU 0% Potato AFK Active | 3D Rendering Disabled"
+            lbl.TextColor3 = Color3.fromRGB(200, 205, 215)
+            lbl.TextTransparency = 0.5
             lbl.Font = Enum.Font.GothamMedium
-            lbl.TextSize = 14
+            lbl.TextSize = 12
             lbl.Parent = gpuScreenFrame
         else
             gpuScreenGui.Enabled = true
+            gpuScreenGui.DisplayOrder = -1000000
             if gpuScreenFrame then
                 gpuScreenFrame.BackgroundColor3 = gpuScreenColor
             end
@@ -313,6 +357,7 @@ local function setGpuAfkMode(enable)
             gpuScreenGui.Enabled = false
         end
     end
+    ensureGuiLayering()
 end
 
 -- 🎁 Мгновенное открытие всех пойманных сундуков
@@ -371,12 +416,11 @@ end
 
 -- 📊 Экранный HUD и статистика AFK сессии (слева по центру экрана)
 local hudEnabled = true
-local statsHudGui = nil
 local hudTimeLabel = nil
-local hudTotalLabel = nil
-local hudMpmLabel = nil
-local hudMphLabel = nil
-local hudSpeedLabel = nil
+local hudTotalValue = nil
+local hudMpmValue = nil
+local hudMphValue = nil
+local hudSpeedValue = nil
 local statsParagraph = nil
 
 local function createStatsHud()
@@ -384,123 +428,154 @@ local function createStatsHud()
     statsHudGui = Instance.new("ScreenGui")
     statsHudGui.Name = "FishyStatsHUD"
     statsHudGui.ResetOnSpawn = false
-    statsHudGui.DisplayOrder = 9999
+    statsHudGui.DisplayOrder = 200 -- Выше 3D бекдропа (-1000000), под окном WindUI (500)
+    statsHudGui.IgnoreGuiInset = true
 
+    local targetParent = nil
     pcall(function()
-        if gethui then
-            statsHudGui.Parent = gethui()
+        if WindUI and WindUI.ScreenGui and WindUI.ScreenGui.Parent then
+            targetParent = WindUI.ScreenGui.Parent
+        elseif gethui then
+            targetParent = gethui()
         elseif syn and syn.protect_gui then
             syn.protect_gui(statsHudGui)
-            statsHudGui.Parent = game:GetService("CoreGui")
+            targetParent = game:GetService("CoreGui")
         else
-            statsHudGui.Parent = game:GetService("CoreGui")
+            targetParent = game:GetService("CoreGui")
         end
     end)
-    if not statsHudGui.Parent then
-        statsHudGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    if not targetParent then
+        targetParent = LocalPlayer:WaitForChild("PlayerGui")
     end
+    statsHudGui.Parent = targetParent
 
     local frame = Instance.new("Frame")
     frame.Name = "HudFrame"
-    frame.Size = UDim2.new(0, 205, 0, 116)
-    frame.Position = UDim2.new(0, 16, 0.5, -58) -- слева по центру экрана
-    frame.BackgroundColor3 = Color3.fromRGB(16, 17, 23)
-    frame.BackgroundTransparency = 0.22
+    frame.Size = UDim2.new(0, 226, 0, 134)
+    frame.Position = UDim2.new(0, 16, 0.5, -67) -- Слева по центру экрана
+    frame.BackgroundColor3 = Color3.fromRGB(15, 17, 23)
+    frame.BackgroundTransparency = 0.15
     frame.BorderSizePixel = 0
     frame.Active = true
     frame.Draggable = true
     frame.Parent = statsHudGui
 
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 10)
+    corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = frame
 
     local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(48, 52, 68)
-    stroke.Transparency = 0.35
-    stroke.Thickness = 1.2
+    stroke.Color = Color3.fromRGB(48, 54, 70)
+    stroke.Transparency = 0.45
+    stroke.Thickness = 1
     stroke.Parent = frame
 
-    -- Хедер: зелёная точка + заголовок слева
-    local headerLeft = Instance.new("TextLabel")
-    headerLeft.Size = UDim2.new(0, 110, 0, 20)
-    headerLeft.Position = UDim2.new(0, 10, 0, 4)
-    headerLeft.BackgroundTransparency = 1
-    headerLeft.Text = "● AFK TRACKER"
-    headerLeft.Font = Enum.Font.GothamBold
-    headerLeft.TextSize = 10
-    headerLeft.TextColor3 = Color3.fromRGB(0, 220, 255)
-    headerLeft.TextXAlignment = Enum.TextXAlignment.Left
-    headerLeft.Parent = frame
+    -- Хедер: минималистичная иконка + заголовок
+    local headerIcon = Instance.new("ImageLabel")
+    headerIcon.Name = "HeaderIcon"
+    headerIcon.Size = UDim2.new(0, 12, 0, 12)
+    headerIcon.Position = UDim2.new(0, 12, 0, 8)
+    headerIcon.BackgroundTransparency = 1
+    headerIcon.Image = "rbxassetid://85473888890506" -- Lucide timer
+    headerIcon.ImageColor3 = Color3.fromRGB(220, 225, 235)
+    headerIcon.Parent = frame
 
-    -- Таймер сессии справа в хедере
+    local headerTitle = Instance.new("TextLabel")
+    headerTitle.Name = "HeaderTitle"
+    headerTitle.Size = UDim2.new(0, 80, 0, 20)
+    headerTitle.Position = UDim2.new(0, 28, 0, 4)
+    headerTitle.BackgroundTransparency = 1
+    headerTitle.Text = "AFK STATS"
+    headerTitle.Font = Enum.Font.GothamBold
+    headerTitle.TextSize = 10
+    headerTitle.TextColor3 = Color3.fromRGB(220, 225, 235)
+    headerTitle.TextXAlignment = Enum.TextXAlignment.Left
+    headerTitle.Parent = frame
+
+    -- Правая часть хедера: часы и время сессии
+    local clockIcon = Instance.new("ImageLabel")
+    clockIcon.Name = "ClockIcon"
+    clockIcon.Size = UDim2.new(0, 11, 0, 11)
+    clockIcon.Position = UDim2.new(1, -72, 0, 8)
+    clockIcon.BackgroundTransparency = 1
+    clockIcon.Image = "rbxassetid://121808839832144" -- Lucide clock
+    clockIcon.ImageColor3 = Color3.fromRGB(160, 165, 180)
+    clockIcon.Parent = frame
+
     hudTimeLabel = Instance.new("TextLabel")
-    hudTimeLabel.Size = UDim2.new(0, 75, 0, 20)
-    hudTimeLabel.Position = UDim2.new(1, -85, 0, 4)
+    hudTimeLabel.Name = "TimeLabel"
+    hudTimeLabel.Size = UDim2.new(0, 56, 0, 20)
+    hudTimeLabel.Position = UDim2.new(1, -58, 0, 4)
     hudTimeLabel.BackgroundTransparency = 1
     hudTimeLabel.Text = "00:00:00"
     hudTimeLabel.Font = Enum.Font.GothamMedium
-    hudTimeLabel.TextSize = 11
-    hudTimeLabel.TextColor3 = Color3.fromRGB(145, 150, 170)
+    hudTimeLabel.TextSize = 10
+    hudTimeLabel.TextColor3 = Color3.fromRGB(175, 180, 195)
     hudTimeLabel.TextXAlignment = Enum.TextXAlignment.Right
     hudTimeLabel.Parent = frame
 
     -- Тонкий разделитель
     local divider = Instance.new("Frame")
-    divider.Size = UDim2.new(1, -20, 0, 1)
-    divider.Position = UDim2.new(0, 10, 0, 25)
+    divider.Name = "Divider"
+    divider.Size = UDim2.new(1, -24, 0, 1)
+    divider.Position = UDim2.new(0, 12, 0, 26)
     divider.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     divider.BackgroundTransparency = 0.92
     divider.BorderSizePixel = 0
     divider.Parent = frame
 
-    -- Строка 1: Всего заработано и поймано рыб
-    hudTotalLabel = Instance.new("TextLabel")
-    hudTotalLabel.Size = UDim2.new(1, -20, 0, 18)
-    hudTotalLabel.Position = UDim2.new(0, 10, 0, 29)
-    hudTotalLabel.BackgroundTransparency = 1
-    hudTotalLabel.Text = "💰 Всего: $0 (0 рыб)"
-    hudTotalLabel.Font = Enum.Font.GothamMedium
-    hudTotalLabel.TextSize = 12
-    hudTotalLabel.TextColor3 = Color3.fromRGB(240, 240, 245)
-    hudTotalLabel.TextXAlignment = Enum.TextXAlignment.Left
-    hudTotalLabel.Parent = frame
+    -- Конструктор строк статистики (монохромная иконка + заголовок + белое значение справа)
+    local function createHudRow(yPos, iconAsset, labelText)
+        local rowIcon = Instance.new("ImageLabel")
+        rowIcon.Size = UDim2.new(0, 13, 0, 13)
+        rowIcon.Position = UDim2.new(0, 12, 0, yPos + 3)
+        rowIcon.BackgroundTransparency = 1
+        rowIcon.Image = iconAsset
+        rowIcon.ImageColor3 = Color3.fromRGB(230, 235, 245)
+        rowIcon.Parent = frame
 
-    -- Строка 2: Доход в минуту ($/min)
-    hudMpmLabel = Instance.new("TextLabel")
-    hudMpmLabel.Size = UDim2.new(1, -20, 0, 18)
-    hudMpmLabel.Position = UDim2.new(0, 10, 0, 49)
-    hudMpmLabel.BackgroundTransparency = 1
-    hudMpmLabel.Text = "⚡ $/мин: $0/m"
-    hudMpmLabel.Font = Enum.Font.GothamMedium
-    hudMpmLabel.TextSize = 12
-    hudMpmLabel.TextColor3 = Color3.fromRGB(105, 255, 140)
-    hudMpmLabel.TextXAlignment = Enum.TextXAlignment.Left
-    hudMpmLabel.Parent = frame
+        local rowTitle = Instance.new("TextLabel")
+        rowTitle.Size = UDim2.new(0, 85, 0, 20)
+        rowTitle.Position = UDim2.new(0, 30, 0, yPos)
+        rowTitle.BackgroundTransparency = 1
+        rowTitle.Text = labelText
+        rowTitle.Font = Enum.Font.GothamMedium
+        rowTitle.TextSize = 11
+        rowTitle.TextColor3 = Color3.fromRGB(160, 165, 180)
+        rowTitle.TextXAlignment = Enum.TextXAlignment.Left
+        rowTitle.Parent = frame
 
-    -- Строка 3: Доход в час ($/hour)
-    hudMphLabel = Instance.new("TextLabel")
-    hudMphLabel.Size = UDim2.new(1, -20, 0, 18)
-    hudMphLabel.Position = UDim2.new(0, 10, 0, 69)
-    hudMphLabel.BackgroundTransparency = 1
-    hudMphLabel.Text = "🚀 $/час: $0/h"
-    hudMphLabel.Font = Enum.Font.GothamMedium
-    hudMphLabel.TextSize = 12
-    hudMphLabel.TextColor3 = Color3.fromRGB(0, 220, 255)
-    hudMphLabel.TextXAlignment = Enum.TextXAlignment.Left
-    hudMphLabel.Parent = frame
+        local rowValue = Instance.new("TextLabel")
+        rowValue.Size = UDim2.new(1, -125, 0, 20)
+        rowValue.Position = UDim2.new(0, 115, 0, yPos)
+        rowValue.BackgroundTransparency = 1
+        rowValue.Text = "-"
+        rowValue.Font = Enum.Font.GothamBold
+        rowValue.TextSize = 11
+        rowValue.TextColor3 = Color3.fromRGB(255, 255, 255)
+        rowValue.TextXAlignment = Enum.TextXAlignment.Right
+        rowValue.Parent = frame
+
+        return rowValue
+    end
+
+    -- Строка 1: Всего заработано монет и рыб
+    hudTotalValue = createHudRow(30, "rbxassetid://116510979641930", "Total Earned")
+    hudTotalValue.Text = "$0 (0 fish)"
+
+    -- Строка 2: Доход в минуту
+    hudMpmValue = createHudRow(54, "rbxassetid://130551565616516", "Money / Min")
+    hudMpmValue.Text = "$0/m"
+
+    -- Строка 3: Доход в час
+    hudMphValue = createHudRow(78, "rbxassetid://81819858538839", "Money / Hour")
+    hudMphValue.Text = "$0/h"
 
     -- Строка 4: Скорость вылова в минуту
-    hudSpeedLabel = Instance.new("TextLabel")
-    hudSpeedLabel.Size = UDim2.new(1, -20, 0, 18)
-    hudSpeedLabel.Position = UDim2.new(0, 10, 0, 89)
-    hudSpeedLabel.BackgroundTransparency = 1
-    hudSpeedLabel.Text = "📈 Темп: 0.0 рыб/мин"
-    hudSpeedLabel.Font = Enum.Font.Gotham
-    hudSpeedLabel.TextSize = 11
-    hudSpeedLabel.TextColor3 = Color3.fromRGB(180, 185, 200)
-    hudSpeedLabel.TextXAlignment = Enum.TextXAlignment.Left
-    hudSpeedLabel.Parent = frame
+    hudSpeedValue = createHudRow(102, "rbxassetid://124360663785796", "Catch Rate")
+    hudSpeedValue.Text = "0.0 / min"
+
+    ensureGuiLayering()
 end
 
 local function updateStatsHud()
@@ -521,7 +596,7 @@ local function updateStatsHud()
 
     if statsParagraph and statsParagraph.SetDesc then
         statsParagraph:SetDesc(string.format(
-            "🐟 Поймано: %d шт. | 💰 Выручка: %s\n⚡ В минуту: %s/m | 🚀 В час: %s/h\n⏱️ Время сессии: %s | 📈 Темп: %.1f рыб/мин",
+            "Поймано: %d шт. | Выручка: %s\nMoney / Min: %s/m | Money / Hour: %s/h\nВремя сессии: %s | Скорость: %.1f рыб/мин",
             sessionFishCaught,
             formatMoney(sessionMoneyEarned),
             formatMoney(mpm),
@@ -534,17 +609,17 @@ local function updateStatsHud()
     if hudTimeLabel then
         hudTimeLabel.Text = timeStr
     end
-    if hudTotalLabel then
-        hudTotalLabel.Text = string.format("💰 Всего: %s (%d рыб)", formatMoney(sessionMoneyEarned), sessionFishCaught)
+    if hudTotalValue then
+        hudTotalValue.Text = string.format("%s (%d fish)", formatMoney(sessionMoneyEarned), sessionFishCaught)
     end
-    if hudMpmLabel then
-        hudMpmLabel.Text = string.format("⚡ $/мин: %s/m", formatMoney(mpm))
+    if hudMpmValue then
+        hudMpmValue.Text = string.format("%s/m", formatMoney(mpm))
     end
-    if hudMphLabel then
-        hudMphLabel.Text = string.format("🚀 $/час: %s/h", formatMoney(mph))
+    if hudMphValue then
+        hudMphValue.Text = string.format("%s/h", formatMoney(mph))
     end
-    if hudSpeedLabel then
-        hudSpeedLabel.Text = string.format("📈 Темп: %.1f рыб/мин", cpm)
+    if hudSpeedValue then
+        hudSpeedValue.Text = string.format("%.1f / min", cpm)
     end
 end
 
@@ -1876,11 +1951,11 @@ local TabFishing = Window:Tab({
     Icon = "fish-symbol"
 })
 
-TabFishing:Section({ Title = "📊 Live AFK Farm Statistics" })
+TabFishing:Section({ Title = "Live AFK Farm Statistics" })
 
 statsParagraph = TabFishing:Paragraph({
-    Title = "🎣 Session Performance",
-    Desc = "🐟 Поймано: 0 шт. | 💰 Выручка: $0\n⏱️ Время сессии: 00:00:00 | 📈 Скорость: 0.0 рыб/мин"
+    Title = "Session Performance",
+    Desc = "Поймано: 0 шт. | Выручка: $0\nMoney / Min: $0/m | Money / Hour: $0/h\nВремя сессии: 00:00:00 | Темп: 0.0 рыб/мин"
 })
 
 TabFishing:Button({
@@ -2337,6 +2412,7 @@ TabBoost:Toggle({
     Value = false,
     Callback = function(state)
         setGpuAfkMode(state)
+        ensureGuiLayering()
         showNotification("GPU 0% AFK", state and "3D рендер выключен! GPU холодная." or "3D рендер включен обратно.")
     end
 })
@@ -2350,6 +2426,7 @@ TabBoost:Colorpicker({
         if gpuScreenFrame then
             gpuScreenFrame.BackgroundColor3 = color
         end
+        ensureGuiLayering()
     end
 })
 
