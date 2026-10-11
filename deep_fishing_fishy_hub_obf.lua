@@ -185,6 +185,7 @@ local CatchFight; pcall(function() CatchFight = require(RS.Shared.Modules.CatchF
 
 -- Контроллеры клиента
 local AutoFishingCtrl, CatchMinigameCtrl, FishingCtrl, FishSchoolCtrl, ThrowCinematicCtrl, NpcSellCtrl
+local unfreezeCharacter, forceEnableControls, equipRod, cleanupStrayFishModels
 pcall(function() AutoFishingCtrl = require(LocalPlayer.PlayerScripts.Client.Controllers.Fishing.AutoFishing) end)
 pcall(function() CatchMinigameCtrl = require(LocalPlayer.PlayerScripts.Client.Controllers.ThrowCinematic.CatchMinigame) end)
 pcall(function() FishingCtrl = require(LocalPlayer.PlayerScripts.Client.Controllers.Fishing) end)
@@ -1121,7 +1122,7 @@ local function autocompleteFrostMaze()
 end
 
 -- Авто-экипировка удочки
-local function equipRod()
+function equipRod()
     local char = LocalPlayer.Character
     if char and char:FindFirstChildOfClass("Tool") then
         return
@@ -1152,7 +1153,7 @@ local function buyUpgrade(statName)
 end
 
 -- ==================== 🧹 AUTO-CLEANUP STRAY & FROZEN FISH MODELS ====================
-local function cleanupStrayFishModels()
+function cleanupStrayFishModels()
     pcall(function()
         -- 1. Очищаем все модели в косяке (включая помеченные taken)
         if FishSchoolCtrl and FishSchoolCtrl.Fish then
@@ -1182,7 +1183,7 @@ local function cleanupStrayFishModels()
 end
 
 -- ==================== 🚶 FREE MOVEMENT & UNFREEZE WATCHDOG ====================
-local function forceEnableControls()
+function forceEnableControls()
     pcall(function()
         local playerScripts = LocalPlayer:FindFirstChild("PlayerScripts")
         local playerModuleObj = playerScripts and playerScripts:FindFirstChild("PlayerModule")
@@ -1219,7 +1220,7 @@ local function forceEnableControls()
     end)
 end
 
-local function unfreezeCharacter()
+function unfreezeCharacter()
     pcall(function()
         local char = LocalPlayer.Character
         if not char then return end
