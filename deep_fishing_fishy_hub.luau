@@ -379,15 +379,62 @@ local function formatMoney(val)
     end
 end
 
--- Поиск активного продавца в текущем мире (World 1, World 2, etc.)
+-- Поиск активного продавца в текущем активном мире (World 1, World 2, World 3, World 4)
 local function getActiveSellNPC()
-    local npcs = CollectionService:GetTagged("NPC_Sell")
-    for _, npc in ipairs(npcs) do
-        if npc:IsDescendantOf(workspace) then
-            return npc
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    local myPos = hrp and hrp.Position or Vector3.zero
+
+    -- 1. Сначала ищем NPC_Sell напрямую в текущей активной папке мира: Workspace.World[ActiveWorld].Interactable.NPC_Sell
+    local worldFolder = workspace:FindFirstChild("World")
+    if worldFolder then
+        -- Сначала проверяем мир, ближе всего к которому находится игрок
+        local bestWorldNpc = nil
+        local bestWorldDist = math.huge
+        for _, w in ipairs(worldFolder:GetChildren()) do
+            local interactable = w:FindFirstChild("Interactable")
+            local npc = interactable and interactable:FindFirstChild("NPC_Sell")
+            if npc and npc:IsDescendantOf(workspace) then
+                local dist = (npc:GetPivot().Position - myPos).Magnitude
+                if dist < bestWorldDist then
+                    bestWorldDist = dist
+                    bestWorldNpc = npc
+                end
+            end
+        end
+        if bestWorldNpc then
+            return bestWorldNpc
         end
     end
-    return npcs[1]
+
+    -- 2. Поиск среди всех объектов с тегом "NPC_Sell" в workspace — выбираем БЛИЖАЙШЕГО к игроку в текущем мире!
+    local bestNpc = nil
+    local bestDist = math.huge
+    for _, npc in ipairs(CollectionService:GetTagged("NPC_Sell")) do
+        if npc:IsDescendantOf(workspace) then
+            local pos = npc:GetPivot().Position
+            local dist = (pos - myPos).Magnitude
+            if dist < bestDist then
+                bestDist = dist
+                bestNpc = npc
+            end
+        end
+    end
+    if bestNpc then return bestNpc end
+
+    -- 3. Резервный поиск по имени "NPC_Sell" среди всех потомков workspace
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj.Name == "NPC_Sell" and obj:IsDescendantOf(workspace) and obj ~= char and not obj:IsDescendantOf(char) then
+            local pos = obj:GetPivot().Position
+            local dist = (pos - myPos).Magnitude
+            if dist < bestDist then
+                bestDist = dist
+                bestNpc = obj
+            end
+        end
+    end
+
+    return bestNpc
 end
 
 -- Авто-помещение лучших рыб в пруд
@@ -2037,12 +2084,44 @@ TabTeleports:Button({
 TabTeleports:Section({ Title = "Hotspots & Islands" })
 
 TabTeleports:Button({
-    Title = "Merchant (Sell NPC)",
-    Desc = "Телепорт к торговцу рыбой",
+    Title = "Merchant (Current World - Auto)",
+    Desc = "Телепорт к торговцу текущего мира (World 1, World 2 и т.д.)",
     Icon = "store",
     Callback = function()
         local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if hrp then hrp.CFrame = CFrame.new(-1226.75, 22, 144.58) end
+        local npc = getActiveSellNPC()
+        if hrp and npc then
+            hrp.CFrame = CFrame.new(npc:GetPivot().Position + Vector3.new(0, 2, 3))
+            showNotification("Teleport", "Телепортирован к торговцу текущего мира!")
+        elseif hrp then
+            showNotification("Teleport", "Торговец в текущем мире не найден")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "Merchant (World 2)",
+    Desc = "Телепорт к торговцу во 2-м мире",
+    Icon = "store",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1335.45, 20.8, 141.23)
+            showNotification("Teleport", "Телепортирован к торговцу World 2!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "Merchant (World 1)",
+    Desc = "Телепорт к торговцу в 1-м мире",
+    Icon = "store",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1226.75, 22, 144.58)
+            showNotification("Teleport", "Телепортирован к торговцу World 1!")
+        end
     end
 })
 
