@@ -1,12 +1,3238 @@
---[[
- .____                  ________ ___.    _____                           __                
- |    |    __ _______   \_____  \\_ |___/ ____\_ __  ______ ____ _____ _/  |_  ___________ 
- |    |   |  |  \__  \   /   |   \| __ \   __\  |  \/  ___// ___\\__  \\   __\/  _ \_  __ \
- |    |___|  |  // __ \_/    |    \ \_\ \  | |  |  /\___ \\  \___ / __ \|  | (  <_> )  | \/
- |_______ \____/(____  /\_______  /___  /__| |____//____  >\___  >____  /__|  \____/|__|   
-         \/          \/         \/    \/                \/     \/     \/                   
-          \_Welcome to LuaObfuscator.com   (Alpha 0.10.9) ~  Much Love, Ferib 
+-- [[ Deep Fishing - Fishy Hub v6.3 (Full Capacity + Item Collector + Landing Predictor) ]] --
+-- Совместимо с Real Executor
+pcall(function()
+    if setthreadidentity then setthreadidentity(8) end
+    if setidentity then setidentity(8) end
+end)
 
-]]--
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+local TeleportService = game:GetService("TeleportService")
+local LocalPlayer = Players.LocalPlayer
 
-local v0=string.char;local v1=string.byte;local v2=string.sub;local v3=bit32 or bit ;local v4=v3.bxor;local v5=table.concat;local v6=table.insert;local function v7(v130,v131) local v132={};for v447=1, #v130 do v6(v132,v0(v4(v1(v2(v130,v447,v447 + 1 )),v1(v2(v131,1 + (v447% #v131) ,1 + (v447% #v131) + 1 )))%256 ));end return v5(v132);end local v8=game:GetService(v7("\225\207\218\60\227\169\212","\126\177\163\187\69\134\219\167"));local v9=game:GetService(v7("\17\216\36\246\249\49\219\35\198\249","\156\67\173\74\165"));local v10=game:GetService(v7("\6\178\89\26\181\37\71\32\178\77\37\168\41\84\53\176\76","\38\84\215\41\118\220\70"));local v11=game:GetService(v7("\101\5\39\0\215\94\6\55\6\205\85\4\52\27\253\85","\158\48\118\66\114"));local v12=game:GetService(v7("\159\33\28\51\99\170\233\191\23\21\36\101\172\248\174","\155\203\68\112\86\19\197"));local v13=v8.LocalPlayer;if getgenv()._FishyHubCleanup then pcall(getgenv()._FishyHubCleanup);end local v14=os.clock();getgenv()._FishyHubToken=v14;getgenv()._FishyHubCleanup=function() local v133=0;while true do if (v133==0) then getgenv()._FishyHubToken=nil;pcall(function() v9:Set3dRenderingEnabled(true);end);v133=1;end if (v133==1) then pcall(function() local v690=0;local v691;while true do if (v690==0) then v691=workspace:FindFirstChild(v7("\96\212\37\244\89\79\228\236\67\207\1\253\76\115","\152\38\189\86\156\32\24\133"));if v691 then v691:Destroy();end break;end end end);pcall(function() local v692=0;local v693;while true do if (v692==0) then v693=game:GetService(v7("\223\88\181\67\219\66\174","\38\156\55\199")):FindFirstChild(v7("\142\116\111\32\10\83\234\86\137\123\119\27\16\102\255\70\166","\35\200\29\28\72\115\20\154"));if v693 then v693:Destroy();end break;end end end);v133=2;end if (v133==2) then pcall(function() local v694=game:GetService(v7("\58\176\195\218\170\57\61","\84\121\223\177\191\237\76")):FindFirstChild(v7("\157\95\218\168\35\99\36\192\175\69\225\149\30","\161\219\54\169\192\90\48\80"));if v694 then v694:Destroy();end if (v13 and v13:FindFirstChild(v7("\121\78\1\60\76\80\39\48\64","\69\41\34\96"))) then local v851=0;local v852;while true do if (v851==0) then v852=v13.PlayerGui:FindFirstChild(v7("\154\202\196\2\27\24\168\194\195\25\42\30\152","\75\220\163\183\106\98"));if v852 then v852:Destroy();end break;end end end end);break;end end end;pcall(function() local v134=0;local v135;while true do if (v134==1) then if gethui then for v853,v854 in ipairs(gethui():GetChildren()) do if (v854.Name:find(v7("\42\199\77\122\103\55\219\242\14","\135\108\174\62\18\30\23\147")) or (v854.Name==v7("\144\224\57\195\1\157\39\198\162\250\2\254\60","\167\214\137\74\171\120\206\83")) or (v854.Name==v7("\173\249\33\85\225\128\155\229\19\91\243\148\136\226\55\88\246","\199\235\144\82\61\152"))) then v854:Destroy();end end end break;end if (v134==0) then v135=game:GetService(v7("\33\181\153\50\254\23\179","\185\98\218\235\87"));for v695,v696 in ipairs(v135:GetChildren()) do if (v696.Name:find(v7("\237\53\52\238\199\234\227\41\37","\202\171\92\71\134\190")) or (v696.Name==v7("\15\200\63\128\48\242\56\137\61\210\4\189\13","\232\73\161\76")) or (v696.Name==v7("\157\208\81\85\7\156\201\87\124\24\176\234\65\79\27\190\215","\126\219\185\34\61"))) then v696:Destroy();end end v134=1;end end end);local v17=loadstring(game:HttpGet(v7("\15\2\173\59\20\76\246\100\0\31\173\35\18\20\247\40\8\27\246\13\8\25\173\42\0\19\170\62\20\89\142\34\9\18\140\2\72\4\188\39\2\23\170\46\20\89\181\42\19\19\170\63\72\18\182\60\9\26\182\42\3\89\180\42\14\24\247\39\18\23","\75\103\118\217")))();local v18=v17:CreateWindow({[v7("\243\93\100\24\188","\126\167\52\16\116\217")]=v7("\238\39\51\136\173\89\212\221\44\96\156\244\61\249\205\62\96\166\189\10\244\193\32\39","\156\168\78\64\224\212\121"),[v7("\46\237\170\192","\174\103\142\197")]=v7("\80\33\76\48\104\77\225\91\42\80\52","\152\54\72\63\88\69\62"),[v7("\245\209\250\84\219\214","\60\180\164\142")]=v7("\90\71\69\27\34\236\30\24\115\38\25","\114\56\62\101\73\71\141"),[v7("\158\230\215\192\189\251","\164\216\137\187")]=v7("\244\239\34\186\191\214\30\208\194\52\183\182\216\2\193\238\56\188\161","\107\178\134\81\210\198\158"),[v7("\11\7\152\195","\202\88\110\226\166")]=UDim2.fromOffset(660,520),[v7("\238\6\140\196\195\217\10","\170\163\111\226\151")]=Vector2.new(580,420),[v7("\37\34\179\54\93\39\40\3\53\188\44","\73\113\80\210\88\46\87")]=true,[v7("\181\36\200\31\226","\135\225\76\173\114")]=v7("\62\236\170\187","\199\122\141\216\208\204\221"),[v7("\159\216\3\249\98\247\175\209\21","\150\205\189\112\144\24")]=true,[v7("\17\139\184\75\8\141\58\21\60","\112\69\228\223\44\100\232\113")]=Enum.KeyCode.RightShift,[v7("\251\15\2\221\148\105\146\192\16\9","\230\180\127\103\179\214\28")]={[v7("\184\12\75\74\225","\128\236\101\63\38\132\33")]=v7("\138\160\2\76\175\171\231\185\171","\175\204\201\113\36\214\139"),[v7("\110\207\58\210","\100\39\172\85\188")]=v7("\171\113\170\136\126\190\97\180\130\60\161","\83\205\24\217\224"),[v7("\197\202\223\51\227\215\255\60\226\204\216\46","\93\134\165\173")]=UDim.new(0,12),[v7("\155\252\192\192\54\203\182","\30\222\146\161\162\90\174\210")]=true,[v7("\193\92\113\13\226\79\114\6\224","\106\133\46\16")]=true}});local v19=nil;local v20=nil;local function v21() pcall(function() local v448=0;while true do if (v448==1) then if v19 then v19.DisplayOrder= -1000000;end break;end if (0==v448) then if v17 then if v17.ScreenGui then v17.ScreenGui.DisplayOrder=500;end if v17.NotificationGui then v17.NotificationGui.DisplayOrder=600;end if v17.DropdownGui then v17.DropdownGui.DisplayOrder=601;end if v17.TooltipGui then v17.TooltipGui.DisplayOrder=602;end end if v20 then v20.DisplayOrder=200;end v448=1;end end end);end v21();local v22={[Enum.KeyCode.RightShift]=true,[Enum.KeyCode.RightControl]=true,[Enum.KeyCode.Insert]=true,[Enum.KeyCode.F4]=true};v11.InputBegan:Connect(function(v136,v137) local v138=0;while true do if (v138==0) then if v11:GetFocusedTextBox() then return;end if v22[v136.KeyCode] then if v18 then if v18.Toggle then v18:Toggle();elseif (v18.Closed~=nil) then if v18.Closed then v18:Open();else v18:Close();end end end end break;end end end);local v23=game:GetService(v7("\107\52\114\238\78\69\74\7\102\245","\32\56\64\19\156\58"));local function v24(v139,v140) local v141=0;while true do if (v141==0) then pcall(function() v23:SetCore(v7("\105\205\235\82\116\253\148\83\206\236\85\91\230\137\85\198","\224\58\168\133\54\58\146"),{[v7("\109\95\95\241\112","\107\57\54\43\157\21\230\231")]=tostring(v139),[v7("\239\142\9\225","\175\187\235\113\149\217\188")]=tostring(v140),[v7("\24\186\147\77\247\112\119\50","\24\92\207\225\44\131\25")]=3.5});end);pcall(function() if (v17 and v17.Notify) then v17:Notify({[v7("\127\218\172\64\30","\29\43\179\216\44\123")]=tostring(v139),[v7("\158\214\46\88\184\215\52","\44\221\185\64")]=tostring(v140),[v7("\37\242\90\94\103\8\232\70","\19\97\135\40\63")]=3.5,[v7("\135\95\60\53","\81\206\60\83\91\79")]=v7("\93\187\209\96\36\207\72\183","\196\46\203\176\18\79\163\45")});end end);break;end end end local v25=v10;local v26=require(v25.Shared.Content.Item.Fish);local v27=require(v25.Shared.Config.RarityConfig);local v28=v25.Shared.Content.Item:FindFirstChild(v7("\155\42\123\13\48","\143\216\66\30\126\68\155")) and require(v25.Shared.Content.Item.Chest) ;local v29=v25.Shared.Content.Item:FindFirstChild(v7("\129\205\20","\129\202\168\109\171\165\195\183")) and require(v25.Shared.Content.Item.Key) ;local v30=v25.Shared.Content.Item:FindFirstChild(v7("\17\91\37\215\210\24","\134\66\56\87\184\190\116")) and require(v25.Shared.Content.Item.Scroll) ;local v31=v25.Shared.Content.Item:FindFirstChild(v7("\15\36\4\182\22\229","\85\92\81\105\219\121\139\65")) and require(v25.Shared.Content.Item.Summon) ;local v32=v25.Shared.Content.Item:FindFirstChild(v7("\222\178\87\64","\191\157\211\48\37\28")) and require(v25.Shared.Content.Item.Cage) ;local v33=v25.Shared.Content.Item:FindFirstChild(v7("\245\10\250\23","\90\191\127\148\124")) and require(v25.Shared.Content.Item.Junk) ;local v34,v35,v36,v37,v38,v39;pcall(function() v34=require(v13.PlayerScripts.Client.Controllers.Fishing.AutoFishing);end);pcall(function() v35=require(v13.PlayerScripts.Client.Controllers.ThrowCinematic.CatchMinigame);end);pcall(function() v36=require(v13.PlayerScripts.Client.Controllers.Fishing);end);pcall(function() v37=require(v13.PlayerScripts.Client.Controllers.ThrowCinematic.FishSchool);end);pcall(function() v38=require(v13.PlayerScripts.Client.Controllers.ThrowCinematic);end);pcall(function() v39=require(v13.PlayerScripts.Client.Controllers.Tags.NPC_Sell);end);local v40=(v34 and (v34.On==true)) or false ;local v41=true;local v42=true;local v43=true;local v44=true;local v45=true;local v46=true;local v47=false;local v48=false;local v49=false;local v50=true;local v51=false;local v52=false;local v53=false;local v54=50;local v55=0;local v56=0;local v57=os.clock();local v58=true;local v59=true;local v60=true;local v61=10;local v62=true;local v63=true;local v64=true;local v65=true;local v66=false;local v67=false;local v68=true;local v69=true;local v70=false;local v71=true;local v72=v7("\74\134\60\18\107\147","\119\24\231\78");local v73=false;local v74=false;local v75={[v7("\161\34\168\71\211\78","\113\226\77\197\42\188\32")]=true,[v7("\15\24\247\186\55\27\251\187","\213\90\118\148")]=true,[v7("\105\47\166\83","\45\59\78\212\54")]=true,[v7("\53\70\138\136","\144\112\54\227\235\230\78\205")]=true,[v7("\159\45\8\249\222\95\178\58\22","\59\211\72\111\156\176")]=false,[v7("\99\158\247\37\71\132","\77\46\231\131")]=false,[v7("\137\81\181\82\191\64","\32\218\52\214")]=false,[v7("\107\15\62\188\248\179","\58\46\119\81\200\145\208\37")]=false};local function v76(v142) pcall(function() local v449=0;local v450;local v451;while true do if (v449==1) then v451=game:GetService(v7("\94\72\112\141\234\130\124\70","\235\18\33\23\229\158"));v451.GlobalShadows= not v142;v449=2;end if (v449==3) then if (v142 and setfpscap) then setfpscap(999);end break;end if (0==v449) then v450=workspace:FindFirstChildOfClass(v7("\31\137\34\190\168\180\56","\86\75\236\80\204\201\221"));if v450 then v450.WaterWaveSize=(v142 and 0) or 0.15 ;v450.WaterWaveSpeed=(v142 and 0) or 10 ;v450.WaterReflectance=(v142 and 0) or 0.05 ;v450.WaterTransparency=(v142 and 1) or 0.8 ;v450.Decoration= not v142;end v449=1;end if (v449==2) then for v760,v761 in ipairs(v451:GetChildren()) do if (v761:IsA(v7("\96\181\210\175\96\168\206\184\85\169\210\158\86\188\196\184\68","\219\48\218\161")) or v761:IsA(v7("\198\125\115\70\214\106\230\226\116\127\93","\128\132\17\28\41\187\47")) or v761:IsA(v7("\35\62\19\40\120\7\52\3\57\73","\61\97\82\102\90")) or v761:IsA(v7("\159\59\165\121\198\78\13\44\170\40\174\72\211","\105\204\78\203\43\167\55\126")) or v761:IsA(v7("\129\175\51\10\27\43\193\119\172\175\47\26\54\2\193\84\166\190","\49\197\202\67\126\115\100\167")) or v761:IsA(v7("\20\84\211\38\146\117\81\37\73\218\42\148\95\81\57\126\217\47\133\85\74","\62\87\59\191\73\224\54"))) then v761.Enabled= not v142;end end for v762,v763 in ipairs(workspace:GetDescendants()) do if (v763:IsA(v7("\215\3\232\221\238\1\246\204\194\15\243\221\243\7\232","\169\135\98\154")) or v763:IsA(v7("\255\101\37\93\241","\168\171\23\68\52\157\83")) or v763:IsA(v7("\199\124\250\166\32","\231\148\17\149\205\69\77")) or v763:IsA(v7("\166\174\213\254","\159\224\199\167\155\55")) or v763:IsA(v7("\196\227\61\192\252\255\57\193","\178\151\147\92")) or v763:IsA(v7("\174\248\77\63","\26\236\157\44\82\114\44"))) then v763.Enabled= not v142;end end v449=3;end end end);end local v77={};local function v78(v143) pcall(function() for v548,v549 in ipairs(workspace:GetDescendants()) do if v549:IsA(v7("\8\47\198\94\26\47\199\79","\59\74\78\181")) then if v143 then local v862=0;while true do if (v862==1) then v549.CastShadow=false;break;end if (0==v862) then if  not v77[v549] then v77[v549]={[v7("\8\208\78\95\161\44\208\86","\211\69\177\58\58")]=v549.Material,[v7("\148\228\106\225\218\195\182\225\118\226","\171\215\133\25\149\137")]=v549.CastShadow};end v549.Material=Enum.Material.SmoothPlastic;v862=1;end end elseif v77[v549] then v549.Material=v77[v549].Material;v549.CastShadow=v77[v549].CastShadow;end elseif (v549:IsA(v7("\197\205\49\251\227","\34\129\168\82\154\143\80\156")) or v549:IsA(v7("\177\183\43\31\93\92\140","\233\229\210\83\107\40\46"))) then v549.Transparency=(v143 and 1) or 0 ;end end end);end local function v79(v144) pcall(function() local v452=game:GetService(v7("\237\75\53\222\17\200\76\53","\101\161\34\82\182"));if v144 then local v652=0;while true do if (1==v652) then for v908,v909 in ipairs(v452:GetChildren()) do if (v909:IsA(v7("\201\25\84\241\200\242\138\43\250\8","\78\136\109\57\158\187\130\226")) or v909:IsA(v7("\29\51\246\228\58\44","\145\94\95\153"))) then v909.Density=0;end end break;end if (v652==0) then v452.FogEnd=100000;v452.FogStart=0;v652=1;end end else v452.FogEnd=1000;end end);end local v80=nil;local v81=Color3.fromRGB(15,15,22);local v82=false;local function v83(v145) v82=v145;pcall(function() v9:Set3dRenderingEnabled( not v145);end);v21();if v145 then if  not v19 then v19=Instance.new(v7("\206\206\6\208\75\185\218\216\29","\215\157\173\116\181\46"));v19.Name=v7("\19\189\152\250\195\18\164\158\211\220\62\135\136\224\223\48\186","\186\85\212\235\146");v19.DisplayOrder= -1000000;v19.IgnoreGuiInset=true;v19.ResetOnSpawn=false;local v702=nil;pcall(function() if (v17 and v17.ScreenGui and v17.ScreenGui.Parent) then v702=v17.ScreenGui.Parent;elseif gethui then v702=gethui();elseif (syn and syn.protect_gui) then local v1056=0;while true do if (v1056==0) then syn.protect_gui(v19);v702=game:GetService(v7("\225\142\4\251\30\251\81","\56\162\225\118\158\89\142"));break;end end else v702=game:GetService(v7("\127\10\210\170\5\205\85","\184\60\101\160\207\66"));end end);if  not v702 then v702=v13:WaitForChild(v7("\1\142\125\165\52\144\91\169\56","\220\81\226\28"));end v19.Parent=v702;v80=Instance.new(v7("\53\199\131\246\239","\167\115\181\226\155\138"));v80.Size=UDim2.fromScale(1,1);v80.BackgroundColor3=v81;v80.BorderSizePixel=0;v80.ZIndex=0;v80.Parent=v19;local v709=Instance.new(v7("\214\39\255\72\87\112\196\231\46","\166\130\66\135\60\27\17"));v709.Name=v7("\101\76\197\70\36\69\94\219\102\28\69\72\203\121","\80\36\42\174\21");v709.Size=UDim2.new(1,0,0,30);v709.Position=UDim2.new(0,0,0.94,0);v709.BackgroundTransparency=1;v709.Text=v7("\105\32\2\58\30\85\119\74\65\4\54\110\65\80\22\92\101\80\22\121\90\25\33\127\14\12\119\41\106\80\5\127\64\20\50\104\71\30\48\58\106\25\36\123\76\28\50\126","\26\46\112\87");v709.TextColor3=Color3.fromRGB(200,205,215);v709.TextTransparency=0.5;v709.Font=Enum.Font.GothamMedium;v709.TextSize=12;v709.Parent=v80;else local v721=0;while true do if (v721==1) then if v80 then v80.BackgroundColor3=v81;end break;end if (v721==0) then v19.Enabled=true;v19.DisplayOrder= -1000000;v721=1;end end end elseif v19 then v19.Enabled=false;end v21();end local function v84() pcall(function() local v453=0;local v454;local v455;while true do if (v453==0) then v454=require(v25.Shared.Events).Client(v7("\154\43\174\103\171","\212\217\67\203\20\223\223\37"));if v454 then local v866=0;while true do if (v866==0) then v454:Fire(v7("\149\157\173\220\155\129\164","\178\218\237\200"));v454:Fire(v7("\153\165\227\222","\176\214\213\134"));break;end end end v453=1;end if (v453==1) then v455=require(v25.Shared.Events).Client(v7("\221\185\179\217","\57\148\205\214\180\200\54"));if v455 then v455:Fire(v7("\61\237\48\58\85\26\248\38\32\101","\22\114\157\85\84"));end break;end end end);pcall(function() local v456=0;local v457;while true do if (v456==0) then v457=v13.PlayerGui:FindFirstChild(v7("\237\197\7\193\79\240\169\199\206\0","\200\164\171\115\164\61\150"));if (v457 and v457:FindFirstChild(v7("\145\228\6\75\160\182\241\16\81","\227\222\148\99\37"))) then local v867=0;local v868;while true do if (v867==0) then v868=v457.OpenChest:FindFirstChild(v7("\28\66\87\248","\153\83\50\50\150"),true);if (v868 and firesignal) then firesignal(v868.MouseButton1Click);end break;end end end break;end end end);v24("🎁 Chests","Запрос на открытие сундуков отправлен!");end local v85={[v7("\126\121\126\17\124\165","\45\61\22\19\124\19\203")]=Color3.fromRGB(200,200,200),[v7("\244\28\14\250\15\125\182\207","\217\161\114\109\149\98\16")]=Color3.fromRGB(60,220,60),[v7("\32\33\42\121","\20\114\64\88\28\220")]=Color3.fromRGB(40,160,255),[v7("\20\17\219\183","\221\81\97\178\212\152\176")]=Color3.fromRGB(190,80,255),[v7("\225\226\26\254\20\201\230\15\226","\122\173\135\125\155")]=Color3.fromRGB(255,150,0),[v7("\169\216\20\177\54\50","\168\228\161\96\217\95\81")]=Color3.fromRGB(255,45,45),[v7("\232\212\45\78\42\67","\55\187\177\78\60\79")]=Color3.fromRGB(255,0,140),[v7("\8\214\80\255\79\204","\224\77\174\63\139\38\175")]=Color3.fromRGB(255,220,0),[v7("\183\81\93\45\141\64\84","\78\228\33\56")]=Color3.fromRGB(0,255,200),[v7("\237\118\183\16\145","\229\174\30\210\99")]=Color3.fromRGB(255,215,0),[v7("\49\248\136\90","\89\123\141\230\49\141\93")]=Color3.fromRGB(160,140,120)};local v86=game:GetService(v7("\208\126\250\0\21\73\231\120\249\2\35\79\225\103\255\15\21","\42\147\17\150\108\112"));local v87={"","K","M","B","T",v7("\62\167","\136\111\198\77\31\135"),v7("\51\0","\201\98\105\199\54\221\132\119"),v7("\138\20","\204\217\108\227\65\98\85"),v7("\109\211","\160\62\163\149\133\76"),v7("\249\163","\163\182\192\109\79"),v7("\26\41","\149\84\70\96\160"),v7("\28\5","\141\88\102\109")};local function v88(v146) local v147=0;local v148;local v149;while true do if (v147==0) then if ( not v146 or (v146<=0)) then return v7("\247\3","\161\211\51\170\16\122\93\53");end if (v146<1000) then return string.format(v7("\191\235\182","\72\155\206\210"),math.floor(v146));end v147=1;end if (v147==2) then v149=v146/(10^(v148 * 3)) ;if ((v149>=999.995) and (v148<( #v87-1))) then local v764=0;while true do if (0==v764) then v149=v149/1000 ;v148=v148 + 1 ;break;end end end v147=3;end if (v147==1) then v148=math.floor(math.log10(v146)/3 );if (v148>( #v87-1)) then v148= #v87-1 ;end v147=2;end if (v147==3) then return string.format(v7("\2\63\26\92\53\3\105","\83\38\26\52\110"),v149,v87[v148 + 1 ]);end end end local v89=v7("\93\25","\38\56\119\71");local v90={};local function v91(v150,v151,v152,v153,v154) local v155=0;while true do if (v155==0) then if  not v150 then return;end table.insert(v90,{[v7("\246\227\93\219\32\88\231","\54\147\143\56\182\69")]=v150,[v7("\211\143\203\64\203\218\132","\191\182\225\159\41")]=v151,[v7("\57\7\28\92\159\139\199","\162\75\114\72\53\235\231")]=v152,[v7("\137\50\96\231\64\1","\98\236\92\36\130\51")]=v153,[v7("\182\12\40\191\86\171","\80\196\121\108\218\37\200\213")]=v154});v155=1;end if (v155==1) then return v150;end end end local function v92(v156,v157) return ((v89==v7("\18\102","\234\96\19\98\31\43\110")) and v157) or v156 ;end local v93=true;local v94=nil;local v95=nil;local v96=nil;local v97=nil;local v98=nil;local v99=nil;local v100={};local v101=nil;local function v102() if v20 then return;end v20=Instance.new(v7("\53\28\64\194\169\124\172\19\22","\235\102\127\50\167\204\18"));v20.Name=v7("\118\168\230\43\93\29\68\160\225\48\108\27\116","\78\48\193\149\67\36");v20.ResetOnSpawn=false;v20.DisplayOrder=200;v20.IgnoreGuiInset=true;local v162=nil;pcall(function() if (v17 and v17.ScreenGui and v17.ScreenGui.Parent) then v162=v17.ScreenGui.Parent;elseif gethui then v162=gethui();elseif (syn and syn.protect_gui) then local v913=0;while true do if (v913==0) then syn.protect_gui(v20);v162=game:GetService(v7("\19\17\146\29\102\37\23","\33\80\126\224\120"));break;end end else v162=game:GetService(v7("\207\167\17\193\123\249\161","\60\140\200\99\164"));end end);if  not v162 then v162=v13:WaitForChild(v7("\183\248\5\63\167\149\211\17\47","\194\231\148\100\70"));end v20.Parent=v162;local v164=Instance.new(v7("\96\94\192\174\243","\168\38\44\161\195\150"));v164.Name=v7("\168\233\134\80\34\233\187\19","\118\224\156\226\22\80\136\214");v164.Size=UDim2.new(0,226,0,134);v164.Position=UDim2.new(0,16,0.5, -67);v164.BackgroundColor3=Color3.fromRGB(15,17,23);v164.BackgroundTransparency=0.15;v164.BorderSizePixel=0;v164.Active=true;v164.Draggable=true;v164.Parent=v20;local v174=Instance.new(v7("\119\199\122\143\80\224\92\146","\224\34\142\57"));v174.CornerRadius=UDim.new(0,8);v174.Parent=v164;local v177=Instance.new(v7("\235\142\246\201\97\254\86\11","\110\190\199\165\189\19\145\61"));v177.Color=Color3.fromRGB(48,54,70);v177.Transparency=0.45;v177.Thickness=1;v177.Parent=v164;local v182=Instance.new(v7("\243\230\118\239\142\235\219\233\114\228","\167\186\139\23\136\235"));v182.Name=v7("\50\176\137\9\31\167\161\14\21\187","\109\122\213\232");v182.Size=UDim2.new(0,12,0,12);v182.Position=UDim2.new(0,12,0,8);v182.BackgroundTransparency=1;v182.Image=v7("\252\245\186\49\253\228\167\36\231\243\248\127\161\175\247\100\185\164\250\104\182\175\251\96\187\167\244","\80\142\151\194");v182.ImageColor3=Color3.fromRGB(220,225,235);v182.Parent=v164;v99=Instance.new(v7("\55\195\111\88\47\199\117\73\15","\44\99\166\23"));v99.Name=v7("\84\242\40\50\54\182\72\254\61\58\54","\196\28\151\73\86\83");v99.Size=UDim2.new(0,105,0,20);v99.Position=UDim2.new(0,28,0,4);v99.BackgroundTransparency=1;v99.Text=((v89==v7("\225\22","\22\147\99\73\112\226\56\120")) and "AFK СТАТИСТИКА") or v7("\153\83\201\181\190\140\84\214\198","\237\216\21\130\149") ;v99.Font=Enum.Font.GothamBold;v99.TextSize=10;v99.TextColor3=Color3.fromRGB(220,225,235);v99.TextXAlignment=Enum.TextXAlignment.Left;v99.Parent=v164;local v202=Instance.new(v7("\171\67\94\88\181\229\95\128\75\83","\62\226\46\63\63\208\169"));v202.Name=v7("\198\21\90\128\20\36\44\81\235","\62\133\121\53\227\127\109\79");v202.Size=UDim2.new(0,11,0,11);v202.Position=UDim2.new(1, -72,0,8);v202.BackgroundTransparency=1;v202.Image=v7("\2\22\42\244\197\189\167\4\29\54\175\153\225\243\66\69\106\165\142\246\241\73\76\97\167\135\250\246","\194\112\116\82\149\182\206");v202.ImageColor3=Color3.fromRGB(160,165,180);v202.Parent=v164;v94=Instance.new(v7("\13\173\84\12\236\227\12\60\164","\110\89\200\44\120\160\130"));v94.Name=v7("\159\202\70\67\111\75\57\72\167","\45\203\163\43\38\35\42\91");v94.Size=UDim2.new(0,56,0,20);v94.Position=UDim2.new(1, -58,0,4);v94.BackgroundTransparency=1;v94.Text=v7("\130\213\134\115\215\243\4\130","\52\178\229\188\67\231\201");v94.Font=Enum.Font.GothamMedium;v94.TextSize=10;v94.TextColor3=Color3.fromRGB(175,180,195);v94.TextXAlignment=Enum.TextXAlignment.Right;v94.Parent=v164;local v222=Instance.new(v7("\7\83\81\9\242","\67\65\33\48\100\151\60"));v222.Name=v7("\251\238\184\209\247\218\245","\147\191\135\206\184");v222.Size=UDim2.new(1, -24,0,1);v222.Position=UDim2.new(0,12,0,26);v222.BackgroundColor3=Color3.fromRGB(255,255,255);v222.BackgroundTransparency=0.92;v222.BorderSizePixel=0;v222.Parent=v164;local function v230(v458,v459,v460,v461) local v462=Instance.new(v7("\173\37\167\198\221\127\179\134\45\170","\210\228\72\198\161\184\51"));v462.Size=UDim2.new(0,13,0,13);v462.Position=UDim2.new(0,12,0,v458 + 3 );v462.BackgroundTransparency=1;v462.Image=v459;v462.ImageColor3=Color3.fromRGB(230,235,245);v462.Parent=v164;local v469=Instance.new(v7("\2\76\235\4\95\207\52\76\255","\174\86\41\147\112\19"));v469.Size=UDim2.new(0,85,0,20);v469.Position=UDim2.new(0,30,0,v458);v469.BackgroundTransparency=1;v469.Text=v461;v469.Font=Enum.Font.GothamMedium;v469.TextSize=11;v469.TextColor3=Color3.fromRGB(160,165,180);v469.TextXAlignment=Enum.TextXAlignment.Left;v469.Parent=v164;v100[v460]=v469;local v482=Instance.new(v7("\111\5\149\31\9\14\19\174\87","\203\59\96\237\107\69\111\113"));v482.Size=UDim2.new(1, -125,0,20);v482.Position=UDim2.new(0,115,0,v458);v482.BackgroundTransparency=1;v482.Text="-";v482.Font=Enum.Font.GothamBold;v482.TextSize=11;v482.TextColor3=Color3.fromRGB(255,255,255);v482.TextXAlignment=Enum.TextXAlignment.Right;v482.Parent=v164;return v482;end v95=v230(30,v7("\54\20\180\224\34\227\210\48\31\168\187\126\191\134\117\64\249\176\97\169\128\125\64\248\176\104\163\135","\183\68\118\204\129\81\144"),v7("\26\162\100\229\7","\226\110\205\16\132\107"),((v89==v7("\249\214","\33\139\163\128\185")) and "Всего доход") or v7("\99\87\16\223\91\24\33\223\69\86\1\218","\190\55\56\100") );v95.Text=v7("\18\255\124\86\67\163\245\95\188\52\87","\147\54\207\92\126\115\131");v96=v230(54,v7("\31\51\45\124\30\109\8\37\60\121\87\49\66\96\102\45\88\43\92\100\99\40\91\47\91\100\100\43","\30\109\81\85\29\109"),v7("\242\97\89","\156\159\17\52\214\86\190"),((v89==v7("\188\250","\220\206\143\221")) and "Доход / Мин") or v7("\171\114\35\18\193\140\157\198\80\36\25","\178\230\29\77\119\184\172") );v96.Text=v7("\177\238\69\22","\152\149\222\106\123\23");v97=v230(78,v7("\207\36\238\66\166\206\35\226\74\177\135\105\185\27\228\133\119\175\27\224\133\115\165\27\237\142\127","\213\189\70\150\35"),v7("\66\69\124","\104\47\53\20"),((v89==v7("\177\89","\111\195\44\225\124\220")) and "Доход / Час") or v7("\245\73\14\118\178\235\151\6\40\124\190\185","\203\184\38\96\19\203") );v97.Text=v7("\125\35\54\73","\174\89\19\25\33");v98=v230(102,v7("\61\16\74\79\228\148\14\59\27\86\20\184\200\90\125\70\1\24\167\209\93\124\69\10\27\160\222\93","\107\79\114\50\46\151\231"),v7("\42\182\176\44\142","\160\89\198\213\73\234\89\215"),((v89==v7("\90\100","\165\40\17\212\158")) and "Темп вылова") or v7("\198\216\28\48\46\165\235\9\39\35","\70\133\185\104\83") );v98.Text=v7("\84\11\20\106\134\68\72\77\36","\169\100\37\36\74");v21();end local function v103() local v235=os.clock() -v57 ;local v236=math.floor(v235/3600 );local v237=math.floor((v235%3600)/60 );local v238=math.floor(v235%60 );local v239=string.format(v7("\69\215\240\84\90\194\242\2\4\221\231\0\82\131","\48\96\231\194"),v236,v237,v238);local v240=0;local v241=0;local v242=0;if (v235>2) then local v550=0;while true do if (v550==0) then v240=(v56/v235) * 60 ;v241=(v56/v235) * 3600 ;v550=1;end if (v550==1) then v242=(v55/v235) * 60 ;break;end end end local v243=v89==v7("\218\79","\227\168\58\110\77\121\184\207") ;if (v101 and v101.SetDesc) then if v243 then v101:SetDesc(string.format("Поймано: %d шт. | Общая выручка: %s\nДоход / Мин: %s/мин | Доход / Час: %s/час\nВремя сессии: %s | Скорость: %.1f / мин",v55,v88(v56),v88(v240),v88(v241),v239,v242));else v101:SetDesc(string.format("Fish Caught: %d | Total Revenue: %s\nMoney / Min: %s/m | Money / Hour: %s/h\nSession Time: %s | Catch Rate: %.1f / min",v55,v88(v56),v88(v240),v88(v241),v239,v242));end end if v94 then v94.Text=v239;end if v95 then v95.Text=string.format((v243 and "%s (%d рыб)") or v7("\62\47\255\8\244\223\49\163\114\47\183\9","\197\27\92\223\32\209\187\17") ,v88(v56),v55);end if v96 then v96.Text=string.format((v243 and "%s/мин") or v7("\70\76\140\246","\155\99\63\163") ,v88(v240));end if v97 then v97.Text=string.format((v243 and "%s/час") or v7("\199\194\238\133","\228\226\177\193\237\217") ,v88(v241));end if v98 then v98.Text=string.format((v243 and "%.1f / мин") or v7("\113\254\114\224\116\255\99\235\61\190","\134\84\208\67") ,v242);end end local function v104(v244) local v245=0;local v246;while true do if (v245==2) then if v100.mpm then v100.mpm.Text=(v246 and "Доход / Мин") or v7("\233\32\47\33\22\132\96\97\9\6\202","\111\164\79\65\68") ;end if v100.mph then v100.mph.Text=(v246 and "Доход / Час") or v7("\235\214\141\219\55\170\137\153\171\209\59\248","\138\166\185\227\190\78") ;end v245=3;end if (v245==0) then v89=v244;v246=v244==v7("\1\185","\60\115\204\230") ;v245=1;end if (v245==3) then if v100.speed then v100.speed.Text=(v246 and "Темп вылова") or v7("\232\117\209\52\90\99\43\202\96\192","\121\171\20\165\87\50\67") ;end if v103 then v103();end v245=4;end if (4==v245) then for v723,v724 in ipairs(v90) do pcall(function() if v724.element then local v914=(v246 and v724.ruTitle) or v724.enTitle ;local v915=(v246 and v724.ruDesc) or v724.enDesc ;if (v914 and v724.element.SetTitle) then v724.element:SetTitle(v914);end if (v915 and v724.element.SetDesc) then v724.element:SetDesc(v915);end end end);end v24((v246 and "Язык") or v7("\234\57\183\49\172\3\193\61","\98\166\88\217\86\217") ,(v246 and "Установлен русский язык интерфейса") or v7("\223\248\109\4\148\218\247\245\124\65\138\221\248\241\108\0\129\217\182\229\124\21\198\200\249\182\92\15\129\208\255\229\113","\188\150\150\25\97\230") );break;end if (v245==1) then if v99 then v99.Text=(v246 and "AFK СТАТИСТИКА") or v7("\198\28\192\48\212\14\202\68\212","\16\135\90\139") ;end if v100.total then v100.total.Text=(v246 and "Всего доход") or v7("\96\123\18\50\66\20\93\85\102\8\54\74","\24\52\20\102\83\46\52") ;end v245=2;end end end v102();task.spawn(function() while true do local v494=0;while true do if (v494==0) then task.wait(1);if (v93 and v20 and v20.Enabled) then v103();end break;end end end end);local function v105() local v247=v13.Character;local v248=v247 and v247:FindFirstChild(v7("\242\156\82\3\2\226\211\141\109\13\3\249\234\136\77\22","\141\186\233\63\98\108")) ;local v249=(v248 and v248.Position) or Vector3.zero ;local v250=workspace:FindFirstChild(v7("\198\229\62\186\33","\69\145\138\76\214"));if v250 then local v556=nil;local v557=math.huge;for v655,v656 in ipairs(v250:GetChildren()) do local v657=0;local v658;local v659;while true do if (v657==1) then if (v659 and v659:IsDescendantOf(workspace)) then local v961=(v659:GetPivot().Position-v249).Magnitude;if (v961<v557) then local v1034=0;while true do if (v1034==0) then v557=v961;v556=v659;break;end end end end break;end if (v657==0) then v658=v656:FindFirstChild(v7("\89\193\157\140\173\23\115\219\136\139\179\19","\118\16\175\233\233\223"));v659=v658 and v658:FindFirstChild(v7("\165\180\22\132\221\142\113\135","\29\235\228\85\219\142\235")) ;v657=1;end end end if v556 then return v556;end end local v251=nil;local v252=math.huge;for v495,v496 in ipairs(v86:GetTagged(v7("\19\228\153\226\68\75\43\94","\50\93\180\218\189\23\46\71"))) do if v496:IsDescendantOf(workspace) then local v660=0;local v661;local v662;while true do if (v660==0) then v661=v496:GetPivot().Position;v662=(v661-v249).Magnitude;v660=1;end if (v660==1) then if (v662<v252) then local v962=0;while true do if (v962==0) then v252=v662;v251=v496;break;end end end break;end end end end if v251 then return v251;end for v497,v498 in ipairs(workspace:GetDescendants()) do if ((v498.Name==v7("\240\148\120\115\119\217\68\210","\40\190\196\59\44\36\188")) and v498:IsDescendantOf(workspace) and (v498~=v247) and  not v498:IsDescendantOf(v247)) then local v663=0;local v664;local v665;while true do if (v663==1) then if (v665<v252) then local v963=0;while true do if (v963==0) then v252=v665;v251=v498;break;end end end break;end if (v663==0) then v664=v498:GetPivot().Position;v665=(v664-v249).Magnitude;v663=1;end end end end return v251;end local function v106() local v253=v13.Character;local v254=v253 and v253:FindFirstChild(v7("\20\80\209\181\244\114\4\56\119\211\187\238\77\12\46\81","\109\92\37\188\212\154\29")) ;local v255=(v254 and v254.Position) or Vector3.zero ;local v256=workspace:FindFirstChild(v7("\51\224\182\207\53","\58\100\143\196\163\81"));if v256 then local v558=nil;local v559=math.huge;for v666,v667 in ipairs(v256:GetChildren()) do local v668=0;local v669;local v670;while true do if (v668==0) then v669=v667:GetPivot().Position;v670=(v669-v255).Magnitude;v668=1;end if (v668==1) then if (v670<v559) then local v964=0;while true do if (v964==0) then v559=v670;v558=v667.Name;break;end end end break;end end end if v558 then local v725=0;local v726;while true do if (v725==0) then v726=string.lower(v558);if (v726:find("2") or v726:find(v7("\30\71\48\166\45\93","\110\122\34\67\195\95\41\133")) or v726:find(v7("\102\176\85\78","\182\21\209\59\42")) or v726:find(v7("\179\66\203\24","\222\215\55\165\125\65"))) then return v7("\27\222\212\22\246\129\191\10\100\245\195\9\247\211\249\10\106\145\226\15\252\196\254\3","\42\76\177\166\122\146\161\141");elseif (v726:find("3") or v726:find(v7("\163\152\10\221\109","\22\197\234\101\174\25")) or v726:find(v7("\36\55\160","\230\77\84\197\188\22\207\183")) or v726:find(v7("\237\1\200\248\158\160","\85\153\116\166\156\236\193\144"))) then return v7("\147\239\95\191\224\64\247\160\5\149\246\15\183\244\64\182\246\5\228\166\13\135\241\14\160\242\76\250","\96\196\128\45\211\132");elseif (v726:find("4") or v726:find(v7("\35\130\119\92\211\161\187","\184\85\237\27\63\178\207\212")) or v726:find(v7("\4\88\31\94","\63\104\57\105"))) then return v7("\60\136\182\72\15\199\240\4\67\177\171\72\8\134\170\75\75\164\165\72\15\130\182\69\66","\36\107\231\196");elseif (v726:find("1") or v726:find(v7("\82\182\167\134\83","\231\61\213\194")) or v726:find(v7("\26\185\60\97\29\168\47","\19\105\205\93")) or v726:find(v7("\164\9\215\143","\95\201\104\190\225"))) then return v7("\152\196\211\194\171\139\144\142\231\248\213\207\189\223\196\220\239\248\196\207\230","\174\207\171\161");else return v7("\218\241\31\255\252\151\165","\183\141\158\109\147\152")   .. tostring(v558)   .. ")" ;end break;end end end end local v257=v105();if v257 then local v560=0;local v561;while true do if (v560==0) then v561=v257:GetPivot().Position;if ((v561-Vector3.new( -1226.75,22,144.58)).Magnitude<80) then return v7("\27\6\244\0\40\73\183\76\100\58\242\13\62\29\227\30\108\58\227\13\101","\108\76\105\134");elseif ((v561-Vector3.new( -1335.45,20.8,141.23)).Magnitude<80) then return v7("\220\202\163\237\202\171\151\241\169\234\238\214\180\243\218\171\131\241\197\219\229\192\162\168","\174\139\165\209\129");elseif ((v561-Vector3.new( -1325.44,23.5,157.35)).Magnitude<80) then return v7("\148\188\240\205\194\67\35\56\235\149\240\206\213\23\125\125\177\182\162\135\134\55\101\118\167\161\227\136","\24\195\211\130\161\166\99\16");elseif ((v561-Vector3.new( -1340.18,20.5,100.98)).Magnitude<80) then return v7("\113\12\251\32\87\86\18\67\161\26\92\26\69\2\231\35\19\53\71\15\237\41\65\23\15","\118\38\99\137\76\51");end break;end end end return v7("\202\41\23\30\13\96\172\102\77\33\29\33\239\50\0\0\73\19\248\39\76","\64\157\70\101\114\105");end local function v107() pcall(function() local v499=0;local v500;local v501;while true do if (v499==0) then v500=require(v25.Shared.Events).Client(v7("\112\167\169\231","\112\32\200\199\131"));if v500 then v500:Fire(true,v7("\15\95\80\180\198\168\54","\66\76\48\60\216\163\203"));v500:Fire(true,v7("\137\131\117\255\126\194\40\158\131\120\247","\68\218\230\25\147\63\174"));v500:Fire(true,v7("\136\59\70\69\166\143\47\64\88","\214\205\74\51\44"));end v499=1;end if (1==v499) then v501=v13.PlayerGui:FindFirstChild(v7("\211\66\246\249\101\252\77\225\249\100","\23\154\44\130\156")) and v13.PlayerGui.Interfaces:FindFirstChild(v7("\60\167\163\175\49\22\33\169\163\170","\115\113\198\205\206\86")) and v13.PlayerGui.Interfaces.ManagePond.Content.Buttons.Container:FindFirstChild(v7("\161\70\235\83\148\117\251\73\144","\58\228\55\158")) ;if (v501 and firesignal) then firesignal(v501.MouseButton1Click);end break;end end end);end local v108=false;local function v109() local v258=0;while true do if (v258==0) then if v108 then return;end v108=true;v258=1;end if (v258==1) then task.spawn(function() local v727,v728=pcall(function() if v62 then local v916=0;while true do if (v916==0) then v107();task.wait(0.2);break;end end end local v771=v105();local v772=v13.Character;local v773=v772 and v772:FindFirstChild(v7("\156\156\221\47\50\162\60\176\187\223\33\40\157\52\166\157","\85\212\233\176\78\92\205")) ;if ( not v773 or  not v771) then return nil;end local v774=v773.CFrame;local v775=v771:GetPivot().Position;local v776=workspace.CurrentCamera;local v777=v776.CameraType;pcall(function() v776.CameraType=Enum.CameraType.Scriptable;end);v773.CFrame=CFrame.new(v775 + Vector3.new(0,2,2) );task.wait(0.18);local v779=nil;pcall(function() if (v39 and v39.Events and v39.Events.Client) then local v965=0;local v966;while true do if (v965==0) then v966=v39.Events.Client(v7("\121\93\132\238\107\84\132","\130\42\56\232"));if v966 then v779=v966:Invoke(5,v7("\204\188\55\235","\95\138\213\68\131\32"),nil);end break;end end end end);if  not v779 then pcall(function() local v967=0;local v968;while true do if (v967==0) then v968=v10:FindFirstChild(v7("\15\62\164\77\98\57","\22\74\72\193\35")) and v10.Events:FindFirstChild(v7("\30\124\233\87\56\124\194\77\34\122\240\81\35\119\247","\56\76\25\132")) and v10.Events.RemoteFunctions:FindFirstChild(v7("\109\196\167\42\238\82\205","\175\62\161\203\70")) ;if v968 then v779=v968:InvokeServer(5,v7("\26\212\208\27","\85\92\189\163\115"),false);end break;end end end);end v773.CFrame=v774;task.wait(0.02);pcall(function() v776.CameraType=Enum.CameraType.Custom;local v879=v772:FindFirstChildOfClass(v7("\1\185\61\57\39\163\57\60","\88\73\204\80"));if v879 then v776.CameraSubject=v879;end end);return v779;end);v108=false;if (v727 and v728) then local v880=((type(v728)==v7("\58\130\18\74\44","\186\78\227\112\38\73")) and (v728.Amount or v728.Count)) or nil ;local v881=((type(v728)==v7("\232\86\255\89\86","\26\156\55\157\53\51")) and (v728.Value or v728.Money or v728.Price)) or nil ;if (v880 and (v880>0)) then v24("💰 Auto-Sell",string.format(v92(v7("\191\215\26\221\226\16\201\220\86\223\177\67\132\152\16\214\170\16\201\203","\48\236\184\118\185\216"),"Продано: %d рыб за %s"),v880,v88(v881 or 0 )));elseif ((type(v728)==v7("\235\168\90\50\202\38","\84\133\221\55\80\175")) and (v728>0)) then v24("💰 Auto-Sell",string.format(v92(v7("\143\226\50\163\201\73\184\189\100\227\212","\60\221\135\68\198\167"),"Выручка: %s"),v88(v728)));else v24("💰 Auto-Sell",v92(v7("\200\180\235\139\2\202\251\190\251\134\81\202\232\168\244\143\91\153\253\178\244\135\2\205\225\253\245\134\80\218\230\188\246\151\3","\185\142\221\152\227\34"),"Рыба успешно продана торговцу!"));end end end);break;end end end local function v110(v259) local v260=0;local v261;local v262;local v263;while true do if (v260==0) then v261=v13.Character;v262=v261 and v261:FindFirstChild(v7("\112\208\90\251\77\60\254\92\247\88\245\87\3\246\74\209","\151\56\165\55\154\35\83")) ;v260=1;end if (v260==3) then if v263 then local v780=0;while true do if (v780==0) then v262.CFrame=v263 + Vector3.new(0,3,3) ;task.wait(0.2);v780=1;end if (v780==1) then for v1000,v1001 in ipairs(workspace:GetDescendants()) do if (v1001:IsA(v7("\201\45\23\252\240\50\17\240\224\15\10\235\244\47\12","\132\153\95\120")) and ((v1001.Parent:GetPivot().Position-v262.Position).Magnitude<25)) then if fireproximityprompt then fireproximityprompt(v1001);end end end v24(v7("\156\179\20\40\183\241\165\168","\192\209\210\110\77\151\186"),"Ворота открыты!");break;end end else v24(v7("\205\2\56\236\191\239\229\26","\164\128\99\66\137\159"),"Ворота рядом не найдены.");end break;end if (v260==2) then v263=nil;for v729,v730 in ipairs(workspace:GetDescendants()) do local v731=v730.Name:lower();if ((v731:find(v259:lower()) or v731:find(v7("\28\57\23\80\8\8","\157\104\92\122\32\100\109")) or v731:find(v7("\164\167\219\207","\203\195\198\175\170\93\71\237")) or v731:find(v7("\42\68\49\199","\156\78\43\94\181\49\113"))) and (v731:find(v7("\118\231\203\177","\25\18\136\164\195\107\35")) or v731:find(v7("\239\44\189\74","\216\136\77\201\47\18\220\161")) or v731:find(v7("\33\227\40\209","\226\77\140\75\186\104\188")) or v731:find(v7("\188\192\196\58\93","\47\217\174\176\95")))) then if v730:IsA(v7("\154\220\101\7\130\85\106\50","\70\216\189\22\98\210\52\24")) then v263=v730.CFrame;break;elseif (v730:IsA(v7("\247\208\167\130\223","\179\186\191\195\231")) and v730.PrimaryPart) then v263=v730.PrimaryPart.CFrame;break;end end end v260=3;end if (v260==1) then if  not v262 then return;end v24(v7("\141\66\31\235\224\104\0\247","\142\192\35\101"),"Поиск ворот "   .. v259   .. v7("\152\59\103","\118\182\21\73\195\135\236\204") );v260=2;end end end local function v111() local v264=v13.Character;local v265=v264 and v264:FindFirstChild(v7("\40\156\228\191\14\134\224\186\50\134\230\170\48\136\251\170","\222\96\233\137")) ;if  not v265 then return;end v24(v7("\138\178\169\27\200\222\241\163\182","\144\217\211\199\127\232\147"),"🏛️ Решение Песчаного Лабиринта (Temple of the Sun)...");local v266=nil;local v267=nil;for v502,v503 in ipairs(workspace:GetDescendants()) do local v504=v503.Name:lower();if ((v504:find(v7("\235\46\48\44","\36\152\79\94\72\181\37\98")) or v504:find(v7("\196\205\73","\95\183\184\39")) or v504:find(v7("\177\42\233\35","\98\213\95\135\70\52\224")) or v504:find(v7("\234\166\196\103\88\251","\52\158\195\169\23"))) and (v504:find(v7("\123\176\38\117\148","\235\26\220\82\20\230\85\27")) or v504:find(v7("\139\169\236\209\96","\20\232\193\137\162")) or v504:find(v7("\36\214\203\175\244\132","\17\66\191\165\198\135\236\119")) or v504:find(v7("\10\161\170","\177\111\207\206\115\159\136\140")) or v504:find(v7("\23\140\28\29\215","\63\101\233\112\116\180\47")) or v504:find(v7("\209\62\250\19\234\50","\86\163\91\141\114\152")))) then if v503:IsA(v7("\113\10\103\118\10\82\25\96","\90\51\107\20\19")) then v266=v503.CFrame + Vector3.new(0,3,0) ;v267=v503:FindFirstChildOfClass(v7("\189\226\138\247\52\128\249\145\246\13\159\255\136\255\41","\93\237\144\229\143")) or v503.Parent:FindFirstChildOfClass(v7("\37\228\255\1\2\75\28\226\233\41\25\73\24\230\228","\38\117\150\144\121\107")) ;break;elseif (v503:IsA(v7("\0\180\234\63\33","\90\77\219\142")) and v503.PrimaryPart) then v266=v503.PrimaryPart.CFrame + Vector3.new(0,3,0) ;v267=v503:FindFirstChildWhichIsA(v7("\214\22\46\33\69\10\115\242\29\17\43\67\10\106\242","\26\134\100\65\89\44\103"),true);break;end end end if  not v266 then for v672,v673 in ipairs(workspace:GetDescendants()) do if ((v673.Name==v7("\194\246\62\2\168\229\226\34","\196\145\131\80\67")) or (v673.Name==v7("\45\177\8\12\57\228\10\177\20","\136\126\208\102\104\120")) or (v673.Name==v7("\75\139\192\71\140\90\56\66\108","\49\24\234\174\35\207\50\93")) or (v673.Name==v7("\63\231\243\171\121\9\225\233","\17\108\146\157\232"))) then if v673:IsA(v7("\105\194\7\232\31\169\89\215","\200\43\163\116\141\79")) then v266=v673.CFrame + Vector3.new(0,3,0) ;v267=v673:FindFirstChildOfClass(v7("\143\36\50\155\185\249\234\171\47\13\145\191\249\243\171","\131\223\86\93\227\208\148"));break;elseif (v673:IsA(v7("\206\74\178\179\17","\213\131\37\214\214\125")) and v673.PrimaryPart) then v266=v673.PrimaryPart.CFrame + Vector3.new(0,3,0) ;v267=v673:FindFirstChildWhichIsA(v7("\22\57\42\167\232\43\34\49\166\209\52\36\40\175\245","\129\70\75\69\223"),true);break;end end end end local v268=v266 or CFrame.new(2450,45, -1820) ;v265.CFrame=v268;task.wait(0.3);pcall(function() if (v267 and fireproximityprompt) then fireproximityprompt(v267);end for v562,v563 in ipairs(workspace:GetDescendants()) do if (v563:IsA(v7("\118\217\252\241\117\226\79\223\234\217\110\224\75\219\231","\143\38\171\147\137\28")) and ((v563.Parent:GetPivot().Position-v265.Position).Magnitude<35)) then if fireproximityprompt then fireproximityprompt(v563);end end end local v505=require(v25.Shared.Events).Client(v7("\243\138\188\224\23","\180\176\226\217\147\99\131"));if v505 then v505:Fire(v7("\252\169\42\9\242\181\35","\103\179\217\79"));end end);v24(v7("\121\182\18\209\1\161\162\80\178","\195\42\215\124\181\33\236"),"🏆 Песчаный лабиринт пройден! Награды собраны.");end local function v112() local v270=v13.Character;local v271=v270 and v270:FindFirstChild(v7("\37\76\58\63\43\247\4\93\5\49\42\236\61\88\37\42","\152\109\57\87\94\69")) ;if  not v271 then return;end v24(v7("\223\197\5\176\170\146\121\169\227\210","\200\153\183\106\195\222\178\52"),"❄️ Решение Ледяного Лабиринта (Frozen Caves)...");local v272=nil;local v273=nil;for v506,v507 in ipairs(workspace:GetDescendants()) do local v508=v507.Name:lower();if ((v508:find(v7("\52\241\135\46\93","\58\82\131\232\93\41")) or v508:find(v7("\138\84\213","\95\227\55\176\117\61")) or v508:find(v7("\30\108\44\81\174\22","\203\120\30\67\43")) or v508:find(v7("\229\48\67\235\203\240","\185\145\69\45\143"))) and (v508:find(v7("\139\19\13\167\206","\188\234\127\121\198")) or v508:find(v7("\59\58\22\144\44","\227\88\82\115")) or v508:find(v7("\69\22\180\174\17\123","\19\35\127\218\199\98")) or v508:find(v7("\25\245\14","\130\124\155\106")) or v508:find(v7("\199\206\250\166\160","\223\181\171\150\207\195\150\28")) or v508:find(v7("\94\63\244\175\27\72","\105\44\90\131\206")))) then if v507:IsA(v7("\221\225\161\188\56\63\237\244","\94\159\128\210\217\104")) then v272=v507.CFrame + Vector3.new(0,3,0) ;v273=v507:FindFirstChildOfClass(v7("\96\235\9\167\86\114\240\110\73\201\20\176\82\111\237","\26\48\153\102\223\63\31\153")) or v507.Parent:FindFirstChildOfClass(v7("\50\82\226\235\11\77\228\231\27\112\255\252\15\80\249","\147\98\32\141")) ;break;elseif (v507:IsA(v7("\53\76\231\207\10","\43\120\35\131\170\102\54")) and v507.PrimaryPart) then v272=v507.PrimaryPart.CFrame + Vector3.new(0,3,0) ;v273=v507:FindFirstChildWhichIsA(v7("\100\20\136\174\172\189\141\64\31\183\164\170\189\148\64","\228\52\102\231\214\197\208"),true);break;end end end if  not v272 then for v674,v675 in ipairs(workspace:GetDescendants()) do if ((v675.Name==v7("\55\227\112\235\230\159\24\196","\182\126\128\21\170\138\235\121")) or (v675.Name==v7("\173\200\58\252\131\29\17\10\159\219\39","\102\235\186\85\134\230\115\80")) or (v675.Name==v7("\126\15\59\124\122\209\49\67","\66\55\108\94\63\18\180")) or (v675.Name==v7("\50\159\138\36\51\122\28\136\150\35","\57\116\237\229\87\71"))) then if v675:IsA(v7("\136\176\254\226\71\239\85\190","\39\202\209\141\135\23\142")) then v272=v675.CFrame + Vector3.new(0,3,0) ;v273=v675:FindFirstChildOfClass(v7("\207\33\6\18\59\245\246\39\16\58\32\247\242\35\29","\152\159\83\105\106\82"));break;elseif (v675:IsA(v7("\172\201\85\247\197","\60\225\166\49\146\169")) and v675.PrimaryPart) then v272=v675.PrimaryPart.CFrame + Vector3.new(0,3,0) ;v273=v675:FindFirstChildWhichIsA(v7("\31\12\32\50\8\10\38\10\54\26\19\8\34\14\59","\103\79\126\79\74\97"),true);break;end end end end local v274=v272 or CFrame.new( -3120, -60,4280) ;v271.CFrame=v274;task.wait(0.3);pcall(function() local v509=0;local v510;while true do if (v509==0) then if (v273 and fireproximityprompt) then fireproximityprompt(v273);end for v781,v782 in ipairs(workspace:GetDescendants()) do if (v782:IsA(v7("\138\109\220\107\87\23\179\107\202\67\76\21\183\111\199","\122\218\31\179\19\62")) and ((v782.Parent:GetPivot().Position-v271.Position).Magnitude<35)) then if fireproximityprompt then fireproximityprompt(v782);end end end v509=1;end if (v509==1) then v510=require(v25.Shared.Events).Client(v7("\144\222\200\210\221","\37\211\182\173\161\169\193"));if v510 then v510:Fire(v7("\216\42\72\215\9\119\181","\217\151\90\45\185\72\27"));end break;end end end);v24(v7("\229\110\232\1\66\131\81\230\8\83","\54\163\28\135\114"),"🏆 Ледяной лабиринт пройден! Награды собраны.");end local function v113() local v276=0;local v277;local v278;while true do if (v276==2) then v278=v277 and v277:FindFirstChildOfClass(v7("\235\19\78\211\73\113\45\199","\68\163\102\35\178\39\30")) ;if (v278 and  not (v277 and v277:FindFirstChildOfClass(v7("\138\127\213\203","\113\222\16\186\167\99\213\227")))) then for v882,v883 in ipairs(v13.Backpack:GetChildren()) do if (v883:IsA(v7("\26\1\244\250","\150\78\110\155")) and v883.Name:lower():find(v7("\151\202\35","\32\229\165\71\129\196\126\223"))) then v278:EquipTool(v883);break;end end end break;end if (v276==1) then if (v34 and v34.EquipRod) then pcall(function() v34:EquipRod();end);end v277=v13.Character;v276=2;end if (v276==0) then v277=v13.Character;if (v277 and v277:FindFirstChildOfClass(v7("\28\212\82\142","\31\72\187\61\226\46"))) then return;end v276=1;end end end local function v114(v279) pcall(function() local v511=require(v25.Shared.Events).Client(v7("\246\153\195\147\128\209\198\154","\181\163\233\164\225\225"));if (v511 and v511.Fire) then v511:Fire(v7("\114\158\39","\23\48\235\94"),v279);end end);end local function v115(v280,v281) local v282=v280.name or (v280.model and v280.model.Name) or (v280.data and v280.data.Name) or v280.findName or "" ;local v283=v282:lower();local v284=false;local v285=v7("\79\202\221\94\94\50\222","\178\28\186\184\61\55\83");if (v280.bypassRoom or v280.special or v280.isItem or (v280.Kind==v7("\226\223\70\59\255\11\251\208","\149\164\173\39\92\146\110")) or (v280.kind==v7("\213\53\17\24\23\30\253\51","\123\147\71\112\127\122")) or (v280.findRarity==v7("\255\221\135\114\79\205\193","\38\172\173\226\17"))) then local v564=0;while true do if (v564==0) then v284=true;v285=v280.Kind or v280.kind or v7("\126\1\41\236\68\16\32","\143\45\113\76") ;break;end end elseif (v29 and v29.Items and v29.Items[v282]) then v284=true;v285=v7("\147\189\5\115\158\170\29\59\181\189\18\40","\92\216\216\124");elseif (v30 and v30.Items and v30.Items[v282]) then local v884=0;while true do if (v884==0) then v284=true;v285=v7("\104\49\190\79\241\87","\157\59\82\204\32");break;end end elseif (v31 and v31.Items and v31.Items[v282]) then local v972=0;while true do if (0==v972) then v284=true;v285=v7("\11\43\238\247\230\228","\209\88\94\131\154\137\138\179");break;end end elseif (v32 and v32.Items and v32.Items[v282]) then local v1036=0;while true do if (v1036==0) then v284=true;v285=v7("\11\160\195\121","\66\72\193\164\28\126\67\81");break;end end elseif (v28 and v28.Items and v28.Items[v282]) then local v1062=0;while true do if (v1062==0) then v284=true;v285=v7("\196\36\173\75\50","\22\135\76\200\56\70");break;end end elseif (v283:find(v7("\139\34\249\35\80\228\131\36","\129\237\80\152\68\61")) or v283:find(v7("\90\173\29","\56\49\200\100\147\124\119")) or v283:find(v7("\223\61\173\255\192\50","\144\172\94\223")) or v283:find(v7("\55\27\173\73\33","\39\68\111\194")) or v283:find(v7("\213\180\232\208\119","\215\182\198\135\167\25")) or v283:find(v7("\142\65\239\91\153","\40\237\41\138")) or v283:find(v7("\197\123\238\236\70\194","\42\167\20\154\152")) or v283:find(v7("\88\251\174\75\114","\65\42\158\194\34\17")) or v283:find(v7("\25\38\85\9","\142\122\71\50\108\77\141\123")) or v283:find(v7("\1\176\254\8","\91\117\194\159\120")) or v283:find(v7("\18\24\63\10\33","\68\122\125\94\120\85\145")) or v283:find(v7("\27\9\204\85\209","\218\119\124\175\62\168\185")) or v283:find(v7("\169\241\94\197","\164\197\144\40")) or v283:find(v7("\144\241\164\143","\214\227\144\202\235\189")) or v283:find(v7("\235\183\136\97\21\189","\92\141\197\231\27\112\211\51")) or v283:find(v7("\233\237\136","\177\134\159\234\195")) or v283:find(v7("\173\238\62\178\197","\169\221\139\95\192")) or v283:find(v7("\221\132\118\49","\70\190\235\31\95\66")) or v283:find(v7("\189\231\23","\133\218\130\122\134")) or v283:find(v7("\63\237\250\215\200\162\52","\88\92\159\131\164\188\195")) or v283:find(v7("\134\33\172\88\222\231","\189\224\78\223\43\183\139")) or v283:find(v7("\58\243\158\19\204","\161\78\156\234\118")) or v283:find(v7("\180\188\220\208\171","\188\199\215\169")) or v283:find(v7("\249\14\88","\136\156\105\63\27")) or v283:find(v7("\26\130\122\61\30\130\109","\84\123\236\25")) or v283:find(v7("\226\158\164\30\175","\213\144\235\202\119\204")) or v283:find(v7("\38\22\221\34\41\45\89","\45\67\120\190\74\72\67"))) then v284=true;v285=v7("\19\50\232\166\240\137\226","\137\64\66\141\197\153\232\142");end if (v284 or v280.bypassRoom) then local v565={[v7("\13\209\47\163","\232\99\176\66\198")]=((v282~="") and v282) or v7("\223\49\45\5\114\140\245\108\197\53\45\11","\76\140\65\72\102\27\237\153") ,[v7("\88\219\4\219\195\24","\222\42\186\118\178\183\97")]=v7("\110\252\65\137\84\237\72","\234\61\140\36"),[v7("\46\207\190\119\29","\111\65\189\218\18")]=10,[v7("\83\89\18\54\14","\207\35\43\123\85\107\60")]=100000,[v7("\121\185\130\229\106\99","\25\16\202\192\138")]=false,[v7("\244\216\158\231\170\230\248\223","\148\157\171\205\130\201")]=true,[v7("\42\199\71\57\212\245\42\213\120","\150\67\180\20\73\177")]=true,[v7("\132\11\51\89\136\21","\45\237\120\122")]=true,[v7("\222\252\167\33\227\241\178\41","\76\183\136\194")]=v285};return 100000000,v565;end local v286=false;if (v33 and v33.Items and v33.Items[v282]) then v286=true;elseif (v283:find(v7("\120\233\234\44","\116\26\134\133\88\48\47")) or v283:find(v7("\13\207\165\229\182\119\12","\18\126\161\192\132\221")) or v283:find(v7("\75\33\188\1","\54\63\72\206\100")) or v283:find(v7("\203\88\75","\27\168\57\37\26\133")) or v283:find(v7("\47\191\127\163\210\57","\183\77\202\28\200"))) then v286=true;end if v286 then local v566={[v7("\25\50\132\13","\104\119\83\233")]=v282,[v7("\231\249\53\43\87\236","\35\149\152\71\66")]=v7("\51\253\76\187","\90\121\136\34\208"),[v7("\200\28\81\27\213","\126\167\110\53")]=0,[v7("\45\2\39\251\217","\95\93\112\78\152\188")]=50,[v7("\200\230\167\26\247\173","\178\161\149\229\117\132\222")]=false,[v7("\129\200\238\169\162\4\163\55","\67\232\187\189\204\193\118\198")]=false,[v7("\130\61\159\53\53\9","\143\235\78\213\64\91\98")]=true};if v64 then return 5000,v566;else return 0,v566;end end local v287=v26:Get(v282,true) or {} ;local v288=v287.Rarity or v7("\174\71\137\228\127\184","\214\237\40\228\137\16") ;local v289=v27.Get(v288);local v290=(v289 and v289.Order) or 1 ;local v291=v287.SellPrice or 10 ;local v292=v287.RollOdds or 1 ;local v293=(v280.model and v280.model.PrimaryPart and v280.model.PrimaryPart.Size.Magnitude) or v280.size or 1 ;local v294=v280.boss==true ;local v295=(v288==v7("\182\230\236\203\6\178","\198\229\131\143\185\99")) or (v288==v7("\116\148\167\103\88\143","\19\49\236\200")) or (v290>=7) ;local v296=v280.mutation~=nil ;local v297={[v7("\240\54\251\178","\218\158\87\150\215\132")]=v282,[v7("\233\31\203\235\34\59","\173\155\126\185\130\86\66")]=v288,[v7("\234\180\190\194\154","\140\133\198\218\167\232")]=v290,[v7("\165\60\189\126\129","\228\213\78\212\29")]=v291,[v7("\142\95\148\10\248\148","\139\231\44\214\101")]=v294,[v7("\208\252\53\91\19\163\52\2","\118\185\143\102\62\112\209\81")]=v295,[v7("\81\101\61\231\177\28\19\54","\88\60\16\73\134\197\117\124")]=v280.mutation};if (v281==v7("\99\239\251\218\68\68","\33\48\138\152\168")) then if (v294 or v295) then return 15000000 + (v290 * 100000) + v291 ,v297;else return 0,v297;end elseif (v281==v7("\64\23\34\84\210\35","\87\18\118\80\49\161")) then local v732=0;local v733;while true do if (v732==1) then if v296 then v733=v733 + 500000 ;end return v733,v297;end if (v732==0) then v733=(v290 * 1000000) + v292 ;if v294 then v733=v733 + 5000000 ;end v732=1;end end elseif (v281==v7("\97\17\212\165\169","\208\44\126\186\192")) then local v885=0;local v886;while true do if (0==v885) then v886=(v296 and 2.5) or 1 ;if v294 then v886=v886 * 5 ;end v885=1;end if (v885==1) then return v291 * v886 * v293 ,v297;end end elseif (v281==v7("\213\19\163\193\17\239\221","\46\151\122\196\166\116\156\169")) then return v293,v297;else return 1,v297;end end local function v116(v298) local v299=0;local v300;local v301;local v302;while true do if (v299==2) then for v734,v735 in ipairs(v298.Fish) do if ( not v735.caught and  not v735.escaped and  not v735.fighting and v735.model and v735.model.Parent) then local v887=0;local v888;local v889;while true do if (0==v887) then v888,v889=v115(v735,v72);if (v889.isSpecial or v735.bypassRoom) then if  not (v298.Cinematic.Sub and v298.Cinematic.Sub.CatchMinigame and v298.Cinematic.Sub.CatchMinigame:Offer(v735)) then v298:CompleteGrab(v735);end end break;end end end end if (v302>0) then local v783=0;local v784;while true do if (v783==0) then v784={};for v1002,v1003 in ipairs(v298.Fish) do if ( not v1003.caught and  not v1003.escaped and  not v1003.fighting and v1003.model and v1003.model.Parent) then local v1058=0;local v1059;local v1060;while true do if (v1058==0) then v1059,v1060=v115(v1003,v72);if  not (v1060.isSpecial or v1003.bypassRoom) then table.insert(v784,{[v7("\227\228\85\18","\155\133\141\38\122")]=v1003,[v7("\54\41\163\83\74","\197\69\74\204\33\47\31")]=v1059,[v7("\249\65\92\136","\231\144\47\58")]=v1060});end break;end end end end v783=1;end if (v783==1) then table.sort(v784,function(v1004,v1005) return v1004.score>v1005.score ;end);for v1006,v1007 in ipairs(v784) do if (v302<=0) then break;end if ((v72==v7("\129\221\217\103\29\41","\89\210\184\186\21\120\93\175")) and (v1007.score<=0) and  not v71) then break;end v302=v302-1 ;if  not (v298.Cinematic.Sub and v298.Cinematic.Sub.CatchMinigame and v298.Cinematic.Sub.CatchMinigame:Offer(v1007.fish)) then v298:CompleteGrab(v1007.fish);end end break;end end end break;end if (v299==1) then v301=v298.Cinematic:CaughtFishCount();v302=math.max(0,v300-v301 );v299=2;end if (v299==0) then if  not (v42 and v298 and v298.Fish and ( #v298.Fish>0) and v298.Cinematic and v298.Cinematic.Catchable) then return;end v300=v298.Cinematic:GetBaitCapacity();v299=1;end end end if v37 then v37._rawTryGrab=v37._rawTryGrab or v37.TryGrab ;local v513=v37._rawTryGrab;v37.TryGrab=function(v567,v568) local v569=0;while true do if (v569==0) then if (v42 and v567.Fish and ( #v567.Fish>0) and v567.Cinematic and v567.Cinematic.Catchable) then local v917=0;while true do if (v917==0) then v116(v567);return;end end end return v513(v567,v568);end end end;end local function v117(v303,v304) local v305=v303 and v303.DistanceContent ;if  not v305 then return;end local v306=v305:FindFirstChild(v7("\129\65\121\209\112\57\165\86\120\249\120\52\181\90\114\210","\90\209\51\28\181\25"));if v306 then v306:Destroy();end local v307=v305:FindFirstChild(v7("\224\119\86\247\186\194\104","\223\176\27\55\142"));if  not v307 then return;end local v308=v307:FindFirstChild(v7("\29\180\219","\213\68\219\174"));if  not v308 then return;end local v309=v307:FindFirstChild(v7("\59\242\38\227\35\198\43\122\15\212\34\245\45\192\43","\31\107\128\67\135\74\165\95"));if  not v65 then local v570=0;while true do if (v570==0) then if v309 then v309.Visible=false;end return;end end end local v310=(v37 and v37.SpawnCtx and v37.SpawnCtx.landing) or (v38 and v38.ActiveLanding) ;local v311=v38 and v38.ThrowOrigin ;local v312=nil;if (v310 and v311) then v312=((v310-v311) * Vector3.new(1,0,1)).Magnitude;elseif (v38 and v38.ThrowDistance and (v38.ThrowDistance>0)) then v312=v38.ThrowDistance;elseif (v304 and (v304>0)) then v312=v304;end if ( not v312 or (v312<=0)) then local v572=0;while true do if (0==v572) then if v309 then v309.Visible=false;end return;end end end local v313=v303.RecordToBeat or 0 ;local v314;if (v313>0) then if (v312>v313) then v314=0.92;else v314=math.clamp(v312/(v313/0.85) ,0,1);end else v314=1;end local v315=nil;local v316=nil;local v317= -1;local v318=0;if (v37 and v37.Fish and ( #v37.Fish>0)) then v318= #v37.Fish;for v678,v679 in ipairs(v37.Fish) do local v680,v681=v115(v679,v72);if (v680>v317) then v317=v680;v315=v681.name;v316=v681.rarity;if v681.mutation then v315="["   .. v681.mutation   .. v7("\229\168","\209\184\136\156\45\33")   .. v315 ;end end end end if  not v309 then v309=Instance.new(v7("\33\218\116\5\189","\216\103\168\21\104"));v309.Name=v7("\72\191\70\160\113\174\87\161\124\153\66\182\127\168\87","\196\24\205\35");v309.AnchorPoint=Vector2.new(0.5,0.5);v309.Size=v308.Size;v309.BackgroundColor3=Color3.fromRGB(0,25,45);v309.BackgroundTransparency=0.25;v309.ZIndex=math.max(v308.ZIndex-1 ,1);Instance.new(v7("\27\162\192\9\60\133\230\20","\102\78\235\131"),v309).CornerRadius=UDim.new(1,0);local v581=Instance.new(v7("\207\7\7\80\85\54\188\49","\84\154\78\84\36\39\89\215"),v309);v581.Color=Color3.fromRGB(0,255,255);v581.Thickness=2;local v584=Instance.new(v7("\201\228\78\76\41\252\227\83\84","\101\157\129\54\56"),v309);v584.Name=v7("\52\170\133\165","\25\125\201\234\203\67");v584.Size=UDim2.new(1,0,1,0);v584.BackgroundTransparency=1;v584.Text="🎯";v584.TextSize=13;v584.Font=Enum.Font.GothamBold;local v592=Instance.new(v7("\77\241\0\23\56\38\17\124\248","\115\25\148\120\99\116\71"),v309);v592.Name=v7("\40\52\170\48\64\2\62\188\16\64\11","\33\108\93\217\68");v592.Size=UDim2.new(0,130,0,16);v592.AnchorPoint=Vector2.new(0.5,0);v592.Position=UDim2.new(0.5,0,1,3);v592.BackgroundColor3=Color3.fromRGB(5,15,25);v592.BackgroundTransparency=0.25;Instance.new(v7("\238\98\130\162\201\69\164\191","\205\187\43\193"),v592).CornerRadius=UDim.new(0,4);local v600=Instance.new(v7("\203\91\54\203\236\125\14\218","\191\158\18\101"),v592);v600.Color=Color3.fromRGB(0,255,255);v600.Thickness=1;v592.TextColor3=Color3.fromRGB(0,255,255);v592.Font=Enum.Font.GothamBold;v592.TextSize=10;v309.Parent=v307;end v309.Position=UDim2.new(v314,0,v308.Position.Y.Scale,0);v309.Visible=true;local v321=v309:FindFirstChild(v7("\225\202\148\163\174\203\192\130\131\174\194","\207\165\163\231\215"));if v321 then local v607=0;local v608;while true do if (v607==0) then v608=string.format("🎯 %dm",math.floor(v312 + 0.5 ));if (v315 and (v318>0)) then local v920=0;while true do if (v920==1) then if (v316 and v85[v316]) then v321.TextColor3=v85[v316];end break;end if (v920==0) then v321.Size=UDim2.new(0,150,0,16);v321.Text=string.format(v7("\131\234\185\74\100\53\213","\16\166\153\153\54\68"),v608,v315);v920=1;end end else local v921=0;while true do if (v921==0) then v321.Size=UDim2.new(0,75,0,16);v321.Text=v608;v921=1;end if (v921==1) then v321.TextColor3=Color3.fromRGB(0,255,255);break;end end end break;end end end end pcall(function() local v322=0;local v323;while true do if (v322==0) then v323=require(v25.Shared.UI.HUD.Fishing.Displays);if v323 then local v787=0;local v788;local v789;while true do if (0==v787) then v323._rawSetDist=v323._rawSetDist or v323.SetDistance ;v788=v323._rawSetDist;v787=1;end if (v787==2) then v789=v323._rawHide;v323.HideThrowDisplays=function(v1008) local v1009=0;while true do if (v1009==0) then if (v1008.DistanceContent and v1008.DistanceContent:FindFirstChild(v7("\226\191\193\95\49\51\234","\153\178\211\160\38\84\65"))) then local v1084=0;local v1085;while true do if (v1084==0) then v1085=v1008.DistanceContent.Players:FindFirstChild(v7("\178\25\95\47\139\8\78\46\134\63\91\57\133\14\78","\75\226\107\58"));if v1085 then v1085.Visible=false;end break;end end end return v789(v1008);end end end;break;end if (v787==1) then v323.SetDistance=function(v1010,v1011,v1012) local v1013=0;while true do if (v1013==0) then v788(v1010,v1011,v1012);v117(v1010,v1012);break;end end end;v323._rawHide=v323._rawHide or v323.HideThrowDisplays ;v787=2;end end end break;end end end);if v37 then local v515=0;local v516;while true do if (v515==1) then v37.Spawn=function(v790,v791) local v792=0;while true do if (v792==0) then v516(v790,v791);task.defer(function() local v1014=0;local v1015;while true do if (v1014==0) then v1015=v25.Shared.UI.HUD.Fishing:FindFirstChild(v7("\124\215\2\106\29\195\212\75","\173\56\190\113\26\113\162")) and require(v25.Shared.UI.HUD.Fishing.Displays) ;if v1015 then v117(v1015,v38 and v38.ThrowDistance );end break;end end end);break;end end end;break;end if (v515==0) then v37._rawSpawn=v37._rawSpawn or v37.Spawn ;v516=v37._rawSpawn;v515=1;end end end if v36 then v36._rawInArea=v36._rawInArea or v36.InArea ;local v518=v36._rawInArea;v36.InArea=function(v609) if v108 then return true;end return v518(v609);end;end if v34 then v34._rawSetOn=v34._rawSetOn or v34.SetOn ;local v521=v34._rawSetOn;v34.SetOn=function(v610,v611) if (v108 and (v611==false)) then return;end return v521(v610,v611);end;end if v37 then local v523=0;local v524;while true do if (v523==1) then v37.TakeCaught=function(v793) local v794=v524(v793);if (v794 and ( #v794>0)) then local v922=0;local v923= #v794;local v924=nil;local v925= -1;for v978,v979 in ipairs(v794) do local v980=0;local v981={[v7("\255\199\61\0","\151\171\190\77\101")]=v7("\227\38\235\161","\107\165\79\152\201\152\29"),[v7("\121\79\229\206","\31\55\46\136\171\52")]=v979.name,[v7("\245\41\200\245","\148\177\72\188")]={[v7("\139\163\67\210\178\191\88\221","\179\198\214\55")]=v979.mutation,[v7("\195\5\104\115","\179\144\108\18\22\37")]=v979.size or 1 }};pcall(function() if (v39 and v39.Services and v39.Services.Item) then v980=v39.Services.Item:GetSellValue(v13,v981) or 0 ;end end);if (v980<=0) then local v1042=v26:Get(v979.name,true);v980=(v1042 and v1042.SellPrice) or 50 ;if v979.mutation then v980=v980 * 2.5 ;end end v922=v922 + v980 ;if (v980>v925) then local v1043=0;while true do if (v1043==0) then v925=v980;v924=((v979.mutation and ("["   .. v979.mutation   .. v7("\251\227","\175\166\195\123\233"))) or "")   .. v979.name ;break;end end end end v55=v55 + v923 ;v56=v56 + v922 ;if v103 then v103();end if v63 then local v1016=0;local v1017;while true do if (v1016==0) then v1017=(v924 and (v92(v7("\175\222\29\107\245\252\214\7\9","\144\143\162\61\41")," | Топ: ")   .. v924)) or "" ;v24(v92("🎣 Cast Complete!","🎣 Заброс завершён!"),string.format(v92(v7("\195\210\8\87\122\147\105\160\150\25\16\116\142\32\232\147\1\16\64\130\37\229\221\8\85\40\199\118\243\150\14","\83\128\179\125\48\18\231"),"Поймано: %d шт. | Выручка: %s%s"),v923,v88(v922),v1017));break;end end end task.spawn(function() local v982=os.clock();while v38 and v38.Active and ((os.clock() -v982)<3)  do task.wait(0.05);end task.wait(0.2);if v62 then v107();end task.wait(0.4);if v60 then v109();end end);end return v794;end;break;end if (v523==0) then v37._rawTakeCaught=v37._rawTakeCaught or v37.TakeCaught ;v524=v37._rawTakeCaught;v523=1;end end end if v38 then v38._rawOnServerStarted=v38._rawOnServerStarted or v38.OnServerStarted ;local v526=v38._rawOnServerStarted;v38.OnServerStarted=function(v612,v613,...) local v614=0;while true do if (v614==0) then if (v44 and (type(v613)==v7("\73\182\241\209\66","\126\61\215\147\189\39"))) then local v926=0;while true do if (v926==0) then v613.arcDuration=0.02;if v613.bounces then for v1078,v1079 in ipairs(v613.bounces) do local v1080=0;while true do if (v1080==0) then v1079.duration=0.01;v1079.Duration=0.01;break;end end end end break;end end end if (v45 and (type(v613)==v7("\108\254\31\73\125","\37\24\159\125"))) then v613.diveDuration=0.05;end v614=1;end if (v614==1) then if v46 then local v928=0;while true do if (0==v928) then pcall(function() v612:SetDoubleSpeed(true);end);if v74 then v612.PullUpDuration=0.35;v612.ReturnDuration=0.25;v612.BreachSpeed=1200;v74=false;else local v1068=0;while true do if (1==v1068) then v612.BreachSpeed=800;break;end if (0==v1068) then v612.PullUpDuration=0.3;v612.ReturnDuration=0.2;v1068=1;end end end break;end end end return v526(v612,v613,...);end end end;v38._rawBeginFlight=v38._rawBeginFlight or v38.BeginFlight ;local v529=v38._rawBeginFlight;v38.BeginFlight=function(v615,...) local v616=0;while true do if (v616==0) then v529(v615,...);if v44 then local v929=0;while true do if (v929==1) then if v615.BounceList then for v1081,v1082 in ipairs(v615.BounceList) do local v1083=0;while true do if (v1083==0) then v1082.duration=0.01;v1082.Duration=0.01;break;end end end end break;end if (0==v929) then v615.ArcDuration=0.02;v615.ArcStart=os.clock() -0.05 ;v929=1;end end end v616=1;end if (v616==1) then if v45 then v615.DiveDuration=0.05;end if v46 then local v931=0;while true do if (v931==1) then v615.ReturnDuration=0.2;v615.BreachSpeed=800;break;end if (0==v931) then pcall(function() v615:SetDoubleSpeed(true);end);v615.PullUpDuration=0.3;v931=1;end end end break;end end end;end if v36 then local v531=0;local v532;while true do if (v531==1) then v36.StopHook=function(v795) local v796=0;while true do if (v796==0) then if (v41 and v795.Charging) then local v1050=0;local v1051;while true do if (v1050==0) then v1051=v795:HUD();if (v1051 and v1051.GetHookSteps) then local v1090=0;local v1091;while true do if (0==v1090) then v1091=v1051:GetHookSteps();if (v1091 and (v1091>=2)) then local v1107=0;while true do if (0==v1107) then v795.HookT=9.5/(v1091-1) ;v795.ThrowTier=v7("\234\163\103\68\223\165\97","\34\186\198\21");break;end end end break;end end end break;end end end return v532(v795);end end end;break;end if (v531==0) then v36._rawStopHook=v36._rawStopHook or v36.StopHook ;v532=v36._rawStopHook;v531=1;end end end if v34 then v34.OwnsAutoSell=function() return true;end;v34.DriveCast=function(v617,v618) if (v108 or (v38 and v38.Active)) then return;end v617.DrivingThrow=true;v113();v618:StartHook();if  not v618.Charging then local v743=0;while true do if (0==v743) then v617.DrivingThrow=false;return;end end end if v43 then task.wait(0.06);else task.wait(0.8);end if v41 then local v744=0;local v745;while true do if (v744==0) then v745=v618:HUD():GetHookSteps();if (v745 and (v745>=2)) then local v1018=0;while true do if (v1018==0) then v618.HookT=9.5/(v745-1) ;v618.ThrowTier=v7("\200\13\215\91\199\251\28","\162\152\104\165\61");break;end end end break;end end end v618:StopHook();v617.DrivingThrow=false;end;task.spawn(function() while true do task.wait(0.05);if (getgenv()._FishyHubToken~=v14) then break;end local v682=v40 and v34 and v34.On ;if (v682 and  not v108) then if  not (v38 and v38.Active) then local v933=0;while true do if (v933==0) then v113();if (v36 and v36:CanStartThrow() and  not v36.Charging) then v34:DriveCast(v36);end break;end end end end end end);v34.WarnFull=function(v620) if v60 then v109();end end;v34.Boost=function(v621) return true;end;v34.BoostedHookT=function(v622,v623,v624) local v625=0;while true do if (v625==0) then if v41 then local v934=0;local v935;while true do if (v934==0) then v935=v623:HUD():GetHookSteps();if (v935 and (v935>=2)) then return 9.5/(v935-1) ;end break;end end end return 0.5;end end end;end if v35 then local v538=0;local v539;while true do if (v538==1) then v35.Begin=function(v797,v798,v799) local v800=0;while true do if (v800==0) then v539(v797,v798,v799);if (v58 and v797.Fight) then v73=true;v74=true;local v1052=(v798 and (v798.name or v798.Name)) or v7("\239\32\161\110\48\170\141\28\183\126\98\224\217\111\148\116\99\237","\133\173\79\210\29\16") ;v24("⚔️ Boss Fight!","Авто-победа босса: "   .. tostring(v1052) );task.spawn(function() local v1061=os.clock();while v797.Fight and ((os.clock() -v1061)<6)  do local v1071=0;while true do if (v1071==0) then if v797.Fight then local v1096=0;while true do if (v1096==0) then v797.Fight.progress=1;if v797.Fight.required then v797.Fight.made=math.max(v797.Fight.made or 0 ,v797.Fight.required);end v1096=1;end if (v1096==1) then pcall(function() if v797.Click then v797:Click();elseif v797.HandleClick then v797:HandleClick();end end);break;end end end task.wait(0.04);break;end end end task.wait(0.4);v73=false;end);end break;end end end;break;end if (v538==0) then v35._rawBegin=v35._rawBegin or v35.Begin ;v539=v35._rawBegin;v538=1;end end end v9.Heartbeat:Connect(function() if (v58 and v35 and v35.Fight) then local v626=0;local v627;while true do if (v626==2) then if v627.required then v627.made=math.max(v627.made or 0 ,v627.required);end pcall(function() if v35.Click then v35:Click();elseif v35.HandleClick then v35:HandleClick();end end);break;end if (v626==0) then v73=true;v74=true;v626=1;end if (v626==1) then v627=v35.Fight;v627.progress=1;v626=2;end end end if (v42 and v38 and v38.Active and v38.Catchable and v37) then v116(v37);end if (v45 and v38 and v38.Active and v38.DiveStart) then if ((os.clock() -v38.DiveStart)<0.5) then local v748=0;while true do if (v748==0) then v38.DiveDuration=0.05;v38.DiveStart=os.clock() -10 ;break;end end end end if (v52 and v13.Character) then local v628=0;local v629;local v630;while true do if (0==v628) then v629=v13.Character:FindFirstChild(v7("\165\105\224\42\131\115\228\47\191\115\226\63\189\125\255\63","\75\237\28\141"));v630=v13.Character:FindFirstChildOfClass(v7("\244\74\193\176\33\20\238\229","\129\188\63\172\209\79\123\135"));v628=1;end if (v628==1) then if (v629 and v630) then if (v630:GetState()==Enum.HumanoidStateType.Swimming) then v630:ChangeState(Enum.HumanoidStateType.Running);end if ( not waterPlatform or  not waterPlatform.Parent) then local v1019=0;while true do if (v1019==2) then waterPlatform.Anchored=true;waterPlatform.CanCollide=true;v1019=3;end if (v1019==0) then waterPlatform=Instance.new(v7("\112\229\244\217","\173\32\132\134"));waterPlatform.Name=v7("\104\18\27\231\183\6\204\90\30\26\216\175\61\198","\173\46\123\104\143\206\81");v1019=1;end if (v1019==3) then waterPlatform.Parent=workspace;break;end if (v1019==1) then waterPlatform.Size=Vector3.new(12,1,12);waterPlatform.Transparency=1;v1019=2;end end end local v939=math.max(16.5,v629.Position.Y-3.1 );waterPlatform.CFrame=CFrame.new(v629.Position.X,v939,v629.Position.Z);end break;end end elseif ( not v52 and waterPlatform) then local v749=0;while true do if (v749==0) then pcall(function() waterPlatform:Destroy();end);waterPlatform=nil;break;end end end if (v53 and v13.Character) then local v631=v13.Character:FindFirstChild(v7("\156\8\47\139\75\140\8\176\47\45\133\81\179\0\166\9","\97\212\125\66\234\37\227"));local v632=v13.Character:FindFirstChildOfClass(v7("\162\246\187\52\16\133\234\178","\126\234\131\214\85"));local v633=workspace.CurrentCamera;if (v631 and v632 and v633) then if ( not flyBodyVelocity or  not flyBodyVelocity.Parent) then flyBodyGyro=Instance.new(v7("\166\218\77\67\104\157\199\70","\47\228\181\41\58"));flyBodyGyro.P=90000;flyBodyGyro.MaxTorque=Vector3.new(8999999488,8999999488,8999999488);flyBodyGyro.CFrame=v633.CFrame;flyBodyGyro.Parent=v631;flyBodyVelocity=Instance.new(v7("\132\243\221\34\53\53\19\169\255\208\47\26","\127\198\156\185\91\99\80"));flyBodyVelocity.MaxForce=Vector3.new(8999999488,8999999488,8999999488);flyBodyVelocity.Velocity=Vector3.zero;flyBodyVelocity.Parent=v631;end flyBodyGyro.CFrame=v633.CFrame;local v752=Vector3.zero;if v11:IsKeyDown(Enum.KeyCode.W) then v752=v752 + v633.CFrame.LookVector ;end if v11:IsKeyDown(Enum.KeyCode.S) then v752=v752-v633.CFrame.LookVector ;end if v11:IsKeyDown(Enum.KeyCode.D) then v752=v752 + v633.CFrame.RightVector ;end if v11:IsKeyDown(Enum.KeyCode.A) then v752=v752-v633.CFrame.RightVector ;end if v11:IsKeyDown(Enum.KeyCode.Space) then v752=v752 + Vector3.new(0,1,0) ;end if v11:IsKeyDown(Enum.KeyCode.LeftShift) then v752=v752-Vector3.new(0,1,0) ;end if (v752.Magnitude>0) then flyBodyVelocity.Velocity=v752.Unit * v54 ;else flyBodyVelocity.Velocity=Vector3.zero;end end elseif  not v53 then local v753=0;while true do if (v753==0) then if flyBodyVelocity then local v1020=0;while true do if (v1020==0) then pcall(function() flyBodyVelocity:Destroy();end);flyBodyVelocity=nil;break;end end end if flyBodyGyro then local v1021=0;while true do if (v1021==0) then pcall(function() flyBodyGyro:Destroy();end);flyBodyGyro=nil;break;end end end break;end end end if (v59 and v38 and v38.Active and  not v38.ReelRequested) then local v634=0;local v635;while true do if (v634==1) then if (v37 and v37.Fish) then for v983,v984 in ipairs(v37.Fish) do if ( not v984.caught and  not v984.escaped and v984.model and v984.model.Parent) then local v1053,v1054=v115(v984,v72);if (v1054.isSpecial or v984.bypassRoom) then v635=true;break;end end end end if  not v635 then local v941=0;local v942;local v943;local v944;while true do if (v941==0) then v942=v38:GetBaitCapacity();v943=v38:CaughtFishCount();v941=1;end if (1==v941) then v944=(v37 and v37.Fish and  #v37.Fish) or 0 ;if ((v943>=v942) or ((v943>0) and (v944<=v943))) then pcall(function() v38:RequestReel();end);end break;end end end break;end if (v634==0) then if (v73 or (v35 and v35.Fight)) then return;end v635=false;v634=1;end end end end);task.spawn(function() while true do task.wait(v61);if (getgenv()._FishyHubToken~=v14) then break;end if v60 then v109();end if (v66 or v67) then v114(v7("\214\27\220\241\164\2\45\199","\190\149\122\172\144\199\107\89"));end if v67 then local v683=0;while true do if (v683==1) then v114(v7("\226\25\214\245\91\237","\133\160\118\163\155\56\136\71"));break;end if (v683==0) then v114(v7("\1\17\227\251\240\53\17\249","\158\82\101\145\158"));v114(v7("\71\251\11\17\76\100","\36\16\158\98\118"));v683=1;end end end end end);v9.Stepped:Connect(function() if (v70 and v13.Character) then for v684,v685 in ipairs(v13.Character:GetDescendants()) do if v685:IsA(v7("\212\163\98\247\134\30\167\226","\213\150\194\17\146\214\127")) then v685.CanCollide=false;end end end end);local function v118(v324,v325) local v326=v324.PrimaryPart;if  not v326 then return;end local v327=v324:FindFirstChild(v7("\61\160\183\220\111\170\164\57\47\168\163","\86\123\201\196\180\38\196\194"));if  not v327 then local v636=0;local v637;local v638;local v639;while true do if (v636==0) then v327=Instance.new(v7("\213\225\213\163\245\231\216\189\243\207\204\166","\207\151\136\185"));v327.Name=v7("\142\138\59\138\93\118\119\167\183\41\133","\17\200\227\72\226\20\24");v327.Adornee=v326;v327.Size=UDim2.new(0,140,0,45);v636=1;end if (v636==4) then v638.TextSize=13;v638.Text=((v325.mutation and ("["   .. v325.mutation   .. v7("\187\25","\172\230\57\149\231\28\90\225"))) or "")   .. v325.name ;v639=Instance.new(v7("\54\175\158\198\4\218\0\175\138","\187\98\202\230\178\72"),v637);v639.Size=UDim2.new(1,0,0.5,0);v636=5;end if (6==v636) then v639.TextSize=11;v639.Text=v325.rarity   .. v7("\97\253\228\116","\42\65\129\196\80")   .. tostring(v325.price) ;v327.Parent=v324;break;end if (v636==5) then v639.Position=UDim2.new(0,0,0.5,0);v639.BackgroundTransparency=1;v639.TextColor3=(v325.isChest and Color3.fromRGB(255,220,0)) or Color3.fromRGB(100,255,120) ;v639.Font=Enum.Font.GothamMedium;v636=6;end if (3==v636) then v638.Size=UDim2.new(1,0,0.5,0);v638.BackgroundTransparency=1;v638.TextColor3=v85[v325.rarity] or Color3.fromRGB(255,255,255) ;v638.Font=Enum.Font.GothamBold;v636=4;end if (2==v636) then v637.BackgroundColor3=Color3.fromRGB(10,20,30);v637.BackgroundTransparency=0.35;Instance.new(v7("\199\115\27\57\224\84\61\36","\86\146\58\88"),v637).CornerRadius=UDim.new(0,6);v638=Instance.new(v7("\108\218\242\212\130\232\52\255\84","\154\56\191\138\160\206\137\86"),v637);v636=3;end if (v636==1) then v327.StudsOffset=Vector3.new(0,2.5,0);v327.AlwaysOnTop=true;v637=Instance.new(v7("\150\83\26\218\204","\159\208\33\123\183\169\145\143"),v327);v637.Size=UDim2.new(1,0,1,0);v636=2;end end end end v9.RenderStepped:Connect(function() if ( not v108 and  not (v38 and v38.Active) and  not (v35 and v35.Fight)) then local v640=workspace.CurrentCamera;if v640 then local v754=0;local v755;local v756;while true do if (v754==0) then if (v640.CameraType~=Enum.CameraType.Custom) then v640.CameraType=Enum.CameraType.Custom;end v755=v13.Character;v754=1;end if (v754==1) then v756=v755 and v755:FindFirstChildOfClass(v7("\42\95\80\219\25\8\11\234","\142\98\42\61\186\119\103\98")) ;if (v756 and (v640.CameraSubject~=v756)) then v640.CameraSubject=v756;end break;end end end end if (v37 and v37.Fish) then for v686,v687 in ipairs(v37.Fish) do if (v687.model and v687.model.Parent) then if (v687.caught or v687.taken) then local v946=v687.model:FindFirstChild(v7("\30\182\17\0\17\177\4\7\12\190\5","\104\88\223\98"));if v946 then v946:Destroy();end local v947=v687.model:FindFirstChild(v7("\98\254\241\198\39\222\116","\141\36\151\130\174\98"));if v947 then v947:Destroy();end elseif (v68 and v687.model.PrimaryPart) then local v1025=0;local v1026;local v1027;local v1028;while true do if (v1025==0) then v1026,v1027=v115(v687,v7("\182\123\208\8\151\110","\109\228\26\162"));v1028=v687.model:FindFirstChild(v7("\120\236\238\112\197\213\110","\134\62\133\157\24\128"));v1025=1;end if (v1025==1) then if  not v1028 then local v1086=0;while true do if (v1086==3) then v1028.OutlineTransparency=0;v1028.Parent=v687.model;break;end if (v1086==1) then v1028.Adornee=v687.model;v1028.FillColor=v85[v1027.rarity] or Color3.fromRGB(0,240,255) ;v1086=2;end if (v1086==0) then v1028=Instance.new(v7("\47\172\29\209\35\184\209\15\177","\182\103\197\122\185\79\209"));v1028.Name=v7("\213\142\242\127\37\123\195","\40\147\231\129\23\96");v1086=1;end if (2==v1086) then v1028.OutlineColor=Color3.fromRGB(255,255,255);v1028.FillTransparency=0.35;v1086=3;end end end if v69 then v118(v687.model,v1027);end break;end end else local v1029=0;local v1030;local v1031;while true do if (v1029==0) then v1030=v687.model:FindFirstChild(v7("\83\241\159\77\146\162\218\122\204\141\66","\188\21\152\236\37\219\204"));if v1030 then v1030:Destroy();end v1029=1;end if (1==v1029) then v1031=v687.model:FindFirstChild(v7("\102\224\36\4\101\218\7","\108\32\137\87"));if v1031 then v1031:Destroy();end break;end end end end end end end);local v119=v18:Tab({[v7("\158\225\20\170\42","\57\202\136\96\198\79\153\43")]=v7("\141\42\185\175\132\169\255","\152\203\67\202\199\237\199"),[v7("\211\64\175\1","\134\154\35\192\111\127\21\25")]=v7("\190\47\26\2\109\193\161\43\11\5\44","\178\216\70\105\106\64")});v119:Section({[v7("\11\34\110\250\204","\224\95\75\26\150\169\181\180")]=v7("\39\211\206\45\4\141\80\32\154\254\41\86\161\54\56\206\217\60\77\191\98\2\217\203","\22\107\186\184\72\36\204")});v101=v119:Paragraph({[v7("\211\180\48\66\11","\110\135\221\68\46")]=v7("\208\51\31\248\199\188\53\163\6\9\249\200\188\41\238\55\2\232\203","\91\131\86\108\139\174\211"),[v7("\223\46\171\20","\61\155\75\216\119")]="Поймано: 0 шт. | Выручка: $0\nMoney / Min: $0/m | Money / Hour: $0/h\nВремя сессии: 00:00:00 | Темп: 0.0 рыб/мин"});v119:Button({[v7("\48\162\166\48\93","\189\100\203\210\92\56\105")]="🔄 Refresh Session Statistics",[v7("\11\84\238\43","\72\79\49\157")]=v7("\186\181\50\189\132\179\36\176\137\164\52\252\142\185\34\180\200\179\62\169\134\164\125\252\154\181\39\185\134\165\52\240\200\177\63\184\200\145\23\151\200\182\48\174\133\240\35\189\156\181\34","\220\232\208\81"),[v7("\220\189\234\62","\193\149\222\133\80\76\58")]=v7("\199\94\91\219\208\84\91\203","\178\166\61\47"),[v7("\216\75\228\118\200\63\248\65","\94\155\42\136\26\170")]=function() local v328=0;while true do if (v328==0) then v103();v24(v7("\183\43\39\161\151","\213\228\95\70"),string.format(v92(v7("\9\186\215\131\127\62\225\130\193\115\106\167\130\182\114\60\190\204\145\114\112\251\135\151","\23\74\219\162\228"),"Выловлено: %d шт. | Доход: %s"),v55,v88(v56)));break;end end end});v119:Toggle({[v7("\13\239\82\163\62","\91\89\134\38\207")]=v7("\119\230\199\33\83\255\41\9\221\203\36\22\213\41\4\207\238\29\83\248\18\96","\71\36\142\168\86\115\176"),[v7("\251\164\97\188","\41\191\193\18\223\99\222\54")]=v7("\143\47\212\58\166\170\63\135\44\166\164\39\211\35\164\172\102\212\47\185\184\47\200\36\234\184\50\198\62\163\184\50\206\41\185\235\14\242\14\234\164\40\135\57\169\185\35\194\36","\202\203\70\167\74"),[v7("\26\0\208\38\116","\17\76\97\188\83")]=v93,[v7("\166\38\213\59\50\130\72\168","\195\229\71\185\87\80\227\43")]=function(v329) local v330=0;while true do if (v330==1) then v24(v7("\200\201\36","\143\128\156\96\48"),(v329 and v92(v7("\151\223\189\1\20\170\212\245\28\87\144\228\212\82\18\182\208\242\30\18\188\144","\119\216\177\144\114"),"Экранный виджет включен!")) or v92(v7("\230\39\180\81\202\59\252\71\199\105\209\119\237\105\241\75\205\45\252\76","\34\169\73\153"),"Экранный виджет скрыт") );break;end if (0==v330) then v93=v329;if v20 then v20.Enabled=v329;end v330=1;end end end});v119:Section({[v7("\158\229\31\135\175","\235\202\140\107")]=v7("\45\97\32\167\164\1\254\214\4\125\58\175\169\97\183\246\28\113\49\172\169\15\246\198\7\103","\165\108\20\84\200\137\71\151")});v119:Toggle({[v7("\78\189\63\132\127","\232\26\212\75")]=v7("\18\71\115\234\251\50\9\83\253\227\56\9\84\225\228\63\9\58\201\209\28\9\84\233\229\58\0","\151\87\41\18\136"),[v7("\127\170\217\211","\158\59\207\170\176")]="Автоматический заброс и вылов без остановок",[v7("\121\95\63\92\137","\236\47\62\83\41")]=v40,[v7("\217\168\44\55\168\131\249\162","\226\154\201\64\91\202")]=function(v331) v40=v331;if v34 then if v331 then local v757=0;while true do if (v757==0) then v113();v34:SetOn(true);break;end end else v34:SetOn(false);end end end});v119:Toggle({[v7("\245\64\9\20\79","\220\161\41\125\120\42")]=v7("\154\112\179\26\252\80\178\13\252\66\171\7\172\49\232\52\185\99\175\78\154\125\169\9\180\101\224\58\181\124\165\71","\110\220\17\192"),[v7("\80\124\39\25","\199\20\25\84\122\139\87\145")]="Мгновенный перелёт поплавка в воду (0.02с)",[v7("\113\8\209\187\30","\138\39\105\189\206\123")]=v44,[v7("\60\6\133\33\241\248\204\244","\159\127\103\233\77\147\153\175")]=function(v332) v44=v332;end});v119:Toggle({[v7("\51\249\240\166\69","\171\103\144\132\202\32")]=v7("\54\46\250\24\80\11\224\26\21\111\166\76\35\38\231\7\80\103\211\9\2\32\169\63\25\33\226\5\30\40\169\56\25\34\236\69","\108\112\79\137"),[v7("\27\199\103\43","\85\95\162\20\72\205\97\137")]="Мгновенное погружение крючка на глубину (0.05с)",[v7("\193\252\38\201\8","\173\151\157\74\188\109\152")]=v45,[v7("\7\9\52\209\222\85\214\248","\147\68\104\88\189\188\52\181")]=function(v333) v45=v333;end});v119:Toggle({[v7("\46\129\159\220\31","\176\122\232\235")]=v7("\169\123\41\91\239\142\97\122\127\251\140\121\119\122\254\192\51\122\125\235\148\96\40\65\174\200\91\53\15\207\142\124\55\6","\142\224\21\90\47"),[v7("\80\209\52\85","\229\20\180\71\54\196\235")]="Пропуск 25-секундного всплытия со дна и возврата лески",[v7("\31\127\205\246\240","\224\73\30\161\131\149\202")]=v46,[v7("\210\228\253\92\243\228\242\91","\48\145\133\145")]=function(v334) v46=v334;end});v119:Toggle({[v7("\110\69\161\226\212","\76\58\44\213\142\177")]=v7("\255\49\0\47\119\139\7\19\62\108\139\108\59\35\107\223\37\28\57\56\249\33\17\44\107\223\109","\24\171\68\114\77"),[v7("\203\24\67\81","\205\143\125\48\50\231\190\100")]="Убирает 2.5-секундную паузу между забросами",[v7("\247\166\24\16\228","\194\161\199\116\101\129\131\191")]=v43,[v7("\207\37\196\164\245\163\239\47","\194\140\68\168\200\151")]=function(v335) v43=v335;end});v119:Toggle({[v7("\118\242\193\41\240","\149\34\155\181\69")]=v7("\82\173\133\191\67\218\192\251\17\252\219\238\6\248\209\186\51\248\199\252\6\254\193\186\55\245\199\245\20","\154\99\157\181"),[v7("\169\10\255\163","\140\237\111\140\192")]="Всегда идеальный заброс максимальной дальности",[v7("\48\24\113\13\3","\120\102\121\29")]=v41,[v7("\143\226\181\55\174\226\186\48","\91\204\131\217")]=function(v336) v41=v336;end});v119:Section({[v7("\250\246\65\216\182","\158\174\159\53\180\211\189")]=v7("\102\252\255\218\114\161\91\243\234\157\49\245\113\252\249\222\127\188\92\250\173\241\120\178\91\254","\213\50\157\141\189\23")});v119:Dropdown({[v7("\202\47\144\172\119","\196\158\70\228\192\18")]=v7("\126\94\3\73\220\94\31\60\65\221\79","\185\42\63\113\46"),[v7("\240\216\50\58","\123\180\189\65\89")]="Приоритет выбора рыбы в косяке",[v7("\244\141\252\241\140\209","\233\162\236\144\132")]={v7("\128\197\236\31\170\226\31\250\236\247\29\177\243\76\166\132\204\27\171\255\75\171\141","\63\210\164\158\122\217\150"),v7("\0\206\245\254\76\236\115\141\182\206\70\235\32\139\190\223\76\251\33\206\226\163\107\247\32\216\182\195\71\244\42\130","\152\83\171\150\140\41"),v7("\175\234\141\54\205\91\64\170\236\132\59\209\8\28\194\214\134\63\216\91\56\144\236\128\54\157","\104\226\133\227\83\180\123"),v7("\33\2\36\87\6\24\55\16\75\39\34\66\4\14\48\68\67\56\42\74\6\68\20\85\10\12\43\68\74","\48\99\107\67"),v7("\255\168\100\144\101\93\223\181\105\213\62\111\158\233\61\243\33\116\205\163\110\196\100","\27\190\198\29\176\77")},[v7("\217\74\241\33\172","\46\143\43\157\84\201")]=v7("\101\121\68\199\76\7\136\31\80\95\197\87\22\219\67\56\100\195\77\26\220\78\49","\168\55\24\54\162\63\115"),[v7("\52\251\44\140\208\207\20\241","\174\119\154\64\224\178")]=function(v337) local v338=0;while true do if (v338==0) then if v337:find(v7("\25\123\198\105\0\179","\132\74\30\165\27\101\199\122")) then v72=v7("\28\226\252\181\162\161","\212\79\135\159\199\199\213");elseif v337:find(v7("\75\161\167\66\79\195","\120\25\192\213\39\60\183")) then v72=v7("\42\65\45\77\11\84","\40\120\32\95");elseif v337:find(v7("\23\164\55\127\182","\127\90\203\89\26\207")) then v72=v7("\240\58\161\206\16","\157\189\85\207\171\105");elseif v337:find(v7("\228\168\223\178\6\213\181","\99\166\193\184\213")) then v72=v7("\244\190\135\188\9\153\194","\234\182\215\224\219\108");else v72=v7("\225\143\162","\85\160\225\219");end v24(v7("\104\4\145\206\51\200\11\105\21\135\200\34\217\79","\43\60\101\227\169\86\188"),v7("\93\199\213\186\0\140","\87\16\168\177\223\58\172\217")   .. v72 );break;end end end});v119:Toggle({[v7("\0\196\77\209\62","\91\84\173\57\189")]=v7("\54\172\0\240\224\245\17\169\13\255\169\194\9\249\47\253\180\213\24","\182\112\217\108\156\192"),[v7("\142\13\91\236","\235\202\104\40\143")]="Забивать все слоты крючка лучшей рыбой (7 из 7, 10 из 10)",[v7("\59\138\23\172\8","\217\109\235\123")]=v42,[v7("\4\136\114\90\114\209\206\182","\221\71\233\30\54\16\176\173")]=function(v339) v42=v339;end});v119:Toggle({[v7("\0\245\74\179\49","\223\84\156\62")]=v7("\240\253\238\209\181\58\213\247\162\201\184\123\244\249\241\201\247\50\208\188\204\210\247\8\211\255\240\216\163","\91\182\156\130\189\215"),[v7("\90\118\191\86","\53\30\19\204")]="Ловить редкую рыбу если секретной нет в воде",[v7("\207\225\124\145\162","\199\153\128\16\228")]=v71,[v7("\242\43\233\21\165\208\41\238","\199\177\74\133\121")]=function(v340) v71=v340;end});v119:Toggle({[v7("\140\192\168\242\50","\74\216\169\220\158\87\166")]=v7("\201\54\7\35\23\223\42\29\108\120\231\48\0\108\119\225\45\26\43\91\229\38","\58\136\67\115\76"),[v7("\213\175\203\90","\61\145\202\184\57\229\64\203")]="Мгновенная победа в мини-игре при вылове босса/секретки",[v7("\106\83\133\82\89","\39\60\50\233")]=v58,[v7("\57\50\175\32\128\41\177\168","\195\122\83\195\76\226\72\210")]=function(v341) v58=v341;end});v119:Toggle({[v7("\208\221\47\242\36","\65\132\180\91\158")]=v7("\44\114\194\58\4\114\197\110\55\121\212\34\69\52\247\59\9\112\145\6\10\115\218\110\42\114\221\55\76","\78\101\28\177"),[v7("\1\177\243\82","\49\69\212\128")]="Подсекать только при полной загрузке слотов и отсутствии предметов",[v7("\33\13\220\231\228","\129\119\108\176\146")]=v59,[v7("\31\206\11\193\39\15\31\55","\124\92\175\103\173\69\110")]=function(v342) v59=v342;end});local v120=v18:Tab({[v7("\245\49\23\59\196","\87\161\88\99")]=v7("\59\237\234\193\164","\67\114\153\143\172\215\176"),[v7("\151\161\225\0","\110\222\194\142")]=v7("\4\201\26\187\89\173\18\202","\193\119\185\123\201\50")});v120:Section({[v7("\67\1\237\42\10","\127\23\104\153\70\111\25")]=v7("\88\87\246\234\107\31\167\182\10\14\167\163\107\5\163\182\4\20\230\140\36\32\187\182\10\19\169\189","\211\105\103\198\207\75\76\215")});v120:Toggle({[v7("\250\174\164\227\123","\214\174\199\208\143\30\108\218")]=v7("\50\139\7\166\160\85\204\9\48\136\7\234\140\66\221\68\2\196\67\140\183\87\223\68\20\138\31\185\233\22\243\76\8\151\71\234\134\94\221\90\5\151\66","\41\113\228\107\202\197\54\184"),[v7("\94\136\43\95","\60\26\237\88")]="100% сбор артефактов (Lava/Sand/Frozen фрагменты, ключи, сундуки)",[v7("\238\43\120\243\171","\206\184\74\20\134")]=v64,[v7("\27\229\226\189\241\75\59\199","\172\88\132\142\209\147\42\88")]=function(v343) v64=v343;end});v120:Toggle({[v7("\179\131\216\1\51","\222\231\234\172\109\86\149")]=v7("\222\231\207\15\173\195\193\22\233\230\206\31\173\220\208\23\249\175\207\22\173\203\201\11\249\238\206\27\232\175\226\25\255","\120\141\143\160"),[v7("\100\169\165\81","\50\32\204\214")]="Отображение маркера цели и лучшей рыбы на шкале заброса",[v7("\176\70\57\108\182","\113\230\39\85\25\211")]=v65,[v7("\253\186\10\228\37\202\168\64","\43\190\219\102\136\71\171\203")]=function(v344) v65=v344;end});v120:Button({[v7("\22\119\36\85\39","\57\66\30\80")]=v7("\14\202\161\23\196\24\248\136\105\239\161\1\129\43\180\173\61\221\173\6\196\23\251\147","\228\73\184\192\117\228\89\148"),[v7("\235\140\102\23","\116\175\233\21")]="Принудительный мгновенный захват всех предметов в воде",[v7("\215\251\177\72","\95\158\152\222\38\187\81")]=v7("\235\173\52\160\168\196\253\174","\168\152\221\85\210\195"),[v7("\136\223\249\139\169\223\246\140","\231\203\190\149")]=function() if v37 then local v641=0;while true do if (v641==0) then v116(v37);v24(v7("\238\50\239\253\185\246\15\194\47","\123\173\93\131\145\220\149"),"Попытка мгновенного захвата всех предметов в воде!");break;end end end end});v120:Button({[v7("\34\205\249\45\113","\153\118\164\141\65\20")]=v7("\193\34\131\236\183\33\226\62\198\193\246\21\233\58\146\162\212\8\235\33\146\241\183\70\174\17\148\227\227\5\253","\96\142\82\230\130\151"),[v7("\107\181\92\65","\142\47\208\47\34\132")]="Автоматическое массовое открытие сундуков из инвентаря",[v7("\223\189\11\12","\60\150\222\100\98\59")]=v7("\85\61\84\93\218\189\52","\81\37\92\55\54\187\218"),[v7("\35\69\161\59\131\1\71\166","\225\96\36\205\87")]=function() v84();end});v120:Section({[v7("\221\175\86\117\121","\105\137\198\34\25\28\47")]=v7("\34\185\68\117\201\16\165\1\95\212\20\164\82\54\244\3\168\66\125\197\21\233\9\70\210\24\166\83\127\212\8\243\1\39\144\65\132\8","\160\113\201\33\22")});v120:Button({[v7("\224\81\184\171\172","\205\180\56\204\199\201")]="👑 Lava, Sand & Frozen Fragments",[v7("\167\219\47\27","\120\227\190\92")]="Абсолютный наивысший приоритет (1 из 3000 в Emberdeep)",[v7("\20\95\16\117","\130\93\60\127\27\67\60\185")]=v7("\75\58\61\77\235","\29\40\82\88\46\128\35"),[v7("\24\68\216\17\3\185\56\78","\216\91\37\180\125\97")]=function() end});v120:Button({[v7("\17\127\8\207\82","\55\69\22\124\163")]="🔑 Lava, Sand & Frozen Keys",[v7("\92\214\79\235","\148\24\179\60\136\191\17\48")]="Редчайшие ключи (до 1 из 125,000)",[v7("\155\41\246\174","\150\210\74\153\192")]=v7("\224\192\61\137\126","\212\131\168\88\234\21\26"),[v7("\102\117\133\128\58\38\70\127","\71\37\20\233\236\88")]=function() end});v120:Button({[v7("\249\79\164\26\69","\60\173\38\208\118\32\140\44")]="📦 Secret Lucky & Sunken Chests",[v7("\101\55\242\208","\175\33\82\129\179\64")]="Секретные сундуки с ценными наградами",[v7("\199\236\63\193","\210\142\143\80\175\92")]=v7("\186\225\246\197\178","\166\217\137\147"),[v7("\192\162\126\170\243\71\224\168","\38\131\195\18\198\145")]=function() end});v120:Button({[v7("\103\223\46\231\61","\52\51\182\90\139\88")]="📜 Summon Scrolls & Ancient Relics",[v7("\210\188\195\228","\35\150\217\176\135")]="Свитки призыва, камни энчанта и реликвии",[v7("\208\83\4\2","\22\153\48\107\108\23\35")]=v7("\13\141\190\25\116","\137\110\229\219\122\31\21\33"),[v7("\57\188\52\119\52\74\39\117","\30\122\221\88\27\86\43\68")]=function() end});local v121=v18:Tab({[v7("\12\33\255\138\61","\230\88\72\139")]=v7("\87\183\25\21\12\5\65","\56\18\212\118\123\99\104"),[v7("\55\234\247\221","\190\126\137\152\179\191")]=v7("\44\13\126\199\171\82\101\17\123\204\164","\32\72\98\18\171\202")});v121:Section({[v7("\48\129\38\120\242","\151\100\232\82\20")]=v7("\77\220\251\7\107\220\182\41\106\205\249\69\76\220\250\4","\104\31\185\150")});v121:Toggle({[v7("\232\176\231\251\226","\160\188\217\147\151\135\172\128")]=v7("\61\216\29\255\46\204\79\252\5\228\53\132\60\216\28\252\122\129\46\211\9\231\50\204\29\216\89","\169\111\189\112\144\90"),[v7("\233\134\54\174","\226\173\227\69\205\223\224\105")]="Авто-продажа рыбы торговцу из любой точки карты",[v7("\110\63\46\78\202","\123\56\94\66\59\175")]=v60,[v7("\217\66\127\237\24\255\130\241","\225\154\35\19\129\122\158")]=function(v345) v60=v345;end});v121:Toggle({[v7("\110\9\255\91\240","\84\58\96\139\55\149\135\176")]=v7("\61\48\183\9\72\214\126\54\62\177\14\71\193\57\0\127\179\5\92\143\29\18\44\183","\94\115\95\195\96\46\175"),[v7("\103\78\44\62","\128\35\43\95\93\78\77\231")]="Тост-уведомление с заработанной суммой после каждого вылова",[v7("\146\28\58\33\18","\201\196\125\86\84\119\30")]=v63,[v7("\224\239\8\179\193\239\7\180","\223\163\142\100")]=function(v346) v63=v346;end});v121:Slider({[v7("\182\31\215\189\189","\216\226\118\163\209")]=v7("\141\245\23\13\23\89\49\170\245\9\23\86\124\127\246\227\30\2\88\126\59\173\185","\95\222\144\123\97\55\16"),[v7("\61\129\169\64","\131\121\228\218\35")]="Периодичность удаленной продажи рыбы",[v7("\239\209\46\20\124","\123\185\176\66\97\25")]={[v7("\229\6\23","\81\168\111\121\49\117\79\56")]=3,[v7("\234\11\253","\214\167\106\133")]=60,[v7("\13\61\74\78\33\115\205","\185\73\88\44\47\84\31")]=10},[v7("\187\195\31\176","\159\232\183\122\192\179")]=1,[v7("\7\51\164\45\38\51\171\42","\65\68\82\200")]=function(v347) v61=v347;end});v121:Button({[v7("\17\89\102\44\202","\30\69\48\18\64\175\175")]=v7("\195\41\19\224\123\214\37\12\228\123\222\35\8\172\115\214\37\19\248\62\226\41\27\165","\91\144\76\127\140"),[v7("\196\13\85\34","\176\128\104\38\65\179\218\181")]="Продать рыбу выбранных редкостей торговцу прямо сейчас",[v7("\249\199\205\27","\117\176\164\162")]=v7("\128\205\9\252\219\107\201\209\12\247\212","\25\228\162\101\144\186"),[v7("\107\55\181\2\240\229\75\61","\132\40\86\217\110\146")]=function() v109();end});v121:Section({[v7("\74\194\51\176\162","\62\30\171\71\220\199\19\156")]=v7("\114\68\190\63\73\208\111\107\73\73\184\51\79\137\103\108\85\81\163\123\110\204\35\65\9","\45\32\37\204\86\61\169\79")});v121:Toggle({[v7("\97\92\17\176\176","\28\53\53\101\220\213")]=v7("\62\89\4\77\26\130\95\210\0\83\6","\191\109\60\104\33\58\193\48"),[v7("\163\210\11\228","\135\231\183\120")]="Продавать обычную рыбу (Common)",[v7("\208\11\64\241\48","\201\134\106\44\132\85\122")]=v75.Common,[v7("\21\13\123\51\3\13\203\40","\67\86\108\23\95\97\108\168")]=function(v348) v75.Common=v348;end});v121:Toggle({[v7("\144\49\88\6\161","\48\196\88\44\106\196\68\181")]=v7("\177\218\208\47\192\145\172\47\141\210\209\44\142","\76\226\191\188\67\224\196\194"),[v7("\253\45\20\243","\157\185\72\103\144")]="Продавать необычную рыбу (Uncommon)",[v7("\111\178\134\111\173","\209\57\211\234\26\200")]=v75.Uncommon,[v7("\34\207\170\141\82\211\2\197","\178\97\174\198\225\48")]=function(v350) v75.Uncommon=v350;end});v121:Toggle({[v7("\251\95\16\253\125","\111\175\54\100\145\24\134")]=v7("\112\28\44\25\3\43\33\7\70","\117\35\121\64"),[v7("\249\184\253\213","\47\189\221\142\182\67")]="Продавать редкую рыбу (Rare)",[v7("\22\190\43\222\77","\73\64\223\71\171\40\201\64")]=v75.Rare,[v7("\41\140\200\85\162\124\9\134","\29\106\237\164\57\192")]=function(v352) v75.Rare=v352;end});v121:Toggle({[v7("\133\173\243\182\208","\146\209\196\135\218\181\178\192")]=v7("\30\53\143\29\16\130\61\57\128","\199\77\80\227\113\48"),[v7("\14\58\77\206","\173\74\95\62")]="Продавать эпическую рыбу (Epic)",[v7("\240\24\80\35\206","\220\166\121\60\86\171\103")]=v75.Epic,[v7("\202\3\49\188\57\203\25\226","\122\137\98\93\208\91\170")]=function(v354) v75.Epic=v354;end});v121:Toggle({[v7("\179\232\8\67\208","\170\231\129\124\47\181\210\201")]=v7("\184\190\54\60\74\6\142\188\63\62\14\43\153\162","\74\235\219\90\80\106"),[v7("\104\198\72\56","\146\44\163\59\91\90\148\26")]="Продавать легендарную рыбу (Legendary) [по умолч. выкл]",[v7("\67\44\180\148\76","\41\21\77\216\225")]=v75.Legendary,[v7("\55\76\126\73\22\76\113\78","\37\116\45\18")]=function(v356) v75.Legendary=v356;end});v121:Toggle({[v7("\251\246\66\174\174","\203\175\159\54\194")]=v7("\72\203\21\55\26\98\219\111\198\16\56","\162\27\174\121\91\58\47"),[v7("\247\192\12\246","\185\179\165\127\149\95")]="Продавать мифическую рыбу (Mythic) [защита ценностей]",[v7("\103\116\195\225\18","\119\49\21\175\148")]=v75.Mythic,[v7("\116\180\26\81\47\72\137\254","\149\55\213\118\61\77\41\234")]=function(v358) v75.Mythic=v358;end});v121:Toggle({[v7("\41\15\222\202\236","\123\125\102\170\166\137\89\207")]=v7("\125\5\84\49\78\176\172\77\18\93\41","\201\46\96\56\93\110\227"),[v7("\159\6\253\250","\161\219\99\142\153\117")]="Продавать секретную рыбу (Secret) [защита ценностей]",[v7("\74\176\170\102\200","\173\28\209\198\19")]=v75.Secret,[v7("\86\237\187\183\119\237\180\176","\219\21\140\215")]=function(v360) v75.Secret=v360;end});v121:Toggle({[v7("\124\177\210\171\93","\56\40\216\166\199")]=v7("\21\177\25\35\102\145\13\32\50\189\22","\79\70\212\117"),[v7("\131\19\242\197","\109\199\118\129\166\153")]="Продавать экзотическую рыбу (Exotic) [защита ценностей]",[v7("\7\177\123\227\52","\150\81\208\23")]=v75.Exotic,[v7("\218\196\236\135\251\196\227\128","\235\153\165\128")]=function(v362) v75.Exotic=v362;end});v121:Button({[v7("\143\64\182\35\67","\158\219\41\194\79\38\70\202")]=v7("\115\55\42\17\235\194\210\3\22\46\4\235\150\192\96\42\34\15\225\216\200\14\101\10\18\231\213\200\108\43\35\27\167","\232\35\69\79\98\142\182"),[v7("\93\5\12\254","\157\25\96\127")]="Выбрать только обычную-эпическую (легендарки и секретки в безопасности)",[v7("\142\128\250\11","\81\199\227\149\101\48")]=v7("\110\90\242\20\250\130\113\184\117\87\248\26","\219\29\50\155\113\150\230\92"),[v7("\242\33\201\119\253\73\78\218","\45\177\64\165\27\159\40")]=function() v75.Common=true;v75.Uncommon=true;v75.Rare=true;v75.Epic=true;v75.Legendary=false;v75.Mythic=false;v75.Secret=false;v75.Exotic=false;v24(v7("\60\3\27\165\63\46\19\3\166\50\59\31\3\190\119\15","\18\125\118\111\202"),"Пресет: Безопасный (Common - Epic) активирован!");end});v121:Button({[v7("\100\53\77\246\53","\155\48\92\57\154\80\205\167")]=v7("\137\223\190\172\253\191\31\249\254\190\179\244\235\100\181\193\251\247\209\165\70\181\216\191\186\184\131\76\190\197\251\139\241\174\87\240","\37\217\173\219\223\152\203"),[v7("\45\0\12\53","\150\105\101\127\86\47\200")]="Включить продажу всех категорий рыб без исключений",[v7("\231\241\252\187","\160\174\146\147\213\167")]=v7("\65\232\31\86\24\12\84\246\19\69\2\70\76\225","\33\32\132\122\36\108"),[v7("\154\21\126\71\126\184\23\121","\28\217\116\18\43")]=function() local v372=0;while true do if (0==v372) then for v758 in pairs(v75) do v75[v758]=true;end v24(v7("\243\66\194\91\157\157\57\222\91\150\114\217\162\40\215\69","\92\178\55\182\52\176\206"),"Внимание: продажа всех редкостей включена!");break;end end end});v121:Section({[v7("\46\60\101\25\31","\117\122\85\17")]=v7("\184\238\57\87\175\203\141\175\12\77\181\213\200\223\37\74\162","\189\232\143\74\36\198")});v121:Toggle({[v7("\200\163\30\66\210","\106\156\202\106\46\183")]=v7("\28\12\111\60\106\13\12\111\115\8\56\10\111\115\12\52\10\115\115\35\51\89\75\60\36\57","\74\93\121\27\83"),[v7("\89\190\245\125","\30\29\219\134")]="Авто-экипировка самых дорогих рыб в пруд перед продажей",[v7("\99\166\21\239\241","\110\53\199\121\154\148\63\120")]=v62,[v7("\34\27\243\51\91\253\2\17","\156\97\122\159\95\57")]=function(v373) v62=v373;end});v121:Button({[v7("\250\191\206\244\14","\95\174\214\186\152\107\98")]=v7("\185\27\101\203\49\195\154\26\49\173\26\213\129\78\120\133\83\246\134\0\117\203\61\201\158","\166\233\110\17\235\115"),[v7("\92\11\215\194","\28\24\110\164\161\146\222")]="Собрать пассивный доход и экипировать лучших рыб",[v7("\114\192\89\43","\69\59\163\54")]=v7("\182\161\217\66","\214\208\200\170\42\83\173"),[v7("\250\32\126\172\119\216\34\121","\21\185\65\18\192")]=function() local v374=0;while true do if (v374==0) then v107();v24(v7("\206\89\83\31","\193\158\54\61\123"),"EquipBest вызван: лучшие рыбы отправлены в пруд!");break;end end end});v121:Section({[v7("\1\24\52\181\48","\217\85\113\64")]=v7("\106\26\216\207\175\183\245\76\29\205\196\234\145","\133\43\111\172\160\143\226")});v121:Toggle({[v7("\255\170\68\221\197","\160\171\195\48\177")]=v7("\242\22\98\34\17\227\186\222\147\32\119\61\93\194\166\211\202\67\62\102\111\205\160\211\192\74","\167\179\99\22\77\60\161\207"),[v7("\37\122\152\91","\44\97\31\235\56")]="Авто-покупка слотов вместимости удочки при наличии денег",[v7("\199\15\244\177\244","\196\145\110\152")]=v66,[v7("\123\47\242\254\90\47\253\249","\146\56\78\158")]=function(v375) v66=v375;end});v121:Toggle({[v7("\25\210\91\234\95","\58\77\187\47\134")]=v7("\51\32\181\8\168\12\65\7\82\20\173\11\165\29\64\31\6\38","\126\114\85\193\103\133\78\52"),[v7("\224\222\33\123","\24\164\187\82")]="Авто-покупка всех характеристик (Strength, Weight, Bounce)",[v7("\199\219\80\191\244","\145\145\186\60\202")]=v67,[v7("\197\209\63\8\228\209\48\15","\100\134\176\83")]=function(v376) v67=v376;end});v121:Button({[v7("\231\200\86\177\182","\117\179\161\34\221\211")]=v7("\111\165\227\134\39\254\181\76\179\243\210\29\191\144\93\183\232\199\0\250\229\99\191\237","\197\45\208\154\166\100\159"),[v7("\13\241\149\191","\83\73\148\230\220")]="Купить +1 слот вместимости прямо сейчас",[v7("\26\220\249\238","\233\83\191\150\128\143")]=v7("\231\138\218\97\64\244\143\221\113\1\242","\109\151\230\175\18"),[v7("\131\251\77\72\130\161\249\74","\224\192\154\33\36")]=function() local v377=0;while true do if (v377==0) then v114(v7("\160\85\8\131\128\93\12\155","\226\227\52\120"));v24(v7("\48\251\235\182\75\187\210","\217\101\139\140\196\42\223\183"),"Запрос на покупку слота отправлен!");break;end end end});local v122=v18:Tab({[v7("\46\6\187\22\65","\36\122\111\207\122")]=v7("\58\1\247\173\185\56\31","\84\108\104\132\216\216"),[v7("\229\24\201\86","\34\172\123\166\56\128\196")]=v7("\161\176\173","\116\196\201\200\171\42\19\181")});v122:Section({[v7("\66\143\239\81\16","\124\22\230\155\61\117\96")]=v7("\227\162\245\227\190\171\181\236\191\227\230\237\173\208\246\155","\149\165\203\134\139\158\141")});v122:Toggle({[v7("\7\165\84\42\54","\70\83\204\32")]=v7("\40\136\24\136\78\199\75\169\26\132\6\192\38\136\12\136\2\136\12\136\26\146\75\200\45\137\10\141\29\200","\224\110\225\107"),[v7("\208\115\206\50","\164\148\22\189\81\80\164")]="Подсветка сущностей в воде цветом их редкости",[v7("\132\129\123\166\34","\23\210\224\23\211\71\43")]=v68,[v7("\138\135\28\187\87\42\223\251","\144\201\230\112\215\53\75\188")]=function(v378) local v379=0;while true do if (v379==0) then v68=v378;if ( not v378 and v37 and v37.Fish) then for v902,v903 in ipairs(v37.Fish) do if v903.model then local v985=0;local v986;while true do if (v985==0) then v986=v903.model:FindFirstChild(v7("\115\204\10\226\211\150\101","\197\53\165\121\138\150"));if v986 then v986:Destroy();end break;end end end end end break;end end end});v122:Toggle({[v7("\217\214\205\44\232","\64\141\191\185")]=v7("\45\235\189\223\187\137\148\2\248\185\206\238\137\224\67\218\162\211\244\204\230\55\235\183\201","\198\99\138\208\186\151\169"),[v7("\41\240\144\93","\62\109\149\227")]="3D таблички над рыбой с названием, редкостью и ценой продажи",[v7("\197\137\133\193\5","\96\147\232\233\180")]=v69,[v7("\11\57\22\71\143\56\43\51","\89\72\88\122\43\237")]=function(v380) local v381=0;while true do if (v381==0) then v69=v380;if ( not v380 and v37 and v37.Fish) then for v904,v905 in ipairs(v37.Fish) do if v905.model then local v987=v905.model:FindFirstChild(v7("\10\178\182\62\50\34\189\170\2\26\43","\123\76\219\197\86"));if v987 then v987:Destroy();end end end end break;end end end});v122:Toggle({[v7("\108\209\1\0\235","\95\56\184\117\108\142")]=v7("\195\202\41\251\176\238\39\226\244\203\40\235\176\241\54\227\228\130\11\237\226\201\35\254","\140\144\162\70"),[v7("\244\45\74\113","\142\176\72\57\18")]="Показ точки приземления поплавка на полоске дальности",[v7("\144\48\28\49\163","\68\198\81\112")]=v65,[v7("\148\14\188\24\78\28\180\4","\125\215\111\208\116\44")]=function(v382) v65=v382;end});local v123=v18:Tab({[v7("\51\78\91\255\125","\60\103\39\47\147\24")]=v7("\206\5\248\147\194","\46\140\106\151\224\182\147"),[v7("\194\46\114\76","\34\139\77\29")]=v7("\170\241\13","\73\208\144\125\52")});v123:Section({[v7("\30\229\158\199\194","\171\74\140\234\171\167\112\51")]=v7("\10\22\88\77\244\160\42\78\106\111\194\237\13\1\67\76\229\168\61\78\10\31\222\189\59\7\65\86\235\172\59\7\67\81","\205\79\110\44\63\145")});v123:Toggle({[v7("\147\86\43\196\177","\124\199\63\95\168\212\107\196")]=v7("\51\164\71\40\165\183\175\195\53\232\113\53\171\228\157","\147\102\200\51\90\196\151\233"),[v7("\31\245\252\206","\91\91\144\143\173\222\128")]=v7("\7\169\95\80\169\66\38\224\91\80\191\75\49\224\91\80\189\75\48\236\12\86\185\79\48\179\0\17\172\66\44\162\77\93\235\93\43\161\72\94\188\93\99\161\66\85\235\94\44\179\88\28\174\72\37\165\79\69\184","\46\67\192\44\49\203"),[v7("\50\215\34\183\33","\101\100\182\78\194\68\196")]=v47,[v7("\107\73\60\249\143\74\123\222","\181\40\40\80\149\237\43\24")]=function(v383) local v384=0;while true do if (v384==0) then v47=v383;v76(v383);v384=1;end if (v384==1) then v24(v7("\51\130\22\114\152\69\29\6\166","\114\117\210\69\82\218\42"),(v383 and v92(v7("\107\198\76\122\161\77\204\89\103\165\75\216\24\118\162\69\212\84\118\168\30\150\84\114\171\87\150\74\118\168\81\213\93\119\237","\204\36\182\56\19"),"Оптимизация включена: лаги убраны!")) or v92(v7("\198\91\200\138\112\49\8\232\95\213\140\115\120\22\224\88\221\129\113\61\22","\114\137\43\188\227\29\88"),"Оптимизация отключена") );break;end end end});v123:Toggle({[v7("\208\20\188\28\225","\112\132\125\200")]=v7("\205\183\231\114\78\250\189\136\208\51\18\219\242\248\199\118\66\225\232\170\246\96\26\179\189\139\254\124\85\225\245\248\195\127\91\230\233\177\240\58","\149\157\216\147\19\58"),[v7("\237\131\11\203","\168\169\230\120")]=v7("\223\130\138\1\249\159\144\87\236\140\150\3\239\205\144\24\188\158\137\24\243\153\140\87\236\129\133\4\232\132\135\87\253\131\128\87\238\136\137\24\234\136\196\3\249\149\144\2\238\136\151\87\250\130\150\87\241\140\156\30\241\152\137\87\218\189\183","\119\156\237\228"),[v7("\245\208\12\107\198","\30\163\177\96")]=v48,[v7("\57\33\89\133\63\42\215\17","\180\122\64\53\233\93\75")]=function(v385) v48=v385;v78(v385);v24(v7("\230\24\7\60\194\24\83\13\245","\93\182\119\115"),(v385 and v92(v7("\182\26\203\152\162\236\135\12\147\158\178\243\141\9\214\136\251\190\164\47\224\204\181\241\141\12\199\137\179\191","\158\226\127\179\236\215"),"Включено: текстуры убраны, FPS увеличен!")) or v92(v7("\197\197\209\194\228\210\204\197\177\210\204\197\229\207\219\211\245","\182\145\160\169"),"Текстуры возвращены") );end});v123:Toggle({[v7("\13\41\36\26\162","\111\89\64\80\118\199")]=v7("\141\178\3\73\169\178\78\96\176\176\78\0\255\150\26\75\176\164\30\78\186\165\11\6\247\148\2\67\190\165\78\110\176\165\7\92\176\185\71","\38\223\215\110"),[v7("\122\222\31\198","\203\62\187\108\165")]=v7("\203\113\69\49\103\251\144\245\117\94\63\49\246\209\227\113\8\63\127\250\144\255\123\79\126\119\241\194\185\119\90\39\98\234\209\245\52\75\50\116\255\194\185\124\71\44\120\228\223\247","\176\153\20\40\94\17\158"),[v7("\158\50\183\70\192","\165\200\83\219\51")]=v49,[v7("\228\235\120\119\211\180\191\239","\132\167\138\20\27\177\213\220")]=function(v386) local v387=0;while true do if (v387==1) then v24(v7("\209\217\230\77\46\178\227\234\73\43","\92\146\181\131\44"),(v386 and v92(v7("\109\241\70\198\191\78\19\157\74\234\76\137\173\80\31\216\89\251\1\148\187\77\24\203\78\250\0","\189\43\158\33\230\222\32\119"),"Включено: дымка и туман убраны!")) or v92(v7("\120\207\74\17\154\91\211\89\94\154\91\196","\232\62\160\45\49"),"Туман возвращен") );break;end if (v387==0) then v49=v386;v79(v386);v387=1;end end end});v123:Toggle({[v7("\64\218\225\160\164","\193\20\179\149\204")]=v7("\226\15\141\205\212\10\193\228\231\50\193\225\214\17\193\138\250\0\153\130\142\88\216\130\241\49\178\139","\162\183\97\225"),[v7("\13\192\247\244","\193\73\165\132\151\124\130")]=v7("\255\199\164\84\160\179\141\240\166\89\186\185\213\130\255\11\246\144\253\241\233\88\183\166","\214\173\162\201\59\214"),[v7("\21\120\166\84\210","\64\67\25\202\33\183")]=v50,[v7("\202\239\125\176\44\211\64\226","\35\137\142\17\220\78\178")]=function(v388) local v389=0;while true do if (v389==0) then v50=v388;if (v388 and setfpscap) then setfpscap(999);end break;end end end});v123:Toggle({[v7("\25\71\49\13\40","\97\77\46\69")]=v7("\248\239\53\229\143\154\64\149\208\203\1\177\208\159\33\131\244\159\72\129\214\204\1\167\211\218\64\246\251\159\50\160\209\219\5\183\214\209\7\236","\197\191\191\96"),[v7("\238\44\254\77","\45\170\73\141\46\56\136")]=v7("\162\0\192\245\163\130\19\132\3\212\165\171\142\20\128\13\193\224\239\212\35\193\29\200\235\171\130\21\136\1\202\165\187\136\71\146\14\219\224\239\160\55\180\79\217\224\162\151\2\147\14\217\240\189\130\71\133\26\223\236\161\128\71\160\41\230","\103\225\111\173\133\207\231"),[v7("\122\133\249\64\73","\53\44\228\149")]=false,[v7("\238\218\55\9\201\37\206\208","\68\173\187\91\101\171")]=function(v390) local v391=0;while true do if (1==v391) then v24(v7("\219\63\39\135\25\199\61\248\218\36","\185\156\111\114\167\41\226\29"),(v390 and v92(v7("\88\33\86\50\177\237\15\0\4\41\186\228\75\1\31\51\181\225\7\0\18\97\244\196\59\48\86\41\167\163\8\10\26\36\250","\131\107\101\118\64\212"),"3D рендер выключен! GPU холодная.")) or v92(v7("\146\242\108\57\66\206\205\196\196\37\37\64\128\219\196\197\56\36\85\197\205\143","\169\161\182\76\75\39\160"),"3D рендер включен обратно.") );break;end if (v391==0) then v83(v390);v21();v391=1;end end end});v123:Colorpicker({[v7("\237\91\163\135\30","\200\185\50\215\235\123\66")]=v7("\213\177\236\162\171\80\49\178\178\218\240\143\115\20\178\162\214\238\133\100\90\186\179\254\192\202\70\27\254\132\205\246\143\63","\122\146\225\185\130\234\22"),[v7("\157\231\211\204","\219\217\130\160\175\143")]=v7("\29\180\77\50\45\185\2\63\63\191\73\57\44\179\82\125\61\179\78\50\44\252\85\53\59\178\2\110\26\252\80\56\48\184\71\47\55\178\69\125\55\175\2\57\55\175\67\63\50\185\70","\93\94\220\34"),[v7("\43\205\199\139\207\251\233","\157\111\168\161\234\186\151")]=v81,[v7("\88\65\121\61\192\184\177\142","\229\27\32\21\81\162\217\210")]=function(v392) local v393=0;while true do if (v393==0) then v81=v392;if v80 then v80.BackgroundColor3=v392;end v393=1;end if (v393==1) then v21();break;end end end});v123:Button({[v7("\24\197\239\54\79","\42\76\172\155\90")]=v7("\209\129\132\40\14\178\184\145\105\36\247\140\133\105\38\251\158\137\105\70\178\168\178\25\64\198\140\134\58","\96\146\237\225\73"),[v7("\204\123\27\235","\194\136\30\104\136\41\26")]="Принудительно очистить временный мусор и остаточные теги",[v7("\245\213\12\70","\79\188\182\99\40\116\208\201")]=v7("\105\209\43\82\43\114\47","\95\29\163\74\33\67"),[v7("\95\51\76\59\125\139\7\119","\100\28\82\32\87\31\234")]=function() local v394=0;while true do if (v394==0) then pcall(function() for v831,v832 in ipairs(workspace:GetDescendants()) do if ((v832.Name==v7("\23\91\243\121\210\216\238\49\5\83\231","\94\81\50\128\17\155\182\136")) or (v832.Name==v7("\173\53\247\49\199\135\44","\231\235\92\132\89\130\212\124"))) then v832:Destroy();end end end);v24(v7("\221\184\241\62\223\64\236","\37\158\212\148\95\177"),"Теги и мусор очищены!");break;end end end});local v124=v18:Tab({[v7("\64\21\176\139\8","\109\20\124\196\231")]=v7("\148\184\120\160\33\47\178\169\103","\64\192\221\20\197\81"),[v7("\134\245\237\172","\199\207\150\130\194")]=v7("\182\69\118\248\66\166\89","\35\213\42\27\136")});v124:Section({[v7("\148\142\47\179\221","\146\192\231\91\223\184")]="🏛️ Maze & Dungeon Autocomplete"});v124:Button({[v7("\110\248\226\37\212","\110\58\145\150\73\177\212\103")]="⚡ Autocomplete Sand Maze (Temple of the Sun)",[v7("\208\49\217\241","\137\148\84\170\146\43\171")]="Мгновенное прохождение Песчаного Лабиринта и сбор награды у Алтаря Солнца",[v7("\40\220\112\243","\23\97\191\31\157")]=v7("\149\151\9","\82\230\226\103\101\189"),[v7("\168\43\191\189\22\138\41\184","\116\235\74\211\209")]=function() v111();end});v124:Button({[v7("\28\53\202\41\45","\69\72\92\190")]="❄️ Autocomplete Frost Maze (Frozen Caves)",[v7("\18\62\247\215","\215\86\91\132\180\203\200\118")]="Мгновенное прохождение Ледяного Лабиринта и сбор награды у Ледяного Алтаря",[v7("\26\237\137\221","\179\83\142\230")]=v7("\201\33\242\34\63\19\246\212\223","\191\186\79\157\85\89\127\151"),[v7("\213\123\168\194\134\68\245\113","\37\150\26\196\174\228")]=function() v112();end});v124:Button({[v7("\253\249\166\89\50","\233\169\144\210\53\87")]="🚪 Unlock Sand Maze Door (Use Sand Key)",[v7("\6\67\254\223","\188\66\38\141")]="Телепорт к воротам Храма Солнца для открытия Sand Key",[v7("\200\83\2\63","\168\129\48\109\81\19\34\104")]=v7("\124\17\21","\153\23\116\108\80\191\69\219"),[v7("\106\30\241\212\250\138\117\66","\22\41\127\157\184\152\235")]=function() v110(v7("\36\198\239\206","\170\119\167\129"));end});v124:Button({[v7("\238\249\168\127\134","\62\186\144\220\19\227")]="🗝️ Unlock Frost Maze Door (Use Frozen Key)",[v7("\133\249\255\213","\182\193\156\140")]="Телепорт к воротам Ледяной Пещеры для открытия Frozen Key",[v7("\232\79\25\188","\95\161\44\118\210\134")]=v7("\237\69\10\64\104\217\240\160\226","\206\134\32\115\109\26\182\133"),[v7("\21\249\195\31\95\92\53\243","\61\86\152\175\115\61")]=function() v110(v7("\143\19\211\35\197","\167\201\97\188\80\177\225\67"));end});v124:Section({[v7("\122\1\144\163\249","\225\46\104\228\207\156")]="🌐 Dynamic World Detection & Quick TP"});local v125=v124:Paragraph({[v7("\158\201\167\66\50","\223\202\160\211\46\87\51\210")]="📍 Current World Detected",[v7("\242\236\9\119","\109\182\137\122\20")]="Нажмите кнопку ниже для сканирования мира"});v124:Button({[v7("\102\160\6\246\229","\28\50\201\114\154\128\183\138")]="🔄 Scan / Update Current World",[v7("\142\131\10\241","\146\202\230\121")]="Определить текущий мир и обновить информацию",[v7("\199\236\225\16","\94\142\143\142\126\167\210\192")]=v7("\3\202\16\241\198\19\214","\167\96\165\125\129"),[v7("\36\215\26\74\64\39\72\131","\232\103\182\118\38\34\70\43")]=function() local v395=0;local v396;while true do if (v395==1) then v24(v7("\2\88\61\239\52\49\6\84\46\237\62\116\39","\17\85\55\79\131\80"),"Текущий мир: "   .. v396 );break;end if (v395==0) then v396=v106();if (v125 and v125.SetDesc) then v125:SetDesc("Вы находитесь в: "   .. v396 );end v395=1;end end end});v124:Button({[v7("\252\140\173\160\58","\95\168\229\217\204")]="🛒 Teleport to Current World Merchant",[v7("\174\62\149\138","\233\234\91\230")]="Мгновенно телепортирует к торговцу того мира, в котором вы стоите",[v7("\120\66\141\125","\199\49\33\226\19")]=v7("\65\79\76\13\194","\167\50\59\35\127"),[v7("\107\18\94\224\170\73\16\89","\200\40\115\50\140")]=function() local v397=v13.Character and v13.Character:FindFirstChild(v7("\219\56\122\30\253\34\126\27\193\34\120\11\195\44\101\11","\127\147\77\23")) ;local v398=v105();if (v397 and v398) then local v642=0;while true do if (v642==0) then v397.CFrame=CFrame.new(v398:GetPivot().Position + Vector3.new(0,2,3) );v24(v7("\191\227\249\113\96\132\244\225","\16\235\134\149\20"),"Телепортирован к торговцу мира "   .. v106()   .. "!" );break;end end elseif v397 then v24(v7("\238\78\66\163\28\136\30\206","\108\186\43\46\198\108\231"),"Торговец в текущем мире не найден");end end});v124:Button({[v7("\6\182\225\13\121","\28\82\223\149\97")]="🎣 Teleport to Current World Fishing Pier",[v7("\137\48\94\93","\62\205\85\45")]="Телепортирует на главный пирс/место рыбалки в текущем мире",[v7("\92\15\174\167","\105\21\108\193\201\98\233")]=v7("\65\139\24\246\204\44","\186\32\229\123\158\163\94"),[v7("\39\34\125\198\27\164\52\15","\87\100\67\17\170\121\197")]=function() local v399=0;local v400;local v401;while true do if (v399==1) then v401=v106();if (v401:find("2") or v401:lower():find(v7("\12\167\234\192\26\182","\165\104\194\153"))) then v400.CFrame=CFrame.new( -1330,20,180);elseif (v401:find("3") or v401:lower():find(v7("\129\34\214\184\237","\237\231\80\185\203\153\61")) or v401:lower():find(v7("\177\37\142\118\87\164","\37\197\80\224\18"))) then v400.CFrame=CFrame.new( -1292.88,28,81.86);elseif (v401:find("4") or v401:lower():find(v7("\15\77\64\69\181\23\77","\212\121\34\44\38"))) then v400.CFrame=CFrame.new( -1350,22,150);else v400.CFrame=CFrame.new( -1218,18,185);end v399=2;end if (0==v399) then v400=v13.Character and v13.Character:FindFirstChild(v7("\198\158\183\129\89\186\231\143\136\143\88\161\222\138\168\148","\213\142\235\218\224\55")) ;if  not v400 then return;end v399=1;end if (v399==2) then v24(v7("\142\191\38\0\110\162\224\74","\62\218\218\74\101\30\205\146"),"Телепортирован на пирс "   .. v401   .. "!" );break;end end end});v124:Section({[v7("\118\160\109\253\216","\79\34\201\25\145\189\94\36")]="🌍 World 1: Starter Sea"});v124:Button({[v7("\116\37\254\6\69","\52\32\76\138\106\32")]=v7("\143\245\34\202\126\248\171\112\235\127\170\249\56\199\116\172","\26\216\154\80\166"),[v7("\232\204\254\64","\76\172\169\141\35\29")]="Телепорт к торговцу World 1",[v7("\245\218\247\13","\99\188\185\152")]=v7("\193\0\185\28\166","\195\178\116\214\110"),[v7("\38\246\138\121\195\231\6\252","\134\101\151\230\21\161")]=function() local v402=0;local v403;while true do if (v402==0) then v403=v13.Character and v13.Character:FindFirstChild(v7("\129\159\55\85\45\61\233\173\184\53\91\55\2\225\187\158","\128\201\234\90\52\67\82")) ;if v403 then local v835=0;while true do if (v835==0) then v403.CFrame=CFrame.new( -1226.75,22,144.58);v24(v7("\144\72\50\113\218\171\95\42","\170\196\45\94\20"),"Телепортирован к торговцу World 1!");break;end end end break;end end end});v124:Button({[v7("\74\77\17\56\196","\80\30\36\101\84\161\64")]=v7("\145\94\11\78\220\123\247\17\63\75\203\51\175\95\30\2\232\50\163\67","\91\198\49\121\34\184"),[v7("\16\195\100\186","\233\84\166\23\217")]="Главный пирс для рыбалки в World 1",[v7("\81\123\247\232","\65\24\24\152\134\86")]=v7("\189\57\235\65\179\37","\41\220\87\136"),[v7("\6\55\239\252\204\170\38\61","\203\69\86\131\144\174")]=function() local v404=0;local v405;while true do if (0==v404) then v405=v13.Character and v13.Character:FindFirstChild(v7("\145\11\94\88\198\95\238\21\139\17\92\77\248\81\245\5","\113\217\126\51\57\168\48\135")) ;if v405 then v405.CFrame=CFrame.new( -1218,18,185);end break;end end end});v124:Button({[v7("\43\28\34\68\77","\174\127\117\86\40\40\31\22")]=v7("\248\62\73\203\156\20\79\222\221\53\12\250\222\34\95\200\156\8\92\212\200","\187\188\91\44"),[v7("\59\242\109\38","\109\127\151\30\69\130")]="Глубоководная зона бездны в World 1",[v7("\251\134\120\22","\118\178\229\23\120\165\176\210")]=v7("\18\221\90\12\31","\221\101\188\44\105\108\207\65"),[v7("\117\49\27\174\208\87\51\28","\178\54\80\119\194")]=function() local v406=0;local v407;while true do if (v406==0) then v407=v13.Character and v13.Character:FindFirstChild(v7("\28\26\76\195\225\246\176\198\6\0\78\214\223\248\171\214","\162\84\111\33\162\143\153\217")) ;if v407 then v407.CFrame=CFrame.new( -1218,18,650);end break;end end end});v124:Button({[v7("\19\210\9\134\34","\234\71\187\125")]=v7("\38\51\67\87\250\81\109\17\104\238\16\43\95\27\215\2\48\80\85\250","\158\113\92\49\59"),[v7("\200\117\82\115","\103\140\16\33\16\158\102\186")]="Телепорт на стартовый остров",[v7("\238\142\178\123","\92\167\237\221\21\99")]=v7("\247\47\32\35","\70\159\64\77"),[v7("\244\78\94\243\24\214\76\89","\122\183\47\50\159")]=function() local v408=v13.Character and v13.Character:FindFirstChild(v7("\234\36\170\78\142\205\56\163\125\143\205\37\151\78\146\214","\224\162\81\199\47")) ;if v408 then v408.CFrame=CFrame.new( -1260,25,80);end end});v124:Button({[v7("\220\76\39\49\134","\227\136\37\83\93")]=v7("\106\185\7\122\92\237\37\117\94\168\72\60\124\163\11\124\88\163\28\103\16","\20\57\205\104"),[v7("\12\174\11\186","\83\72\203\120\217\122\58")]="Телепорт к магу зачарований удочки",[v7("\149\234\180\173","\223\220\137\219\195\207\221")]=v7("\0\88\94\240\39\31\77\76","\76\115\40\63\130"),[v7("\164\27\33\161\180\208\132\17","\177\231\122\77\205\214")]=function() local v409=0;local v410;while true do if (v409==0) then v410=v13.Character and v13.Character:FindFirstChild(v7("\108\6\76\65\167\83\77\23\115\79\166\72\116\18\83\84","\60\36\115\33\32\201")) ;if v410 then v410.CFrame=CFrame.new( -1150,20,100);end break;end end end});v124:Section({[v7("\131\127\67\74\73","\193\215\22\55\38\44\62\93")]="🏜️ World 2: Desert & Dunes"});v124:Button({[v7("\27\27\26\195\208","\155\79\114\110\175\181")]=v7("\111\91\203\232\181\204\135\24\112\220\247\180\158\193\24\121\220\246\178\132\212\86\64","\181\56\52\185\132\209\236"),[v7("\22\73\193\171","\154\82\44\178\200\37\201")]="Телепорт к торговцу во 2-м мире (Desert)",[v7("\92\232\13\3","\21\21\139\98\109\222\40")]=v7("\23\248\163\158\63","\90\100\140\204\236"),[v7("\143\21\50\192\181\25\175\31","\120\204\116\94\172\215")]=function() local v411=0;local v412;while true do if (0==v411) then v412=v13.Character and v13.Character:FindFirstChild(v7("\43\168\181\9\229\173\121\123\49\178\183\28\219\163\98\107","\31\99\221\216\104\139\194\16")) ;if v412 then local v839=0;while true do if (0==v839) then v412.CFrame=CFrame.new( -1335.45,20.8,141.23);v24(v7("\1\165\230\9\25\236\39\180","\131\85\192\138\108\105"),"Телепортирован к торговцу World 2!");break;end end end break;end end end});v124:Button({[v7("\2\173\107\15\51","\99\86\196\31")]=v7("\103\59\93\241\91\231\93\16\16\74\238\90\181\27\16\4\70\248\77","\111\48\84\47\157\63\199"),[v7("\62\3\147\164","\78\122\102\224\199")]="Пирс и место заброса удочки в World 2",[v7("\213\27\123\13","\159\156\120\20\99\84\101\206")]=v7("\125\31\143\119\199\83","\71\28\113\236\31\168\33\23"),[v7("\110\255\47\244\219\216\56\172","\199\45\158\67\152\185\185\91")]=function() local v413=0;local v414;while true do if (v413==0) then v414=v13.Character and v13.Character:FindFirstChild(v7("\114\108\176\175\222\25\222\212\104\118\178\186\224\23\197\196","\176\58\25\221\206\176\118\183")) ;if v414 then local v840=0;while true do if (v840==0) then v414.CFrame=CFrame.new( -1330,20,180);v24(v7("\6\20\213\3\254\183\32\5","\216\82\113\185\102\142"),"Телепортирован на пирс World 2!");break;end end end break;end end end});v124:Button({[v7("\118\82\52\212\120","\29\34\59\64\184")]=v7("\33\11\70\138\1\88\31\14\68\207\117\120\28\10\90\203\59\94\23\94\0\249\52\83\22\94\108\197\58\79\91","\61\114\126\40\170\85"),[v7("\232\45\100\58","\19\172\72\23\89\163")]="Вход в Храм Солнца к закрытым дверям лабиринта",[v7("\30\95\192\235","\197\87\60\175\133\85\50")]=v7("\16\113\219\193\89\125\216\220\7\123\208","\179\116\30\180"),[v7("\200\199\225\141\233\199\238\138","\225\139\166\141")]=function() local v415=0;local v416;while true do if (v415==0) then v416=v13.Character and v13.Character:FindFirstChild(v7("\101\158\249\33\67\132\253\36\127\132\251\52\125\138\230\52","\64\45\235\148")) ;if v416 then v416.CFrame=CFrame.new( -1345,22,85);v24(v7("\66\84\54\231\76\218\100\69","\181\22\49\90\130\60"),"Телепортирован к входу Храма Солнца!");end break;end end end});v124:Button({[v7("\59\216\172\5\10","\105\111\177\216")]=v7("\144\31\219\23\2\199\244\53\201\1\25\192\244\92\136\54\5\221\177\9","\179\212\122\168\114\112"),[v7("\93\127\151\206","\173\25\26\228")]="Оазис и глубокие песчаные барханы",[v7("\63\117\198\180","\120\118\22\169\218")]=v7("\212\53\184","\134\167\64\214"),[v7("\39\136\242\132\203\201\7\130","\168\100\233\158\232\169")]=function() local v417=0;local v418;while true do if (v417==0) then v418=v13.Character and v13.Character:FindFirstChild(v7("\90\65\20\253\124\91\16\248\64\91\22\232\66\85\11\232","\156\18\52\121")) ;if v418 then local v842=0;while true do if (v842==0) then v418.CFrame=CFrame.new( -1360,25,220);v24(v7("\119\21\215\207\148\186\23\203","\191\35\112\187\170\228\213\101"),"Телепортирован в пустынный оазис!");break;end end end break;end end end});v124:Section({[v7("\140\166\104\89\59","\31\216\207\28\53\94\124")]="❄️ World 3: Frostmere & Tundra"});v124:Button({[v7("\21\46\191\3\94","\59\65\71\203\111")]=v7("\32\175\110\120\143\76\103\87\134\110\123\152\24\116\58\165\110\119\131\13\58\3","\84\119\192\28\20\235\108"),[v7("\168\251\55\245","\33\236\158\68\150\122\92\201")]="Телепорт к торговцу в 3-м мире (Tundra)",[v7("\201\219\246\23","\89\128\184\153\121\41\145")]=v7("\255\33\171\147\39","\91\140\85\196\225\66\231\96"),[v7("\16\185\187\189\73\50\187\188","\43\83\216\215\209")]=function() local v419=0;local v420;while true do if (v419==0) then v420=v13.Character and v13.Character:FindFirstChild(v7("\99\178\189\10\32\68\174\180\57\33\68\179\128\10\60\95","\78\43\199\208\107")) ;if v420 then local v843=0;while true do if (v843==0) then v420.CFrame=CFrame.new( -1325.44,23.5,157.35);v24(v7("\70\141\12\27\171\53\215\194","\182\18\232\96\126\219\90\165"),"Телепортирован к торговцу World 3!");break;end end end break;end end end});v124:Button({[v7("\9\87\51\164\56","\200\93\62\71")]=v7("\113\66\92\214\192\242\93\6\107\92\213\222\183\0\6\125\71\223\214","\110\38\45\46\186\164\210"),[v7("\92\187\187\21","\94\24\222\200\118")]="Замерзший пирс для рыбалки в World 3",[v7("\52\195\41\23","\121\125\160\70")]=v7("\242\228\56\186\252\248","\210\147\138\91"),[v7("\22\252\196\71\50\18\54\246","\115\85\157\168\43\80")]=function() local v421=0;local v422;while true do if (v421==0) then v422=v13.Character and v13.Character:FindFirstChild(v7("\215\79\138\86\130\198\79\205\205\85\136\67\188\200\84\221","\169\159\58\231\55\236\169\38")) ;if v422 then v422.CFrame=CFrame.new( -1292.88,28,81.86);v24(v7("\37\196\179\21\212\27\110\5","\28\113\161\223\112\164\116"),"Телепортирован на ледяной пирс World 3!");end break;end end end});v124:Button({[v7("\242\81\83\117\94","\59\166\56\39\25")]=v7("\148\202\201\210\70\188\152\229\201\85\183\203\134\237\77\166\202\199\198\64\183\152\142\238\81\189\203\210\136\103\189\215\212\129","\35\210\184\166\168"),[v7("\125\92\110\65","\23\57\57\29\34\68")]="Вход в Ледяные Пещеры к вратам лабиринта",[v7("\121\50\16\34","\76\48\81\127")]=v7("\10\170\94\165\71\119\209\95\29\160\85","\48\110\197\49\215\106\20\189"),[v7("\62\19\68\160\194\42\69\7","\108\125\114\40\204\160\75\38")]=function() local v423=v13.Character and v13.Character:FindFirstChild(v7("\29\101\242\12\59\127\246\9\7\127\240\25\5\113\237\25","\109\85\16\159")) ;if v423 then local v644=0;while true do if (v644==0) then v423.CFrame=CFrame.new( -1310,25,120);v24(v7("\19\246\161\94\11\87\162\51","\208\71\147\205\59\123\56"),"Телепортирован к ледяным вратам!");break;end end end end});v124:Button({[v7("\99\41\144\180\82","\216\55\64\228")]=v7("\152\132\63\193\176\240\249\255\172\59\199\169\181\205\173\135\45\214\249\198\251\176\156","\139\223\232\94\162\217\149"),[v7("\241\134\48\242","\170\181\227\67\145\219\53")]="Глубокая ледяная расщелина для редкой арктической рыбы",[v7("\112\134\17\188","\210\57\229\126")]=v7("\171\61\229\177\52\201\130\179\54","\227\216\83\138\198\82\165"),[v7("\8\180\186\116\240\42\182\189","\146\75\213\214\24")]=function() local v424=v13.Character and v13.Character:FindFirstChild(v7("\98\107\204\69\116\74\92\78\76\206\75\110\117\84\88\106","\53\42\30\161\36\26\37")) ;if v424 then local v645=0;while true do if (v645==0) then v424.CFrame=CFrame.new( -1280,20,250);v24(v7("\201\252\251\229\237\246\229\244","\128\157\153\151"),"Телепортирован к леднику World 3!");break;end end end end});v124:Section({[v7("\66\124\152\37\16","\19\22\21\236\73\117")]="🌋 World 4: Volcano & Magma Abyss"});v124:Button({[v7("\67\204\182\165\242","\150\23\165\194\201\151\221\77")]=v7("\73\52\250\22\122\123\188\90\72\52\228\25\127\53\231\90\83\62\250\25\118\58\230\14","\122\30\91\136"),[v7("\155\161\246\179","\237\223\196\133\208")]="Телепорт к торговцу в лавовом мире (World 4)",[v7("\245\11\204\176","\154\188\104\163\222\62")]=v7("\38\249\34\233\21","\162\85\141\77\155\112\47"),[v7("\49\40\170\66\16\40\165\69","\46\114\73\198")]=function() local v425=v13.Character and v13.Character:FindFirstChild(v7("\141\107\123\238\32\69\172\122\68\224\33\94\149\127\100\251","\42\197\30\22\143\78")) ;if v425 then local v646=0;while true do if (v646==0) then v425.CFrame=CFrame.new( -1340.18,20.5,100.98);v24(v7("\71\64\83\58\99\74\77\43","\95\19\37\63"),"Телепортирован к торговцу World 4!");break;end end end end});v124:Button({[v7("\69\37\179\240\116","\103\17\76\199\156\17")]=v7("\159\43\147\233\28\49\187\227\160\57\197\206\85\3\177\243\189\45\197\219\76\31\173","\154\211\74\229\136\60\112\217"),[v7("\139\25\249\206","\39\207\124\138\173\101")]="Пирс над лавовой бездной для огненных рыб",[v7("\231\2\76\206","\194\174\97\35\160")]=v7("\249\44\60\15\250","\98\159\64\93"),[v7("\45\176\33\19\19\7\88\47","\68\110\209\77\127\113\102\59")]=function() local v426=v13.Character and v13.Character:FindFirstChild(v7("\134\241\170\78\13\204\167\170\214\168\64\23\243\175\188\240","\206\206\132\199\47\99\163")) ;if v426 then v426.CFrame=CFrame.new( -1350,22,150);v24(v7("\194\199\219\119\65\249\208\195","\49\150\162\183\18"),"Телепортирован в лавовую бездну!");end end});local v126=v18:Tab({[v7("\125\35\175\45\31","\120\41\74\219\65\122\128")]=v7("\106\10\93\3\224\181","\181\58\102\60\122\133\199"),[v7("\122\225\211\23","\26\51\130\188\121")]=v7("\253\145\41\11","\57\136\226\76\121\41\126\151")});v126:Section({[v7("\22\222\29\95\33","\29\66\183\105\51\68\131")]=v7("\104\42\95\203\72\32\71\218\5\99\9\254\77\60\90\199\70\54","\174\37\69\41")});v126:Slider({[v7("\181\191\90\2\21","\112\225\214\46\110")]=v7("\41\37\47\80\215\173\233\27\32","\140\126\68\67\59\132\221"),[v7("\166\116\20\72","\230\226\17\103\43\45\127")]="Скорость перемещения персонажа",[v7("\230\77\200\94\130","\231\176\44\164\43")]={[v7("\140\207\42","\236\193\166\68\201\206")]=16,[v7("\41\58\208","\17\100\91\168")]=150,[v7("\126\163\138\237\166\47\111","\27\58\198\236\140\211\67")]=16},[v7("\18\217\201\90","\139\65\173\172\42\233")]=2,[v7("\164\87\125\212\198\118\227\67","\40\231\54\17\184\164\23\128")]=function(v427) local v428=0;local v429;local v430;while true do if (v428==1) then if v430 then v430.WalkSpeed=v427;end break;end if (v428==0) then v429=v13.Character;v430=v429 and v429:FindFirstChildOfClass(v7("\172\220\114\249\139\229\141\205","\138\228\169\31\152\229")) ;v428=1;end end end});v126:Slider({[v7("\248\5\86\57\229","\163\172\108\34\85\128")]=v7("\13\4\250\151\235\75\159\81\53","\52\71\113\151\231\187\36\232"),[v7("\82\136\107\174","\205\22\237\24")]="Сила прыжка персонажа",[v7("\136\121\127\221\60","\89\222\24\19\168")]={[v7("\216\80\93","\113\149\57\51\215")]=50,[v7("\84\113\211","\160\25\16\171\214\130")]=250,[v7("\85\221\49\124\104\222\159","\235\17\184\87\29\29\178")]=50},[v7("\153\189\124\232","\144\202\201\25\152")]=5,[v7("\26\218\8\114\249\75\228\11","\96\89\187\100\30\155\42\135")]=function(v431) local v432=0;local v433;local v434;while true do if (v432==1) then if v434 then local v849=0;while true do if (v849==0) then v434.UseJumpPower=true;v434.JumpPower=v431;break;end end end break;end if (0==v432) then v433=v13.Character;v434=v433 and v433:FindFirstChildOfClass(v7("\5\216\14\75\116\114\36\201","\29\77\173\99\42\26")) ;v432=1;end end end});v126:Toggle({[v7("\176\235\19\118\94","\109\228\130\103\26\59\143\151")]=v7("\170\118\168\208\48\67\59\129\195\82\187\212\46","\228\227\24\206\185\94\42\79"),[v7("\234\39\36\171","\80\174\66\87\200\212\123")]="Прыжок в воздухе без земли",[v7("\253\120\50\221\242","\115\171\25\94\168\151")]=v51,[v7("\47\179\232\45\245\13\177\239","\151\108\210\132\65")]=function(v435) v51=v435;end});v126:Toggle({[v7("\236\93\29\68\195","\52\184\52\105\40\166\33\167")]=v7("\101\15\193\163\122\251\194\18\57\204\188\63\198\140\26\36\200\187\47\199\140\127\1\201\173\115","\172\50\110\173\200\90\180"),[v7("\223\191\231\79","\44\155\218\148")]=v7("\218\250\32\48\148\38\178\255\244\63\40\148\40\178\232\250\34\123\213\41\181\173\236\45\47\209\53\241\254\238\62\61\213\36\180\254\187\59\50\192\47\190\248\239\108\40\195\46\188\224\242\34\60","\209\141\155\76\91\180\71"),[v7("\197\124\211\94\31","\122\147\29\191\43")]=v52,[v7("\159\209\82\5\216\254\143\117","\30\220\176\62\105\186\159\236")]=function(v436) v52=v436;v24(v7("\191\220\145\181\36\149\128\188\132\214","\221\232\189\229\208\86\181\215"),(v436 and v92(v7("\59\181\248\215\110\3\186\180\203\47\24\177\230\156\43\2\181\246\208\43\8\245","\78\108\212\148\188"),"Хождение по воде включено!")) or v92(v7("\12\17\24\41\172\15\181\122\44\17\0\39\254\64\191\51\40\17\22\46\233\4","\90\91\112\116\66\140\96\219"),"Хождение по воде выключено") );end});v126:Toggle({[v7("\241\94\30\0\229","\100\165\55\106\108\128\200")]=v7("\227\199\40\243\232\196\53\182\133\131\6\146\246\239\113\149\201\194\54\187\209\130","\211\165\171\81"),[v7("\32\112\193\201","\188\100\21\178\170\183")]=v7("\88\5\85\182\190\212\62\17\92\170\242\196\112\87\81\186\160\141\54\32\113\128\150\141\53\87\99\163\179\206\123\87\68\188\242\204\109\20\85\189\182\129\62\36\88\186\180\217\62\3\95\243\182\200\109\20\85\189\182\132","\173\30\119\48\211\210"),[v7("\109\216\53\47\94","\90\59\185\89")]=v53,[v7("\99\241\86\67\57\124\67\251","\29\32\144\58\47\91")]=function(v437) local v438=0;while true do if (v438==0) then v53=v437;v24(v7("\53\57\104","\193\115\85\17\221\33"),(v437 and v92(v7("\203\119\7\25\167\200\173\118\1\26\170\156\236\120\26\23\185\221\249\126\10\95","\188\141\27\110\126\207"),"Полёт активирован!")) or v92(v7("\171\58\87\112\236\252\73\128\57\90\114\164\236\0\158\55\92\123\225\236","\105\237\86\62\23\132\136"),"Полёт отключен") );break;end end end});v126:Slider({[v7("\141\64\40\65\38","\125\217\41\92\45\67")]=v7("\127\184\15\88\139\79\25\135\22\90\134\95","\59\57\212\102\63\227"),[v7("\89\237\108\4","\103\29\136\31")]="Скорость полёта персонажа",[v7("\40\47\214\63\67","\38\126\78\186\74")]={[v7("\236\73\36","\228\161\32\74\234\39")]=20,[v7("\19\133\18","\224\94\228\106\213\144\225\84")]=200,[v7("\148\237\65\193\20\188\252","\97\208\136\39\160")]=50},[v7("\197\61\198\150","\91\150\73\163\230\57\114")]=5,[v7("\109\172\190\90\242\10\189\84","\63\46\205\210\54\144\107\222")]=function(v439) v54=v439;end});v126:Toggle({[v7("\196\37\224\75\217","\188\144\76\148\39")]=v7("\171\68\118\168\69\28\98\29\178\74\121\175\12\56\42\71\138\94\114\172\12\59\35\89\137\88\60","\53\229\43\21\196\44\108\66"),[v7("\23\48\4\166","\197\83\85\119")]="Проход сквозь любые препятствия и стены",[v7("\121\251\18\34\74","\87\47\154\126")]=v70,[v7("\8\121\192\215\208\213\40\115","\180\75\24\172\187\178")]=function(v440) v70=v440;end});v11.JumpRequest:Connect(function() if v51 then local v648=v13.Character;local v649=v648 and v648:FindFirstChildOfClass(v7("\235\204\232\2\114\43\240\20","\112\163\185\133\99\28\68\153")) ;if v649 then v649:ChangeState(Enum.HumanoidStateType.Jumping);end end end);local v127=v18:Tab({[v7("\159\93\232\199\174","\171\203\52\156")]=v7("\137\207\105\165\35\143\186\179","\192\218\170\29\209\74\225\221"),[v7("\170\223\84\14","\157\227\188\59\96\175\45\73")]=v7("\172\207\195\2\56\177\205\196","\81\223\170\183\118")});v127:Section({[v7("\18\72\184\183\252","\113\70\33\204\219\153\82")]=v7("\221\131\49\59\235\177\246\135\127\122\190\153\255\150\58\46\248\177\242\135","\208\145\226\95\92\158")});local v128=v127:Dropdown({[v7("\138\232\201\64\234","\120\222\129\189\44\143\149\207")]=v7("\173\31\9\180\216\77\120\187\129\81\49\176\196\76\108\185\131\20","\216\228\113\125\209\170\43\25"),[v7("\221\255\75\70","\30\153\154\56\37\18")]="Select script language (Default: English / Русский)",[v7("\43\184\251\25\62\14","\91\125\217\151\108")]={v7("\220\29\161\124\215\234\27","\190\153\115\198\16"),"Русский"},[v7("\12\122\166\146\63","\231\90\27\202")]=v7("\164\138\95\174\87\146\140","\62\225\228\56\194"),[v7("\53\184\181\33\118\84\21\178","\53\118\217\217\77\20")]=function(v441) v104(((v441=="Русский") and v7("\187\10","\79\201\127\132\190")) or v7("\45\26","\169\72\116\137") );end});v91(v128,v7("\80\116\221\163\107\124\200\165\124\58\229\167\119\125\220\167\126\127","\198\25\26\169"),"Язык интерфейса","Select script language (Default: English / Русский)","Выберите язык скрипта (По умолчанию: English / Русский)");v127:Section({[v7("\125\122\201\42\130","\31\41\19\189\70\231\49\27")]=v7("\158\221\69\227\165\213\80\229\178\147\112\246\167\214\80\244\182\221\82\227\247\149\17\210\191\214\92\227\164","\134\215\179\49")});local v129={v7("\197\245\68\237","\115\129\148\54\134\53"),v7("\196\142\84\69\209\15\27\253","\115\137\231\48\43\184\104"),v7("\234\226\3","\95\185\137\122\131\201\192"),v7("\83\59\194\1\36\122\50","\69\22\86\167\115"),v7("\113\138\67\136\66\40","\71\56\228\39\225\37"),v7("\130\238\247\44","\66\208\129\132\73\154\141"),v7("\124\86\217\241\79\75","\157\42\63\182"),v7("\248\49\61\232\192\213\29\40\242\203\194","\175\187\94\73\156"),v7("\11\48\65\47\16\34\201\22\45\64","\160\70\95\47\64\123\67"),v7("\253\72\125\60\205\85\122","\81\190\58\20"),v7("\109\64\180\114\145","\83\44\45\214\23\227\73\63"),v7("\199\191\66","\64\149\218\38\222"),v7("\42\171\203\222\14","\176\122\199\170"),v7("\63\14\188\220\62\60\1\2","\75\114\107\208\176\81"),v7("\213\34\46\125\237","\21\153\75\73")};v127:Dropdown({[v7("\61\26\89\254\183","\38\105\115\45\146\210")]=v7("\55\63\76\66\59\7\27\9\54\0\7\26\9\117\39\11\25\2","\83\98\118\108\22"),[v7("\109\238\106\46","\67\41\139\25\77\197\228")]="Выберите стильную цветовую тему (15 стилей)",[v7("\222\175\194\63\83\251","\136\136\206\174\74\54")]=v129,[v7("\18\242\138\144\86","\219\68\147\230\229\51\196")]=v7("\88\79\228\235","\123\28\46\150\128\102\39"),[v7("\38\72\17\91\25\136\56\126","\21\101\41\125\55\123\233\91")]=function(v442) v18:SetTheme(v442);end});v127:Toggle({[v7("\182\226\186\255\9","\82\226\139\206\147\108")]=v7("\208\5\95\168\192\248\5\13\150\192\240\21\94\241\238\253\19\95","\172\145\102\45\209"),[v7("\208\8\31\67","\30\148\109\108\32\235")]="Эффект матового стекла на фоне меню",[v7("\34\70\29\74\17","\63\116\39\113")]=true,[v7("\27\81\203\224\18\41\171\51","\200\88\48\167\140\112\72")]=function(v443) v18:ToggleAcrylic(v443);end});v127:Keybind({[v7("\246\87\60\167\231","\130\162\62\72\203")]=v7("\151\184\186\119\139\133\175\208\166\185\168\48\172\133\246","\157\195\215\221\16\231\224\143"),[v7("\91\220\24\143","\131\31\185\107\236")]="Бинд меню: [Insert], [RightShift], [RightControl], [F4] или круг на экране",[v7("\157\170\70\49\174","\68\203\203\42")]=Enum.KeyCode.Insert,[v7("\96\86\121\213\65\86\118\210","\185\35\55\21")]=function(v444) if (typeof(v444)==v7("\150\247\170\137\154\237\186\137","\228\211\153\223")) then local v650=0;while true do if (v650==0) then v22[v444]=true;v24(v7("\127\234\65\63\51\8\80","\102\52\143\56\93\90"),"Бинд изменен на "   .. v444.Name );break;end end elseif v18 then if v18.Toggle then v18:Toggle();elseif (v18.Closed~=nil) then if v18.Closed then v18:Open();else v18:Close();end end end end});v127:Section({[v7("\114\30\180\36\224","\133\38\119\192\72")]=v7("\196\164\102\237\242\179\52\189\183\143\113\239\224\174\102\240\183\148\96\242\251\168\96\242\242\178","\155\151\193\20")});v127:Button({[v7("\26\173\20\66\126","\27\78\196\96\46")]="🔄 Rejoin Current Server",[v7("\206\254\161\187","\44\138\155\210\216\26\36")]="Быстро переподключиться к текущему серверу",[v7("\146\78\182\84","\157\219\45\217\58")]=v7("\162\178\34\212\234\181\240\53\214\233","\158\208\221\86\181"),[v7("\195\64\230\7\34\190\59\235","\88\128\33\138\107\64\223")]=function() pcall(function() v12:TeleportToPlaceInstance(game.PlaceId,game.JobId,v13);end);end});v127:Button({[v7("\245\251\97\121\168","\142\161\146\21\21\205\27")]="🌐 Server Hop (Change Server)",[v7("\52\255\111\0","\172\112\154\28\99\122\153")]="Найти другой свободный сервер и подключиться",[v7("\226\244\175\16","\126\171\151\192")]=v7("\57\18\246\30\2","\57\94\126\153\124\103\154"),[v7("\52\198\69\21\212\64\20\204","\33\119\167\41\121\182")]=function() pcall(function() local v540=0;local v541;local v542;local v543;while true do if (v540==1) then v543=v541:JSONDecode(v542);if (v543 and v543.data) then for v949,v950 in ipairs(v543.data) do if ((v950.playing<v950.maxPlayers) and (v950.id~=game.JobId)) then v12:TeleportToPlaceInstance(game.PlaceId,v950.id,v13);break;end end end break;end if (v540==0) then v541=game:GetService(v7("\111\160\47\70\152\86\14\46\78\183\62","\88\39\212\91\54\203\51\124"));v542=game:HttpGet(v7("\36\184\160\154\104\148\135\99\171\181\135\126\221\134\62\163\182\134\116\214\134\47\163\185\197\109\159\135\43\173\185\143\104\129","\168\76\204\212\234\27\174")   .. game.PlaceId   .. v7("\195\23\54\86\31\227\92\159\75\3\81\11\234\71\143\91\32\75\27\242\97\158\0\54\86\84\199\93\143\66\63\77\4\239\90\209\85\99\20","\46\236\100\83\36\105\134") );v540=1;end end end);end});v127:Section({[v7("\13\243\147\140\132","\111\89\154\231\224\225")]="🎁 Promo Codes & Freebies"});v127:Button({[v7("\201\211\18\169\41","\177\157\186\102\197\76\153\188")]="🎟️ Redeem All Working Promo Codes",[v7("\134\187\51\172","\207\194\222\64")]="Автоматический ввод всех промокодов игры на бесплатные монеты и зелья",[v7("\50\118\216\78","\179\123\21\183\32\232")]=v7("\193\42\202\41","\98\166\67\172\93\211"),[v7("\196\226\219\217\0\75\225\236","\130\135\131\183\181\98\42")]=function() local v445={v7("\241\179\55\230\33\208\179","\64\163\214\91\131"),v7("\55\38\11\62\54\31\40","\95\113\79\120\86"),v7("\159\252\33\190\141\30\57\198\185\196\44\177\159\4\49\206","\169\203\148\64\208\230\109\95"),v7("\239\30\0\166\35\21\59","\134\168\119\102\210\74\123\92"),v7("\155\1\18\93","\57\203\110\124"),v7("\157\216\28\39\19","\96\206\179\117\73"),v7("\172\54\99\36\149\42\120\43\146","\69\225\67\23"),v7("\230\136\52\147\213\144\209","\27\164\225\83\213\188\227\185"),v7("\174\29\141\237\211\133\10\144\251","\167\232\111\226\158"),v7("\111\54\46\19\30\83","\209\36\68\79\120\123\61\144"),v7("\103\228\74\40","\96\44\129\51\91"),v7("\32\31\8\167\231\237\170","\147\117\111\108\198\147\136"),v7("\60\185\206\87\11\184\205","\52\106\214\162"),v7("\39\0\223\176\226","\145\101\111\190\196"),v7("\99\216\143\231\74\94\238\147\227\88\94","\47\48\173\225\140")};local v446=0;pcall(function() local v544=0;local v545;while true do if (v544==0) then v545=require(v25.Shared.Events).Client(v7("\96\194\133\221","\204\35\173\225\184\75"));if v545 then for v951,v952 in ipairs(v445) do v545:Fire(v952);task.wait(0.2);v446=v446 + 1 ;end end break;end end end);v24(v7("\205\75\231\136\245","\110\142\36\131\237\134\198"),string.format(v92(v7("\88\72\182\243\51\126\68\243\181\60\59\80\161\255\53\116\0\176\255\60\126\83\253\176\27\115\69\176\251\120\121\65\191\241\54\120\69\242","\88\27\32\211\144"),"Проверено промокодов: %d шт. Проверьте баланс!"),v446));end});pcall(function() v13.Idled:Connect(function() local v546=0;local v547;while true do if (v546==0) then v547=game:GetService(v7("\187\162\172\40\222\172\87\69\158\174\172","\16\237\203\222\92\171\205\59"));v547:CaptureController();v546=1;end if (v546==1) then v547:ClickButton2(Vector2.new());break;end end end);end);v24(v7("\199\184\174\128\6\243\201\164\191\200\50\188\229\180\175\134\95\134\200","\211\129\209\221\232\127"),v92(v7("\59\74\71\32\229\92\240\113\0\65\66\17\213\93\188\73\8\75\67\32\188\10\185\82\1\15\103\39\238\4\188\79\10\15\0\100\173\72\240\82\1\74\75\33\239\83","\38\105\47\38\68\156\125\208"),"Готово! WindUI загружен с поддержкой акрила и 15 тем."));
+-- Очистка старых потоков и GUI чтобы не двоились
+if getgenv()._FishyHubCleanup then
+    pcall(getgenv()._FishyHubCleanup)
+end
+
+local myHubToken = os.clock()
+local fightThread = nil
+getgenv()._FishyHubToken = myHubToken
+getgenv()._FishyHubCleanup = function()
+    getgenv()._FishyHubToken = nil
+    if fightThread then pcall(task.cancel, fightThread) end
+    pcall(function() RunService:Set3dRenderingEnabled(true) end)
+    pcall(function()
+        local p = workspace:FindFirstChild("FishyWaterWalk")
+        if p then p:Destroy() end
+    end)
+    pcall(function()
+        local g = game:GetService("CoreGui"):FindFirstChild("FishyGpuAfkScreen")
+        if g then g:Destroy() end
+    end)
+    pcall(function()
+        local h = game:GetService("CoreGui"):FindFirstChild("FishyStatsHUD")
+        if h then h:Destroy() end
+        if LocalPlayer and LocalPlayer:FindFirstChild("PlayerGui") then
+            local ph = LocalPlayer.PlayerGui:FindFirstChild("FishyStatsHUD")
+            if ph then ph:Destroy() end
+        end
+    end)
+    pcall(function()
+        if gethui then
+            for _, g in ipairs(gethui():GetChildren()) do
+                if g.Name:find("WindUI") or g.Name:find("Fishy") then
+                    g:Destroy()
+                end
+            end
+        end
+        for _, g in ipairs(game:GetService("CoreGui"):GetChildren()) do
+            if g.Name:find("WindUI") or g.Name:find("Fishy") then
+                g:Destroy()
+            end
+        end
+    end)
+end
+
+pcall(function()
+    local cg = game:GetService("CoreGui")
+    for _, g in ipairs(cg:GetChildren()) do
+        if g.Name:find("Fishy") or g.Name:find("WindUI") or g.Name == "FishyStatsHUD" or g.Name == "FishyGpuAfkScreen" then
+            g:Destroy()
+        end
+    end
+    if gethui then
+        for _, g in ipairs(gethui():GetChildren()) do
+            if g.Name:find("Fishy") or g.Name:find("WindUI") or g.Name == "FishyStatsHUD" or g.Name == "FishyGpuAfkScreen" then
+                g:Destroy()
+            end
+        end
+    end
+end)
+
+-- Загрузка современной UI библиотеки WindUI (Glassmorphism & Acrylic)
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "Fishy Hub | Deep Fishing",
+    Icon = "fish-symbol",
+    Author = "by Real MCP",
+    Folder = "FishyHubDeepFishing",
+    Size = UDim2.fromOffset(660, 520),
+    MinSize = Vector2.new(580, 420),
+    Transparent = true,
+    Theme = "Dark",
+    Resizable = true,
+    ToggleKey = Enum.KeyCode.RightShift,
+    OpenButton = {
+        Title = "Fishy Hub",
+        Icon = "fish-symbol",
+        CornerRadius = UDim.new(0, 12),
+        Enabled = true,
+        Draggable = true,
+    }
+})
+
+-- Предварительные ссылки на экраны для управления слоями
+local gpuScreenGui = nil
+local statsHudGui = nil
+
+-- Гарантия приоритета слоев: WindUI (верх) > HUD (середина) > 3D бекдроп (низ)
+local function ensureGuiLayering()
+    pcall(function()
+        if WindUI then
+            if WindUI.ScreenGui then
+                WindUI.ScreenGui.DisplayOrder = 500
+            end
+            if WindUI.NotificationGui then
+                WindUI.NotificationGui.DisplayOrder = 600
+            end
+            if WindUI.DropdownGui then
+                WindUI.DropdownGui.DisplayOrder = 601
+            end
+            if WindUI.TooltipGui then
+                WindUI.TooltipGui.DisplayOrder = 602
+            end
+        end
+        if statsHudGui then
+            statsHudGui.DisplayOrder = 200
+        end
+        if gpuScreenGui then
+            gpuScreenGui.DisplayOrder = -1000000
+        end
+    end)
+end
+ensureGuiLayering()
+
+-- Надежный глобальный бинд открытия/закрытия GUI (Insert, RightShift, RightControl, F4)
+local toggleKeys = {
+    [Enum.KeyCode.RightShift] = true,
+    [Enum.KeyCode.RightControl] = true,
+    [Enum.KeyCode.Insert] = true,
+    [Enum.KeyCode.F4] = true,
+}
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if UserInputService:GetFocusedTextBox() then return end
+    if toggleKeys[input.KeyCode] then
+        if Window then
+            if Window.Toggle then
+                Window:Toggle()
+            elseif Window.Closed ~= nil then
+                if Window.Closed then Window:Open() else Window:Close() end
+            end
+        end
+    end
+end)
+
+-- Гарантированная система уведомлений (Roblox Core + WindUI)
+local StarterGui = game:GetService("StarterGui")
+local function showNotification(title, text)
+    pcall(function()
+        StarterGui:SetCore("SendNotification", {
+            Title = tostring(title),
+            Text = tostring(text),
+            Duration = 3.5
+        })
+    end)
+    pcall(function()
+        if WindUI and WindUI.Notify then
+            WindUI:Notify({
+                Title = tostring(title),
+                Content = tostring(text),
+                Duration = 3.5,
+                Icon = "sparkles"
+            })
+        end
+    end)
+end
+
+
+-- Игровые конфигурации и модули
+local RS = ReplicatedStorage
+local FishConfig = require(RS.Shared.Content.Item.Fish)
+local RarityConfig = require(RS.Shared.Config.RarityConfig)
+local CatchFight
+pcall(function() CatchFight = require(RS.Shared.Modules.CatchFight) end)
+local ChestConfig = RS.Shared.Content.Item:FindFirstChild("Chest") and require(RS.Shared.Content.Item.Chest)
+local KeyConfig = RS.Shared.Content.Item:FindFirstChild("Key") and require(RS.Shared.Content.Item.Key)
+local ScrollConfig = RS.Shared.Content.Item:FindFirstChild("Scroll") and require(RS.Shared.Content.Item.Scroll)
+local SummonConfig = RS.Shared.Content.Item:FindFirstChild("Summon") and require(RS.Shared.Content.Item.Summon)
+local CageConfig = RS.Shared.Content.Item:FindFirstChild("Cage") and require(RS.Shared.Content.Item.Cage)
+local JunkConfig = RS.Shared.Content.Item:FindFirstChild("Junk") and require(RS.Shared.Content.Item.Junk)
+local CatchFight; pcall(function() CatchFight = require(RS.Shared.Modules.CatchFight) end)
+
+-- Контроллеры клиента
+local AutoFishingCtrl, CatchMinigameCtrl, FishingCtrl, FishSchoolCtrl, ThrowCinematicCtrl, NpcSellCtrl
+pcall(function() AutoFishingCtrl = require(LocalPlayer.PlayerScripts.Client.Controllers.Fishing.AutoFishing) end)
+pcall(function() CatchMinigameCtrl = require(LocalPlayer.PlayerScripts.Client.Controllers.ThrowCinematic.CatchMinigame) end)
+pcall(function() FishingCtrl = require(LocalPlayer.PlayerScripts.Client.Controllers.Fishing) end)
+pcall(function() FishSchoolCtrl = require(LocalPlayer.PlayerScripts.Client.Controllers.ThrowCinematic.FishSchool) end)
+pcall(function() ThrowCinematicCtrl = require(LocalPlayer.PlayerScripts.Client.Controllers.ThrowCinematic) end)
+pcall(function() NpcSellCtrl = require(LocalPlayer.PlayerScripts.Client.Controllers.Tags.NPC_Sell) end)
+
+-- Переменные состояния
+local autoFishEnabled = (AutoFishingCtrl and AutoFishingCtrl.On == true) or false
+local autoPerfectEnabled = true
+local instantCatchEnabled = true
+local turboCastEnabled = true
+local fastArcEnabled = true          -- ⚡ Мгновенный перелёт поплавка в воду (Arc Skip)
+local fastDiveEnabled = true         -- 🌊 Мгновенное погружение на дно (Dive Skip)
+local instantPullEnabled = true       -- ⏩ Мгновенный подъем со дна и возврат (Skip Pull-Up & Return Animations)
+local freeWalkEnabled = true          -- 🚶 Свободный ход во время и после заброса (Анти-заморозка)
+local currentWalkSpeed = 16           -- Текущая скорость ходьбы
+local fpsBoostEnabled = false         -- 🚀 Оптимизация FPS (Boost Performance)
+local potatoGfxEnabled = false        -- 🥔 Картофельная графика (Potato PC / Smooth Plastic & No Textures)
+local clearFogEnabled = false         -- 🌫️ Удаление тумана и атмосферы (Clear Horizon / No Fog Lag)
+local unlockFpsEnabled = true         -- ⚡ Разблокировка FPS (999 FPS)
+local infJumpEnabled = false          -- 🦘 Бесконечные прыжки в воздухе
+local waterWalkEnabled = false        -- 🌊 Хождение по воде / Jesus Mode (без плавания)
+local flyEnabled = false              -- 🚀 Плавный полёт (WASD + Space/Shift)
+local flySpeed = 50                   -- Скорость полёта
+local sessionFishCaught = 0           -- Всего поймано рыб за сессию
+local sessionMoneyEarned = 0          -- Всего заработано монет за сессию
+local sessionStartTime = os.clock()   -- Время старта скрипта
+local autoFightEnabled = true
+local instantReelEnabled = true
+local autoSellEnabled = true
+local autoSellInterval = 10
+local autoPondEnabled = true        -- Авто-помещение лучших рыб в пруд перед продажей
+local notifyCatchValue = true       -- Уведомление о заработке за заброс
+local collectItemsEnabled = true   -- Сбор сундуков, бутылок, мусора и артефактов
+local landingPredictorEnabled = true -- Показ точки приземления поплавка на полоске
+local autoUpgradeCapacity = false  -- Авто-покупка слотов вместимости
+local autoUpgradeAll = false       -- Авто-покупка всех статов
+local fishEspEnabled = true
+local espLabelsEnabled = true
+local noclipEnabled = false
+local fallbackToBest = true
+local catchMode = "Rarest" -- "Secret", "Rarest", "Money", "Biggest", "Any"
+local activeBossFight = false
+local wasBossFight = false
+local sellRarities = {
+    Common = true,
+    Uncommon = true,
+    Rare = true,
+    Epic = true,
+    Legendary = false, -- Защита ценной рыбы от случайной продажи
+    Mythic = false,    -- Защита мифической рыбы
+    Secret = false,    -- Защита секретной рыбы
+    Exotic = false     -- Защита экзотической рыбы
+}
+
+-- 🚀 Функция применения комплексной оптимизации FPS
+local function applyFpsBoost(enable)
+    pcall(function()
+        local terrain = workspace:FindFirstChildOfClass("Terrain")
+        if terrain then
+            terrain.WaterWaveSize = enable and 0 or 0.15
+            terrain.WaterWaveSpeed = enable and 0 or 10
+            terrain.WaterReflectance = enable and 0 or 0.05
+            terrain.WaterTransparency = enable and 1 or 0.8
+            terrain.Decoration = not enable -- Отключает ресурсоемкую 3D траву
+        end
+        local lighting = game:GetService("Lighting")
+        lighting.GlobalShadows = not enable
+        for _, obj in ipairs(lighting:GetChildren()) do
+            if obj:IsA("PostProcessEffect") or obj:IsA("BloomEffect") or obj:IsA("BlurEffect") 
+               or obj:IsA("SunRaysEffect") or obj:IsA("DepthOfFieldEffect") or obj:IsA("ColorCorrectionEffect") then
+                obj.Enabled = not enable
+            end
+        end
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Smoke") 
+               or obj:IsA("Fire") or obj:IsA("Sparkles") or obj:IsA("Beam") then
+                obj.Enabled = not enable
+            end
+        end
+        if enable and setfpscap then
+            setfpscap(999)
+        end
+    end)
+end
+
+-- 🥔 Картофельная графика (Potato PC: убирает текстуры, декали и тени деталей)
+local originalMaterials = {}
+local function applyPotatoGfx(enable)
+    pcall(function()
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") then
+                if enable then
+                    if not originalMaterials[obj] then
+                        originalMaterials[obj] = {
+                            Material = obj.Material,
+                            CastShadow = obj.CastShadow
+                        }
+                    end
+                    obj.Material = Enum.Material.SmoothPlastic
+                    obj.CastShadow = false
+                elseif originalMaterials[obj] then
+                    obj.Material = originalMaterials[obj].Material
+                    obj.CastShadow = originalMaterials[obj].CastShadow
+                end
+            elseif obj:IsA("Decal") or obj:IsA("Texture") then
+                obj.Transparency = enable and 1 or 0
+            end
+        end
+    end)
+end
+
+-- 🌫️ Удаление тумана и атмосферы (Clear Horizon: убирает лаги от дымки лавы и тумана)
+local function applyClearFog(enable)
+    pcall(function()
+        local lighting = game:GetService("Lighting")
+        if enable then
+            lighting.FogEnd = 100000
+            lighting.FogStart = 0
+            for _, obj in ipairs(lighting:GetChildren()) do
+                if obj:IsA("Atmosphere") or obj:IsA("Clouds") then
+                    obj.Density = 0
+                end
+            end
+        else
+            lighting.FogEnd = 1000
+        end
+    end)
+end
+
+-- 🥔 0% GPU AFK Режим с настраиваемым цветом экрана (RGB Палетка)
+local gpuScreenFrame = nil
+local gpuScreenColor = Color3.fromRGB(15, 15, 22)
+local gpuAfkEnabled = false
+
+local function setGpuAfkMode(enable)
+    gpuAfkEnabled = enable
+    pcall(function()
+        RunService:Set3dRenderingEnabled(not enable)
+    end)
+    ensureGuiLayering()
+    if enable then
+        if not gpuScreenGui then
+            gpuScreenGui = Instance.new("ScreenGui")
+            gpuScreenGui.Name = "FishyGpuAfkScreen"
+            gpuScreenGui.DisplayOrder = -1000000 -- Гарантированно самый нижний слой под меню и HUD
+            gpuScreenGui.IgnoreGuiInset = true
+            gpuScreenGui.ResetOnSpawn = false
+
+            local targetParent = nil
+            pcall(function()
+                if WindUI and WindUI.ScreenGui and WindUI.ScreenGui.Parent then
+                    targetParent = WindUI.ScreenGui.Parent
+                elseif gethui then
+                    targetParent = gethui()
+                elseif syn and syn.protect_gui then
+                    syn.protect_gui(gpuScreenGui)
+                    targetParent = game:GetService("CoreGui")
+                else
+                    targetParent = game:GetService("CoreGui")
+                end
+            end)
+            if not targetParent then
+                targetParent = LocalPlayer:WaitForChild("PlayerGui")
+            end
+            gpuScreenGui.Parent = targetParent
+
+            gpuScreenFrame = Instance.new("Frame")
+            gpuScreenFrame.Size = UDim2.fromScale(1, 1)
+            gpuScreenFrame.BackgroundColor3 = gpuScreenColor
+            gpuScreenFrame.BorderSizePixel = 0
+            gpuScreenFrame.ZIndex = 0
+            gpuScreenFrame.Parent = gpuScreenGui
+
+            local lbl = Instance.new("TextLabel")
+            lbl.Name = "AfkStatusLabel"
+            lbl.Size = UDim2.new(1, 0, 0, 30)
+            lbl.Position = UDim2.new(0, 0, 0.94, 0)
+            lbl.BackgroundTransparency = 1
+            lbl.Text = "GPU 0% Potato AFK Active | 3D Rendering Disabled"
+            lbl.TextColor3 = Color3.fromRGB(200, 205, 215)
+            lbl.TextTransparency = 0.5
+            lbl.Font = Enum.Font.GothamMedium
+            lbl.TextSize = 12
+            lbl.Parent = gpuScreenFrame
+        else
+            gpuScreenGui.Enabled = true
+            gpuScreenGui.DisplayOrder = -1000000
+            if gpuScreenFrame then
+                gpuScreenFrame.BackgroundColor3 = gpuScreenColor
+            end
+        end
+    else
+        if gpuScreenGui then
+            gpuScreenGui.Enabled = false
+        end
+    end
+    ensureGuiLayering()
+end
+
+-- 🎁 Мгновенное открытие всех пойманных сундуков
+local function openAllChests()
+    pcall(function()
+        local ev = require(RS.Shared.Events).Client("Chest")
+        if ev then
+            ev:Fire("OpenAll")
+            ev:Fire("Open")
+        end
+        local evItem = require(RS.Shared.Events).Client("Item")
+        if evItem then
+            evItem:Fire("OpenChests")
+        end
+    end)
+    pcall(function()
+        local int = LocalPlayer.PlayerGui:FindFirstChild("Interfaces")
+        if int and int:FindFirstChild("OpenChest") then
+            local btn = int.OpenChest:FindFirstChild("Open", true)
+            if btn and firesignal then firesignal(btn.MouseButton1Click) end
+        end
+    end)
+    showNotification("🎁 Chests", "Запрос на открытие сундуков отправлен!")
+end
+
+-- Цвета редкостей
+local rarityColors = {
+    Common    = Color3.fromRGB(200, 200, 200),
+    Uncommon  = Color3.fromRGB(60, 220, 60),
+    Rare      = Color3.fromRGB(40, 160, 255),
+    Epic      = Color3.fromRGB(190, 80, 255),
+    Legendary = Color3.fromRGB(255, 150, 0),
+    Mythic    = Color3.fromRGB(255, 45, 45),
+    Secret    = Color3.fromRGB(255, 0, 140),
+    Exotic    = Color3.fromRGB(255, 220, 0),
+    Special   = Color3.fromRGB(0, 255, 200),
+    Chest     = Color3.fromRGB(255, 215, 0),
+    Junk      = Color3.fromRGB(160, 140, 120)
+}
+
+local CollectionService = game:GetService("CollectionService")
+
+-- Форматирование чисел в валюту ($1.25M, $45.2K, $6.36T, $1Qa, $1Qi)
+local moneySuffixes = {"", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"}
+local function formatMoney(val)
+    if not val or val <= 0 then return "$0" end
+    if val < 1000 then
+        return string.format("$%d", math.floor(val))
+    end
+    local exp = math.floor(math.log10(val) / 3)
+    if exp > #moneySuffixes - 1 then
+        exp = #moneySuffixes - 1
+    end
+    local num = val / (10 ^ (exp * 3))
+    if num >= 999.995 and exp < #moneySuffixes - 1 then
+        num = num / 1000
+        exp = exp + 1
+    end
+    return string.format("$%.2f%s", num, moneySuffixes[exp + 1])
+end
+
+-- 🌐 Двуязычная локализация скрипта (English дефолтный / Русский)
+local currentLanguage = "en"
+local locElements = {}
+
+local function registerLoc(element, enTitle, ruTitle, enDesc, ruDesc)
+    if not element then return end
+    table.insert(locElements, {
+        element = element,
+        enTitle = enTitle,
+        ruTitle = ruTitle,
+        enDesc = enDesc,
+        ruDesc = ruDesc,
+    })
+    return element
+end
+
+local function locText(enStr, ruStr)
+    return (currentLanguage == "ru") and ruStr or enStr
+end
+
+-- 📊 Экранный HUD и статистика AFK сессии (слева по центру экрана)
+local hudEnabled = true
+local hudTimeLabel = nil
+local hudTotalValue = nil
+local hudMpmValue = nil
+local hudMphValue = nil
+local hudSpeedValue = nil
+local hudHeaderTitleLabel = nil
+local hudRowTitles = {}
+local statsParagraph = nil
+
+local function createStatsHud()
+    if statsHudGui then return end
+    statsHudGui = Instance.new("ScreenGui")
+    statsHudGui.Name = "FishyStatsHUD"
+    statsHudGui.ResetOnSpawn = false
+    statsHudGui.DisplayOrder = 200 -- Выше 3D бекдропа (-1000000), под окном WindUI (500)
+    statsHudGui.IgnoreGuiInset = true
+
+    local targetParent = nil
+    pcall(function()
+        if WindUI and WindUI.ScreenGui and WindUI.ScreenGui.Parent then
+            targetParent = WindUI.ScreenGui.Parent
+        elseif gethui then
+            targetParent = gethui()
+        elseif syn and syn.protect_gui then
+            syn.protect_gui(statsHudGui)
+            targetParent = game:GetService("CoreGui")
+        else
+            targetParent = game:GetService("CoreGui")
+        end
+    end)
+    if not targetParent then
+        targetParent = LocalPlayer:WaitForChild("PlayerGui")
+    end
+    statsHudGui.Parent = targetParent
+
+    local frame = Instance.new("Frame")
+    frame.Name = "HudFrame"
+    frame.Size = UDim2.new(0, 226, 0, 134)
+    frame.Position = UDim2.new(0, 16, 0.5, -67) -- Слева по центру экрана
+    frame.BackgroundColor3 = Color3.fromRGB(15, 17, 23)
+    frame.BackgroundTransparency = 0.15
+    frame.BorderSizePixel = 0
+    frame.Active = true
+    frame.Draggable = true
+    frame.Parent = statsHudGui
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = frame
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(48, 54, 70)
+    stroke.Transparency = 0.45
+    stroke.Thickness = 1
+    stroke.Parent = frame
+
+    -- Хедер: минималистичная иконка + заголовок
+    local headerIcon = Instance.new("ImageLabel")
+    headerIcon.Name = "HeaderIcon"
+    headerIcon.Size = UDim2.new(0, 12, 0, 12)
+    headerIcon.Position = UDim2.new(0, 12, 0, 8)
+    headerIcon.BackgroundTransparency = 1
+    headerIcon.Image = "rbxassetid://85473888890506" -- Lucide timer
+    headerIcon.ImageColor3 = Color3.fromRGB(220, 225, 235)
+    headerIcon.Parent = frame
+
+    hudHeaderTitleLabel = Instance.new("TextLabel")
+    hudHeaderTitleLabel.Name = "HeaderTitle"
+    hudHeaderTitleLabel.Size = UDim2.new(0, 105, 0, 20)
+    hudHeaderTitleLabel.Position = UDim2.new(0, 28, 0, 4)
+    hudHeaderTitleLabel.BackgroundTransparency = 1
+    hudHeaderTitleLabel.Text = (currentLanguage == "ru") and "AFK СТАТИСТИКА" or "AFK STATS"
+    hudHeaderTitleLabel.Font = Enum.Font.GothamBold
+    hudHeaderTitleLabel.TextSize = 10
+    hudHeaderTitleLabel.TextColor3 = Color3.fromRGB(220, 225, 235)
+    hudHeaderTitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    hudHeaderTitleLabel.Parent = frame
+
+    -- Правая часть хедера: часы и время сессии
+    local clockIcon = Instance.new("ImageLabel")
+    clockIcon.Name = "ClockIcon"
+    clockIcon.Size = UDim2.new(0, 11, 0, 11)
+    clockIcon.Position = UDim2.new(1, -72, 0, 8)
+    clockIcon.BackgroundTransparency = 1
+    clockIcon.Image = "rbxassetid://121808839832144" -- Lucide clock
+    clockIcon.ImageColor3 = Color3.fromRGB(160, 165, 180)
+    clockIcon.Parent = frame
+
+    hudTimeLabel = Instance.new("TextLabel")
+    hudTimeLabel.Name = "TimeLabel"
+    hudTimeLabel.Size = UDim2.new(0, 56, 0, 20)
+    hudTimeLabel.Position = UDim2.new(1, -58, 0, 4)
+    hudTimeLabel.BackgroundTransparency = 1
+    hudTimeLabel.Text = "00:00:00"
+    hudTimeLabel.Font = Enum.Font.GothamMedium
+    hudTimeLabel.TextSize = 10
+    hudTimeLabel.TextColor3 = Color3.fromRGB(175, 180, 195)
+    hudTimeLabel.TextXAlignment = Enum.TextXAlignment.Right
+    hudTimeLabel.Parent = frame
+
+    -- Тонкий разделитель
+    local divider = Instance.new("Frame")
+    divider.Name = "Divider"
+    divider.Size = UDim2.new(1, -24, 0, 1)
+    divider.Position = UDim2.new(0, 12, 0, 26)
+    divider.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    divider.BackgroundTransparency = 0.92
+    divider.BorderSizePixel = 0
+    divider.Parent = frame
+
+    -- Конструктор строк статистики (монохромная иконка + заголовок + белое значение справа)
+    local function createHudRow(yPos, iconAsset, key, defaultLabel)
+        local rowIcon = Instance.new("ImageLabel")
+        rowIcon.Size = UDim2.new(0, 13, 0, 13)
+        rowIcon.Position = UDim2.new(0, 12, 0, yPos + 3)
+        rowIcon.BackgroundTransparency = 1
+        rowIcon.Image = iconAsset
+        rowIcon.ImageColor3 = Color3.fromRGB(230, 235, 245)
+        rowIcon.Parent = frame
+
+        local rowTitle = Instance.new("TextLabel")
+        rowTitle.Size = UDim2.new(0, 85, 0, 20)
+        rowTitle.Position = UDim2.new(0, 30, 0, yPos)
+        rowTitle.BackgroundTransparency = 1
+        rowTitle.Text = defaultLabel
+        rowTitle.Font = Enum.Font.GothamMedium
+        rowTitle.TextSize = 11
+        rowTitle.TextColor3 = Color3.fromRGB(160, 165, 180)
+        rowTitle.TextXAlignment = Enum.TextXAlignment.Left
+        rowTitle.Parent = frame
+        hudRowTitles[key] = rowTitle
+
+        local rowValue = Instance.new("TextLabel")
+        rowValue.Size = UDim2.new(1, -125, 0, 20)
+        rowValue.Position = UDim2.new(0, 115, 0, yPos)
+        rowValue.BackgroundTransparency = 1
+        rowValue.Text = "-"
+        rowValue.Font = Enum.Font.GothamBold
+        rowValue.TextSize = 11
+        rowValue.TextColor3 = Color3.fromRGB(255, 255, 255)
+        rowValue.TextXAlignment = Enum.TextXAlignment.Right
+        rowValue.Parent = frame
+
+        return rowValue
+    end
+
+    -- Строка 1: Всего заработано монет и рыб
+    hudTotalValue = createHudRow(30, "rbxassetid://116510979641930", "total", (currentLanguage == "ru") and "Всего доход" or "Total Earned")
+    hudTotalValue.Text = "$0 (0 fish)"
+
+    -- Строка 2: Доход в минуту
+    hudMpmValue = createHudRow(54, "rbxassetid://130551565616516", "mpm", (currentLanguage == "ru") and "Доход / Мин" or "Money / Min")
+    hudMpmValue.Text = "$0/m"
+
+    -- Строка 3: Доход в час
+    hudMphValue = createHudRow(78, "rbxassetid://81819858538839", "mph", (currentLanguage == "ru") and "Доход / Час" or "Money / Hour")
+    hudMphValue.Text = "$0/h"
+
+    -- Строка 4: Скорость вылова в минуту
+    hudSpeedValue = createHudRow(102, "rbxassetid://124360663785796", "speed", (currentLanguage == "ru") and "Темп вылова" or "Catch Rate")
+    hudSpeedValue.Text = "0.0 / min"
+
+    ensureGuiLayering()
+end
+
+local function updateStatsHud()
+    local elapsed = os.clock() - sessionStartTime
+    local hrs = math.floor(elapsed / 3600)
+    local mins = math.floor((elapsed % 3600) / 60)
+    local secs = math.floor(elapsed % 60)
+    local timeStr = string.format("%02d:%02d:%02d", hrs, mins, secs)
+
+    local mpm = 0
+    local mph = 0
+    local cpm = 0
+    if elapsed > 2 then
+        mpm = (sessionMoneyEarned / elapsed) * 60
+        mph = (sessionMoneyEarned / elapsed) * 3600
+        cpm = (sessionFishCaught / elapsed) * 60
+    end
+
+    local isRu = (currentLanguage == "ru")
+    if statsParagraph and statsParagraph.SetDesc then
+        if isRu then
+            statsParagraph:SetDesc(string.format(
+                "Поймано: %d шт. | Общая выручка: %s\nДоход / Мин: %s/мин | Доход / Час: %s/час\nВремя сессии: %s | Скорость: %.1f / мин",
+                sessionFishCaught,
+                formatMoney(sessionMoneyEarned),
+                formatMoney(mpm),
+                formatMoney(mph),
+                timeStr,
+                cpm
+            ))
+        else
+            statsParagraph:SetDesc(string.format(
+                "Fish Caught: %d | Total Revenue: %s\nMoney / Min: %s/m | Money / Hour: %s/h\nSession Time: %s | Catch Rate: %.1f / min",
+                sessionFishCaught,
+                formatMoney(sessionMoneyEarned),
+                formatMoney(mpm),
+                formatMoney(mph),
+                timeStr,
+                cpm
+            ))
+        end
+    end
+
+    if hudTimeLabel then
+        hudTimeLabel.Text = timeStr
+    end
+    if hudTotalValue then
+        hudTotalValue.Text = string.format(isRu and "%s (%d рыб)" or "%s (%d fish)", formatMoney(sessionMoneyEarned), sessionFishCaught)
+    end
+    if hudMpmValue then
+        hudMpmValue.Text = string.format(isRu and "%s/мин" or "%s/m", formatMoney(mpm))
+    end
+    if hudMphValue then
+        hudMphValue.Text = string.format(isRu and "%s/час" or "%s/h", formatMoney(mph))
+    end
+    if hudSpeedValue then
+        hudSpeedValue.Text = string.format(isRu and "%.1f / мин" or "%.1f / min", cpm)
+    end
+end
+
+local function setScriptLanguage(lang)
+    currentLanguage = lang
+    local isRu = (lang == "ru")
+    if hudHeaderTitleLabel then
+        hudHeaderTitleLabel.Text = isRu and "AFK СТАТИСТИКА" or "AFK STATS"
+    end
+    if hudRowTitles.total then
+        hudRowTitles.total.Text = isRu and "Всего доход" or "Total Earned"
+    end
+    if hudRowTitles.mpm then
+        hudRowTitles.mpm.Text = isRu and "Доход / Мин" or "Money / Min"
+    end
+    if hudRowTitles.mph then
+        hudRowTitles.mph.Text = isRu and "Доход / Час" or "Money / Hour"
+    end
+    if hudRowTitles.speed then
+        hudRowTitles.speed.Text = isRu and "Темп вылова" or "Catch Rate"
+    end
+    if updateStatsHud then
+        updateStatsHud()
+    end
+    for _, item in ipairs(locElements) do
+        pcall(function()
+            if item.element then
+                local title = isRu and item.ruTitle or item.enTitle
+                local desc = isRu and item.ruDesc or item.enDesc
+                if title and item.element.SetTitle then item.element:SetTitle(title) end
+                if desc and item.element.SetDesc then item.element:SetDesc(desc) end
+            end
+        end)
+    end
+    showNotification(
+        isRu and "Язык" or "Language",
+        isRu and "Установлен русский язык интерфейса" or "Interface language set to English"
+    )
+end
+
+createStatsHud()
+
+task.spawn(function()
+    while true do
+        task.wait(1)
+        if hudEnabled and statsHudGui and statsHudGui.Enabled then
+            updateStatsHud()
+        end
+    end
+end)
+
+-- Поиск активного продавца в текущем активном мире (World 1, World 2, World 3, World 4)
+local function getActiveSellNPC()
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    local myPos = hrp and hrp.Position or Vector3.zero
+
+    -- 1. Сначала ищем NPC_Sell напрямую в текущей активной папке мира: Workspace.World[ActiveWorld].Interactable.NPC_Sell
+    local worldFolder = workspace:FindFirstChild("World")
+    if worldFolder then
+        -- Сначала проверяем мир, ближе всего к которому находится игрок
+        local bestWorldNpc = nil
+        local bestWorldDist = math.huge
+        for _, w in ipairs(worldFolder:GetChildren()) do
+            local interactable = w:FindFirstChild("Interactable")
+            local npc = interactable and interactable:FindFirstChild("NPC_Sell")
+            if npc and npc:IsDescendantOf(workspace) then
+                local dist = (npc:GetPivot().Position - myPos).Magnitude
+                if dist < bestWorldDist then
+                    bestWorldDist = dist
+                    bestWorldNpc = npc
+                end
+            end
+        end
+        if bestWorldNpc then
+            return bestWorldNpc
+        end
+    end
+
+    -- 2. Поиск среди всех объектов с тегом "NPC_Sell" в workspace — выбираем БЛИЖАЙШЕГО к игроку в текущем мире!
+    local bestNpc = nil
+    local bestDist = math.huge
+    for _, npc in ipairs(CollectionService:GetTagged("NPC_Sell")) do
+        if npc:IsDescendantOf(workspace) then
+            local pos = npc:GetPivot().Position
+            local dist = (pos - myPos).Magnitude
+            if dist < bestDist then
+                bestDist = dist
+                bestNpc = npc
+            end
+        end
+    end
+    if bestNpc then return bestNpc end
+
+    -- 3. Резервный поиск по имени "NPC_Sell" среди всех потомков workspace
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj.Name == "NPC_Sell" and obj:IsDescendantOf(workspace) and obj ~= char and not obj:IsDescendantOf(char) then
+            local pos = obj:GetPivot().Position
+            local dist = (pos - myPos).Magnitude
+            if dist < bestDist then
+                bestDist = dist
+                bestNpc = obj
+            end
+        end
+    end
+
+    return bestNpc
+end
+
+-- Определение текущего мира (World 1, World 2, World 3, World 4)
+local function getCurrentWorldName()
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    local myPos = hrp and hrp.Position or Vector3.zero
+
+    local worldFolder = workspace:FindFirstChild("World")
+    if worldFolder then
+        local bestWorld = nil
+        local bestDist = math.huge
+        for _, w in ipairs(worldFolder:GetChildren()) do
+            local p = w:GetPivot().Position
+            local d = (p - myPos).Magnitude
+            if d < bestDist then
+                bestDist = d
+                bestWorld = w.Name
+            end
+        end
+        if bestWorld then
+            local bw = string.lower(bestWorld)
+            if bw:find("2") or bw:find("desert") or bw:find("sand") or bw:find("dune") then
+                return "World 2 (Desert & Dunes)"
+            elseif bw:find("3") or bw:find("frost") or bw:find("ice") or bw:find("tundra") then
+                return "World 3 (Frostmere & Tundra)"
+            elseif bw:find("4") or bw:find("volcano") or bw:find("lava") then
+                return "World 4 (Volcano Caldera)"
+            elseif bw:find("1") or bw:find("ocean") or bw:find("starter") or bw:find("main") then
+                return "World 1 (Starter Sea)"
+            else
+                return "World (" .. tostring(bestWorld) .. ")"
+            end
+        end
+    end
+
+    local npc = getActiveSellNPC()
+    if npc then
+        local pos = npc:GetPivot().Position
+        if (pos - Vector3.new(-1226.75, 22, 144.58)).Magnitude < 80 then
+            return "World 1 (Starter Sea)"
+        elseif (pos - Vector3.new(-1335.45, 20.8, 141.23)).Magnitude < 80 then
+            return "World 2 (Desert & Dunes)"
+        elseif (pos - Vector3.new(-1325.44, 23.5, 157.35)).Magnitude < 80 then
+            return "World 3 (Frostmere & Tundra)"
+        elseif (pos - Vector3.new(-1340.18, 20.5, 100.98)).Magnitude < 80 then
+            return "World 4 (Volcano Caldera)"
+        end
+    end
+
+    return "World 1 (Starter Sea)"
+end
+
+-- Авто-помещение лучших рыб в пруд
+local function putBestFishInPond()
+    pcall(function()
+        local ev = require(RS.Shared.Events).Client("Pond")
+        if ev then
+            ev:Fire(true, "Collect")     -- собираем пассивный доход из пруда
+            ev:Fire(true, "SellAllDead") -- очищаем погибших если были
+            ev:Fire(true, "EquipBest")   -- экипируем лучших рыб из инвентаря
+        end
+        local btn = LocalPlayer.PlayerGui:FindFirstChild("Interfaces")
+            and LocalPlayer.PlayerGui.Interfaces:FindFirstChild("ManagePond")
+            and LocalPlayer.PlayerGui.Interfaces.ManagePond.Content.Buttons.Container:FindFirstChild("EquipBest")
+        if btn and firesignal then
+            firesignal(btn.MouseButton1Click)
+        end
+    end)
+end
+
+-- ==================== 💰 НАДЕЖНАЯ АВТО-ПРОДАЖА (DISTANCE VALIDATION + AUTO-POND) ====================
+local isSelling = false
+local function sellFishNow()
+    if isSelling then return end
+    if ThrowCinematicCtrl and (ThrowCinematicCtrl.Active or (ThrowCinematicCtrl.Sub and ThrowCinematicCtrl.Sub.ThrowCamera and ThrowCinematicCtrl.Sub.ThrowCamera.OutroConn)) then
+        return -- Не продаем прямо посреди полета поплавка или анимации камеры
+    end
+    isSelling = true
+
+    task.spawn(function()
+        local success, result = pcall(function()
+            -- 1. Сначала экипируем лучших рыб в пруд (сохраняет топ рыб)
+            if autoPondEnabled then
+                putBestFishInPond()
+                task.wait(0.2)
+            end
+
+            local npc = getActiveSellNPC()
+            local char = LocalPlayer.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if not hrp or not npc then
+                return nil
+            end
+
+            local oldCF = hrp.CFrame
+            local npcPos = npc:GetPivot().Position
+
+            -- Фиксируем камеру, чтобы экран не дергался при мгновенном смещении к NPC
+            local cam = workspace.CurrentCamera
+            local oldCamType = cam.CameraType
+            pcall(function() cam.CameraType = Enum.CameraType.Scriptable end)
+
+            -- Смещаемся к NPC для серверной валидации дистанции
+            hrp.CFrame = CFrame.new(npcPos + Vector3.new(0, 2, 2))
+            task.wait(0.18)
+
+            local res = nil
+            -- Официальный вызов ремоута торговца (требует nil для продажи всей рыбы)
+            pcall(function()
+                if NpcSellCtrl and NpcSellCtrl.Events and NpcSellCtrl.Events.Client then
+                    local ev = NpcSellCtrl.Events.Client("SellAll")
+                    if ev then
+                        res = ev:Invoke(5, "Fish", nil)
+                    end
+                end
+            end)
+
+            if not res then
+                pcall(function()
+                    local rf = ReplicatedStorage:FindFirstChild("Events")
+                        and ReplicatedStorage.Events:FindFirstChild("RemoteFunctions")
+                        and ReplicatedStorage.Events.RemoteFunctions:FindFirstChild("SellAll")
+                    if rf then
+                        res = rf:InvokeServer(5, "Fish", false)
+                    end
+                end)
+            end
+
+            -- Возвращаемся обратно на место ловли
+            hrp.CFrame = oldCF
+            task.wait(0.04)
+            pcall(function()
+                cam.CameraType = Enum.CameraType.Custom
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                if hum then
+                    cam.CameraSubject = hum
+                end
+                equipRod()
+            end)
+
+            return res
+        end)
+
+        isSelling = false
+
+        if success and result then
+            local count = (type(result) == "table" and (result.Amount or result.Count)) or nil
+            local val = (type(result) == "table" and (result.Value or result.Money or result.Price)) or nil
+            if count and count > 0 then
+                showNotification("💰 Auto-Sell", string.format(locText("Sold: %d fish for %s", "Продано: %d рыб за %s"), count, formatMoney(val or 0)))
+            elseif type(result) == "number" and result > 0 then
+                showNotification("💰 Auto-Sell", string.format(locText("Revenue: %s", "Выручка: %s"), formatMoney(result)))
+            else
+                showNotification("💰 Auto-Sell", locText("Fish successfully sold to merchant!", "Рыба успешно продана торговцу!"))
+            end
+        end
+    end)
+end
+
+-- ==================== 🏛️ MAZE & DUNGEON AUTOCOMPLETE (SAND & FROST) ====================
+local function unlockMazeDoor(mazeType)
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    showNotification("Maze Key", "Поиск ворот " .. mazeType .. "...")
+
+    local doorCF = nil
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        local n = obj.Name:lower()
+        if (n:find(mazeType:lower()) or n:find("temple") or n:find("gate") or n:find("door")) and
+           (n:find("door") or n:find("gate") or n:find("lock") or n:find("enter")) then
+            if obj:IsA("BasePart") then
+                doorCF = obj.CFrame
+                break
+            elseif obj:IsA("Model") and obj.PrimaryPart then
+                doorCF = obj.PrimaryPart.CFrame
+                break
+            end
+        end
+    end
+
+    if doorCF then
+        hrp.CFrame = doorCF + Vector3.new(0, 3, 3)
+        task.wait(0.2)
+        for _, p in ipairs(workspace:GetDescendants()) do
+            if p:IsA("ProximityPrompt") and (p.Parent:GetPivot().Position - hrp.Position).Magnitude < 25 then
+                if fireproximityprompt then fireproximityprompt(p) end
+            end
+        end
+        showNotification("Maze Key", "Ворота открыты!")
+    else
+        showNotification("Maze Key", "Ворота рядом не найдены.")
+    end
+end
+
+local function autocompleteSandMaze()
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    showNotification("Sand Maze", "🏛️ Решение Песчаного Лабиринта (Temple of the Sun)...")
+
+    local goalCF = nil
+    local goalPrompt = nil
+
+    -- 1. Динамический поиск алтаря, сундука или финишной зоны
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        local n = obj.Name:lower()
+        if (n:find("sand") or n:find("sun") or n:find("dune") or n:find("temple")) and
+           (n:find("altar") or n:find("chest") or n:find("finish") or n:find("end") or n:find("relic") or n:find("reward")) then
+            if obj:IsA("BasePart") then
+                goalCF = obj.CFrame + Vector3.new(0, 3, 0)
+                goalPrompt = obj:FindFirstChildOfClass("ProximityPrompt") or obj.Parent:FindFirstChildOfClass("ProximityPrompt")
+                break
+            elseif obj:IsA("Model") and obj.PrimaryPart then
+                goalCF = obj.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
+                goalPrompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
+                break
+            end
+        end
+    end
+
+    -- 2. Поиск по имени модели
+    if not goalCF then
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj.Name == "SunAltar" or obj.Name == "SandAltar" or obj.Name == "SandChest" or obj.Name == "SunChest" then
+                if obj:IsA("BasePart") then
+                    goalCF = obj.CFrame + Vector3.new(0, 3, 0)
+                    goalPrompt = obj:FindFirstChildOfClass("ProximityPrompt")
+                    break
+                elseif obj:IsA("Model") and obj.PrimaryPart then
+                    goalCF = obj.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
+                    goalPrompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
+                    break
+                end
+            end
+        end
+    end
+
+    -- 3. Резервные координаты храма солнца (Dunes)
+    local finalCF = goalCF or CFrame.new(2450, 45, -1820)
+    hrp.CFrame = finalCF
+    task.wait(0.3)
+
+    -- Авто-взаимодействие с алтарем / сундуком
+    pcall(function()
+        if goalPrompt and fireproximityprompt then
+            fireproximityprompt(goalPrompt)
+        end
+        for _, p in ipairs(workspace:GetDescendants()) do
+            if p:IsA("ProximityPrompt") and (p.Parent:GetPivot().Position - hrp.Position).Magnitude < 35 then
+                if fireproximityprompt then fireproximityprompt(p) end
+            end
+        end
+        local evChest = require(RS.Shared.Events).Client("Chest")
+        if evChest then evChest:Fire("OpenAll") end
+    end)
+
+    showNotification("Sand Maze", "🏆 Песчаный лабиринт пройден! Награды собраны.")
+end
+
+local function autocompleteFrostMaze()
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    showNotification("Frost Maze", "❄️ Решение Ледяного Лабиринта (Frozen Caves)...")
+
+    local goalCF = nil
+    local goalPrompt = nil
+
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        local n = obj.Name:lower()
+        if (n:find("frost") or n:find("ice") or n:find("frozen") or n:find("tundra")) and
+           (n:find("altar") or n:find("chest") or n:find("finish") or n:find("end") or n:find("relic") or n:find("reward")) then
+            if obj:IsA("BasePart") then
+                goalCF = obj.CFrame + Vector3.new(0, 3, 0)
+                goalPrompt = obj:FindFirstChildOfClass("ProximityPrompt") or obj.Parent:FindFirstChildOfClass("ProximityPrompt")
+                break
+            elseif obj:IsA("Model") and obj.PrimaryPart then
+                goalCF = obj.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
+                goalPrompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
+                break
+            end
+        end
+    end
+
+    if not goalCF then
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj.Name == "IceAltar" or obj.Name == "FrozenAltar" or obj.Name == "IceChest" or obj.Name == "FrostChest" then
+                if obj:IsA("BasePart") then
+                    goalCF = obj.CFrame + Vector3.new(0, 3, 0)
+                    goalPrompt = obj:FindFirstChildOfClass("ProximityPrompt")
+                    break
+                elseif obj:IsA("Model") and obj.PrimaryPart then
+                    goalCF = obj.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
+                    goalPrompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
+                    break
+                end
+            end
+        end
+    end
+
+    local finalCF = goalCF or CFrame.new(-3120, -60, 4280)
+    hrp.CFrame = finalCF
+    task.wait(0.3)
+
+    pcall(function()
+        if goalPrompt and fireproximityprompt then
+            fireproximityprompt(goalPrompt)
+        end
+        for _, p in ipairs(workspace:GetDescendants()) do
+            if p:IsA("ProximityPrompt") and (p.Parent:GetPivot().Position - hrp.Position).Magnitude < 35 then
+                if fireproximityprompt then fireproximityprompt(p) end
+            end
+        end
+        local evChest = require(RS.Shared.Events).Client("Chest")
+        if evChest then evChest:Fire("OpenAll") end
+    end)
+
+    showNotification("Frost Maze", "🏆 Ледяной лабиринт пройден! Награды собраны.")
+end
+
+-- Авто-экипировка удочки
+local function equipRod()
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChildOfClass("Tool") then
+        return
+    end
+    if AutoFishingCtrl and AutoFishingCtrl.EquipRod then
+        pcall(function() AutoFishingCtrl:EquipRod() end)
+    end
+    char = LocalPlayer.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if hum and not (char and char:FindFirstChildOfClass("Tool")) then
+        for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
+            if item:IsA("Tool") and item.Name:lower():find("rod") then
+                hum:EquipTool(item)
+                break
+            end
+        end
+    end
+end
+
+-- Покупка улучшений через ремоут
+local function buyUpgrade(statName)
+    pcall(function()
+        local ev = require(RS.Shared.Events).Client("Upgrades")
+        if ev and ev.Fire then
+            ev:Fire("Buy", statName)
+        end
+    end)
+end
+
+-- ==================== 🧹 AUTO-CLEANUP STRAY & FROZEN FISH MODELS ====================
+local function cleanupStrayFishModels()
+    pcall(function()
+        -- 1. Очищаем все модели в косяке (включая помеченные taken)
+        if FishSchoolCtrl and FishSchoolCtrl.Fish then
+            for _, f in ipairs(FishSchoolCtrl.Fish) do
+                if f.model and f.model.Parent then
+                    pcall(function() f.model:Destroy() end)
+                end
+            end
+        end
+        -- 2. Сканируем Workspace на брошенные 3D-модели рыбы вне активного заброса
+        if not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) and not (CatchMinigameCtrl and CatchMinigameCtrl:IsActive()) then
+            for _, m in ipairs(workspace:GetChildren()) do
+                if m:IsA("Model") and (
+                    m:FindFirstChild("Fish") or
+                    m:FindFirstChild("BaitAttachment") or
+                    m:FindFirstChild("FishESP") or
+                    m:FindFirstChild("FishInfoTag") or
+                    m:GetAttribute("Fish") or
+                    (m.PrimaryPart and m.PrimaryPart:FindFirstChild("BaitAttachment"))
+                ) then
+                    pcall(function() m:Destroy() end)
+                end
+            end
+        end
+    end)
+end
+
+-- ==================== 🚶 FREE MOVEMENT & UNFREEZE WATCHDOG ====================
+local function unfreezeCharacter()
+    pcall(function()
+        local char = LocalPlayer.Character
+        if not char then return end
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        local hum = char:FindFirstChildOfClass("Humanoid")
+
+        -- 1. Снимаем Anchored со всех частей персонажа
+        if hrp and hrp.Anchored and not (waterPlatform and waterPlatform.Parent and math.abs(hrp.Position.Y - waterPlatform.Position.Y) < 4) then
+            hrp.Anchored = false
+        end
+        for _, part in ipairs(char:GetChildren()) do
+            if part:IsA("BasePart") and part.Anchored and part ~= waterPlatform then
+                part.Anchored = false
+            end
+        end
+
+        -- 2. Восстанавливаем WalkSpeed и состояние гуманоида
+        if hum then
+            if hum.WalkSpeed <= 0 then
+                hum.WalkSpeed = (currentWalkSpeed and currentWalkSpeed > 0) and currentWalkSpeed or 16
+            end
+            if hum.PlatformStand then
+                hum.PlatformStand = false
+            end
+            if hum.Sit and not (char:FindFirstChildOfClass("VehicleSeat") or (char.Parent and char.Parent:FindFirstChildOfClass("VehicleSeat"))) then
+                hum.Sit = false
+            end
+        end
+
+        -- 3. Восстанавливаем PlayerModule Controls (WASD)
+        local playerScripts = LocalPlayer:FindFirstChild("PlayerScripts")
+        local playerModuleObj = playerScripts and playerScripts:FindFirstChild("PlayerModule")
+        if playerModuleObj then
+            local PlayerModule = require(playerModuleObj)
+            local Controls = PlayerModule and PlayerModule:GetControls()
+            if Controls and Controls.Enable then
+                Controls:Enable()
+            end
+        end
+
+        -- 4. Восстанавливаем камеру если она застряла в Scriptable
+        local cam = workspace.CurrentCamera
+        if cam and cam.CameraType == Enum.CameraType.Scriptable and hum then
+            cam.CameraType = Enum.CameraType.Custom
+            cam.CameraSubject = hum
+        end
+
+        -- 5. Останавливаем зависшие анимации заброса/стойки если заброс не идет
+        if hum and hum:FindFirstChild("Animator") and not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) and not (CatchMinigameCtrl and CatchMinigameCtrl.Fight) then
+            for _, t in ipairs(hum.Animator:GetPlayingAnimationTracks()) do
+                pcall(function() t:Stop() end)
+            end
+        end
+
+        -- 6. Гарантированно берем удочку в руки
+        equipRod()
+
+        -- 7. Автоудаление любой зависшей/дохлой рыбы
+        cleanupStrayFishModels()
+    end)
+end
+
+-- Перехватываем попытки игры заглушить WASD управление
+pcall(function()
+    local playerScripts = LocalPlayer:WaitForChild("PlayerScripts", 5)
+    local playerModuleObj = playerScripts and playerScripts:FindFirstChild("PlayerModule")
+    if playerModuleObj then
+        local PlayerModule = require(playerModuleObj)
+        local Controls = PlayerModule and PlayerModule:GetControls()
+        if Controls then
+            Controls:Enable()
+            if not Controls._fishyHooked then
+                Controls._fishyHooked = true
+                local oldDisable = Controls.Disable
+                Controls.Disable = function(self, ...)
+                    if freeWalkEnabled then
+                        return -- Не даем игре выключать управление во время заброса!
+                    end
+                    return oldDisable(self, ...)
+                end
+            end
+        end
+    end
+end)
+
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(0.5)
+    unfreezeCharacter()
+end)
+
+-- Мгновенная разморозка при старте скрипта
+task.defer(unfreezeCharacter)
+
+-- ==================== SMART ENTITY SCORING (FISH + ITEMS) ====================
+local function getEntityScore(f, mode)
+    local name = f.name or (f.model and f.model.Name) or (f.data and f.data.Name) or f.findName or ""
+    local lower = name:lower()
+    
+    -- 1. Особые предметы, фрагменты (Lava/Sand/Frozen), ключи, свитки, сундуки, камни и реликвии
+    local isSpecialItem = false
+    local itemType = "Special"
+    
+    if f.bypassRoom or f.special or f.isItem or f.Kind == "Fragment" or f.kind == "Fragment" or f.findRarity == "Special" then
+        isSpecialItem = true
+        itemType = f.Kind or f.kind or "Special"
+    elseif KeyConfig and KeyConfig.Items and KeyConfig.Items[name] then
+        isSpecialItem = true
+        itemType = "Key/Fragment"
+    elseif ScrollConfig and ScrollConfig.Items and ScrollConfig.Items[name] then
+        isSpecialItem = true
+        itemType = "Scroll"
+    elseif SummonConfig and SummonConfig.Items and SummonConfig.Items[name] then
+        isSpecialItem = true
+        itemType = "Summon"
+    elseif CageConfig and CageConfig.Items and CageConfig.Items[name] then
+        isSpecialItem = true
+        itemType = "Cage"
+    elseif ChestConfig and ChestConfig.Items and ChestConfig.Items[name] then
+        isSpecialItem = true
+        itemType = "Chest"
+    else
+        if lower:find("fragment") or lower:find("key") or lower:find("scroll") 
+           or lower:find("stone") or lower:find("crown") or lower:find("chest") 
+           or lower:find("bottle") or lower:find("relic") or lower:find("cage") 
+           or lower:find("trap") or lower:find("heart") or lower:find("lucky")
+           or lower:find("lava") or lower:find("sand") or lower:find("frozen")
+           or lower:find("orb") or lower:find("pearl") or lower:find("coin")
+           or lower:find("gem") or lower:find("crystal") or lower:find("fossil")
+           or lower:find("totem") or lower:find("skull") or lower:find("egg")
+           or lower:find("ancient") or lower:find("runic") or lower:find("enchant") then
+            isSpecialItem = true
+            itemType = "Special"
+        end
+    end
+    
+    if isSpecialItem or f.bypassRoom then
+        local info = {
+            name = (name ~= "" and name) or "Special Item",
+            rarity = "Special",
+            order = 10,
+            price = 100000,
+            isBoss = false,
+            isSecret = true,
+            isSpecial = true,
+            isItem = true,
+            itemType = itemType
+        }
+        -- Абсолютный наивысший приоритет (100M): фрагменты и предметы ловятся первыми всегда!
+        return 100000000, info
+    end
+    
+    -- 2. Мусор
+    local isJunk = false
+    if JunkConfig and JunkConfig.Items and JunkConfig.Items[name] then
+        isJunk = true
+    else
+        if lower:find("boot") or lower:find("sneaker") or lower:find("tire") or lower:find("can") or lower:find("bucket") then
+            isJunk = true
+        end
+    end
+    
+    if isJunk then
+        local info = {
+            name = name,
+            rarity = "Junk",
+            order = 0,
+            price = 50,
+            isBoss = false,
+            isSecret = false,
+            isJunk = true
+        }
+        if collectItemsEnabled then
+            return 5000, info
+        else
+            return 0, info
+        end
+    end
+    
+    -- 3. Обычная рыба
+    local cfg = FishConfig:Get(name, true) or {}
+    local rarity = cfg.Rarity or "Common"
+    local rInfo = RarityConfig.Get(rarity)
+    local order = rInfo and rInfo.Order or 1
+    local price = cfg.SellPrice or 10
+    local odds = cfg.RollOdds or 1
+    local size = (f.model and f.model.PrimaryPart and f.model.PrimaryPart.Size.Magnitude) or (f.size or 1)
+    
+    local isBoss = f.boss == true
+    local isSecret = (rarity == "Secret" or rarity == "Exotic" or order >= 7)
+    local isMutation = f.mutation ~= nil
+    
+    local info = {
+        name = name,
+        rarity = rarity,
+        order = order,
+        price = price,
+        isBoss = isBoss,
+        isSecret = isSecret,
+        mutation = f.mutation
+    }
+    
+    if mode == "Secret" then
+        if isBoss or isSecret then
+            return 15000000 + order * 100000 + price, info
+        else
+            return 0, info
+        end
+    elseif mode == "Rarest" then
+        local score = order * 1000000 + odds
+        if isBoss then score = score + 5000000 end
+        if isMutation then score = score + 500000 end
+        return score, info
+    elseif mode == "Money" then
+        local mult = isMutation and 2.5 or 1.0
+        if isBoss then mult = mult * 5 end
+        return price * mult * size, info
+    elseif mode == "Biggest" then
+        return size, info
+    else -- "Any"
+        return 1, info
+    end
+end
+
+-- ==================== FULL CAPACITY MULTI-GRAB & ITEM COLLECTOR ====================
+local function isFightingFish(f)
+    if not f then return false end
+    if f.boss == true then return true end
+    local name = f.name or (f.model and f.model.Name) or (f.data and f.data.Name) or f.findName
+    if name and FishConfig and FishConfig.Items and FishConfig.Items[name] then
+        local data = FishConfig.Items[name]
+        if CatchFight and CatchFight.Required and CatchFight.Required(data) then
+            return true
+        end
+    end
+    return false
+end
+
+if FishSchoolCtrl then
+    FishSchoolCtrl._rawTryGrab = FishSchoolCtrl._rawTryGrab or FishSchoolCtrl.TryGrab
+    local rawTryGrab = FishSchoolCtrl._rawTryGrab
+    
+    FishSchoolCtrl.TryGrab = function(self, point)
+        if instantCatchEnabled and self.Fish and #self.Fish > 0 and self.Cinematic and self.Cinematic.Catchable and self.Cinematic.PullStart then
+            local maxCap = self.Cinematic:GetBaitCapacity()
+            local currentCaught = self.Cinematic:CaughtFishCount()
+            local slotsFree = maxCap - currentCaught
+            
+            if slotsFree > 0 or collectItemsEnabled then
+                local candidates = {}
+                for _, f in ipairs(self.Fish) do
+                    if not f.caught and not f.escaped and not f.fighting and f.model and f.model.Parent then
+                        local score, info = getEntityScore(f, catchMode)
+                        table.insert(candidates, {
+                            fish = f,
+                            score = score,
+                            info = info
+                        })
+                    end
+                end
+                
+                table.sort(candidates, function(a, b)
+                    return a.score > b.score
+                end)
+                
+                if #candidates > 0 then
+                    for _, cand in ipairs(candidates) do
+                        local target = cand.fish
+                        local isSpecial = cand.info and cand.info.isSpecial
+                        local isBypass = target.bypassRoom == true or isSpecial
+                        local isFighting = target.boss == true or isFightingFish(target) or (CatchFight and CatchFight.Required and CatchFight.Required(FishConfig:Get(target.name, true)))
+                        
+                        if catchMode == "Secret" and cand.score <= 0 then
+                            if not fallbackToBest then
+                                break
+                            end
+                        end
+                        
+                        if isFighting then
+                            -- Босс / Секретная рыба: начинаем бой в одиночку, не смешивая с другими рыбами
+                            self.Cinematic.Sub.CatchMinigame:Offer(target)
+                            return
+                        end
+                        
+                        if slotsFree > 0 or isBypass then
+                            if not isBypass then
+                                slotsFree = slotsFree - 1
+                            end
+                            if not self.Cinematic.Sub.CatchMinigame:Offer(target) then
+                                self:CompleteGrab(target)
+                            end
+                        end
+                    end
+                    return
+                end
+            end
+        end
+        
+        return rawTryGrab(self, point)
+    end
+
+    FishSchoolCtrl._rawDespawn = FishSchoolCtrl._rawDespawn or FishSchoolCtrl.Despawn
+    local rawDespawn = FishSchoolCtrl._rawDespawn
+    FishSchoolCtrl.Despawn = function(self)
+        if self.Fish then
+            for _, f in ipairs(self.Fish) do
+                if f.model and f.model.Parent then
+                    pcall(function() f.model:Destroy() end)
+                end
+            end
+        end
+        return rawDespawn(self)
+    end
+end
+
+-- ==================== PREDICTED LANDING MARKER НА ПОЛОСКЕ ====================
+-- Рассчитывает точную точку приземления по заспавненной рыбе и формуле DistanceScale игры
+local function updateLandingHUD(hudInstance, totalDist)
+    local content = hudInstance and hudInstance.DistanceContent
+    if not content then return end
+    
+    -- Очистка старых маркеров
+    local legacy = content:FindFirstChild("PredictedLanding")
+    if legacy then legacy:Destroy() end
+    
+    local playersFrame = content:FindFirstChild("Players")
+    if not playersFrame then return end
+    local you = playersFrame:FindFirstChild("You")
+    if not you then return end
+    
+    local target = playersFrame:FindFirstChild("PredictedTarget")
+    if not landingPredictorEnabled then
+        if target then target.Visible = false end
+        return
+    end
+    
+    -- 1. Вычисляем дистанцию прямо по позиции заспавненной рыбы / активного лендинга
+    local landingPos = (FishSchoolCtrl and FishSchoolCtrl.SpawnCtx and FishSchoolCtrl.SpawnCtx.landing)
+        or (ThrowCinematicCtrl and ThrowCinematicCtrl.ActiveLanding)
+    local origin = ThrowCinematicCtrl and ThrowCinematicCtrl.ThrowOrigin
+    
+    local calcDist = nil
+    if landingPos and origin then
+        calcDist = ((landingPos - origin) * Vector3.new(1, 0, 1)).Magnitude
+    elseif ThrowCinematicCtrl and ThrowCinematicCtrl.ThrowDistance and ThrowCinematicCtrl.ThrowDistance > 0 then
+        calcDist = ThrowCinematicCtrl.ThrowDistance
+    elseif totalDist and totalDist > 0 then
+        calcDist = totalDist
+    end
+    
+    if not calcDist or calcDist <= 0 then
+        if target then target.Visible = false end
+        return
+    end
+    
+    -- 2. Точный расчет позиции на шкале по внутренней математике SetDistance:
+    local record = hudInstance.RecordToBeat or 0
+    local finalRatio
+    if record > 0 then
+        if calcDist > record then
+            finalRatio = 0.92 -- При новом рекорде игра динамически держит финиш на 0.92
+        else
+            finalRatio = math.clamp(calcDist / (record / 0.85), 0, 1)
+        end
+    else
+        finalRatio = 1.0
+    end
+    
+    -- 3. Находим лучшую заспавненную рыбу / предмет в точке приземления
+    local bestFishName = nil
+    local bestRarity = nil
+    local bestScore = -1
+    local totalSpawned = 0
+    
+    if FishSchoolCtrl and FishSchoolCtrl.Fish and #FishSchoolCtrl.Fish > 0 then
+        totalSpawned = #FishSchoolCtrl.Fish
+        for _, f in ipairs(FishSchoolCtrl.Fish) do
+            local score, info = getEntityScore(f, catchMode)
+            if score > bestScore then
+                bestScore = score
+                bestFishName = info.name
+                bestRarity = info.rarity
+                if info.mutation then
+                    bestFishName = "[" .. info.mutation .. "] " .. bestFishName
+                end
+            end
+        end
+    end
+    
+    -- 4. Создаем или позиционируем маркер цели
+    if not target then
+        target = Instance.new("Frame")
+        target.Name = "PredictedTarget"
+        target.AnchorPoint = Vector2.new(0.5, 0.5)
+        target.Size = you.Size
+        target.BackgroundColor3 = Color3.fromRGB(0, 25, 45)
+        target.BackgroundTransparency = 0.25
+        target.ZIndex = math.max(you.ZIndex - 1, 1)
+        Instance.new("UICorner", target).CornerRadius = UDim.new(1, 0)
+        
+        local stroke = Instance.new("UIStroke", target)
+        stroke.Color = Color3.fromRGB(0, 255, 255)
+        stroke.Thickness = 2
+        
+        local icon = Instance.new("TextLabel", target)
+        icon.Name = "Icon"
+        icon.Size = UDim2.new(1, 0, 1, 0)
+        icon.BackgroundTransparency = 1
+        icon.Text = "🎯"
+        icon.TextSize = 13
+        icon.Font = Enum.Font.GothamBold
+        
+        local tag = Instance.new("TextLabel", target)
+        tag.Name = "DistanceTag"
+        tag.Size = UDim2.new(0, 130, 0, 16)
+        tag.AnchorPoint = Vector2.new(0.5, 0)
+        tag.Position = UDim2.new(0.5, 0, 1, 3)
+        tag.BackgroundColor3 = Color3.fromRGB(5, 15, 25)
+        tag.BackgroundTransparency = 0.25
+        Instance.new("UICorner", tag).CornerRadius = UDim.new(0, 4)
+        local tagStroke = Instance.new("UIStroke", tag)
+        tagStroke.Color = Color3.fromRGB(0, 255, 255)
+        tagStroke.Thickness = 1
+        tag.TextColor3 = Color3.fromRGB(0, 255, 255)
+        tag.Font = Enum.Font.GothamBold
+        tag.TextSize = 10
+        
+        target.Parent = playersFrame
+    end
+    
+    target.Position = UDim2.new(finalRatio, 0, you.Position.Y.Scale, 0)
+    target.Visible = true
+    
+    local tag = target:FindFirstChild("DistanceTag")
+    if tag then
+        local distText = string.format("🎯 %dm", math.floor(calcDist + 0.5))
+        if bestFishName and totalSpawned > 0 then
+            tag.Size = UDim2.new(0, 150, 0, 16)
+            tag.Text = string.format("%s | %s", distText, bestFishName)
+            if bestRarity and rarityColors[bestRarity] then
+                tag.TextColor3 = rarityColors[bestRarity]
+            end
+        else
+            tag.Size = UDim2.new(0, 75, 0, 16)
+            tag.Text = distText
+            tag.TextColor3 = Color3.fromRGB(0, 255, 255)
+        end
+    end
+end
+
+-- Хуки на HUD и спавн рыбы для мгновенного отображения лендинга
+pcall(function()
+    local Displays = require(RS.Shared.UI.HUD.Fishing.Displays)
+    if Displays then
+        Displays._rawSetDist = Displays._rawSetDist or Displays.SetDistance
+        local rawSetDist = Displays._rawSetDist
+        Displays.SetDistance = function(self, currentDist, totalDist)
+            rawSetDist(self, currentDist, totalDist)
+            updateLandingHUD(self, totalDist)
+        end
+        
+        Displays._rawHide = Displays._rawHide or Displays.HideThrowDisplays
+        local rawHide = Displays._rawHide
+        Displays.HideThrowDisplays = function(self)
+            if self.DistanceContent and self.DistanceContent:FindFirstChild("Players") then
+                local target = self.DistanceContent.Players:FindFirstChild("PredictedTarget")
+                if target then target.Visible = false end
+            end
+            return rawHide(self)
+        end
+    end
+end)
+
+-- Мгновенный вызов при спавне рыбы
+if FishSchoolCtrl then
+    FishSchoolCtrl._rawSpawn = FishSchoolCtrl._rawSpawn or FishSchoolCtrl.Spawn
+    local rawSpawn = FishSchoolCtrl._rawSpawn
+    FishSchoolCtrl.Spawn = function(self, a2)
+        rawSpawn(self, a2)
+        task.defer(function()
+            local d = RS.Shared.UI.HUD.Fishing:FindFirstChild("Displays") and require(RS.Shared.UI.HUD.Fishing.Displays)
+            if d then
+                updateLandingHUD(d, ThrowCinematicCtrl and ThrowCinematicCtrl.ThrowDistance)
+            end
+        end)
+    end
+end
+
+-- Защита от сброса авто-рыбалки при телепорте на продажу
+if FishingCtrl then
+    FishingCtrl._rawInArea = FishingCtrl._rawInArea or FishingCtrl.InArea
+    local rawInArea = FishingCtrl._rawInArea
+    FishingCtrl.InArea = function(self)
+        if isSelling then return true end
+        return rawInArea(self)
+    end
+end
+
+if AutoFishingCtrl then
+    AutoFishingCtrl._rawSetOn = AutoFishingCtrl._rawSetOn or AutoFishingCtrl.SetOn
+    local rawSetOn = AutoFishingCtrl._rawSetOn
+    AutoFishingCtrl.SetOn = function(self, val)
+        if isSelling and val == false then
+            return -- блокируем отключение во время продажи
+        end
+        return rawSetOn(self, val)
+    end
+end
+
+-- Хук на завершение вылова заброса: подсчет заработка, уведомление, авто-пруд и авто-продажа
+if FishSchoolCtrl then
+    FishSchoolCtrl._rawTakeCaught = FishSchoolCtrl._rawTakeCaught or FishSchoolCtrl.TakeCaught
+    local rawTakeCaught = FishSchoolCtrl._rawTakeCaught
+    FishSchoolCtrl.TakeCaught = function(self)
+        local caught = rawTakeCaught(self)
+        if caught and #caught > 0 then
+            local totalValue = 0
+            local count = #caught
+            local bestName = nil
+            local bestVal = -1
+            
+            for _, f in ipairs(caught) do
+                local val = 0
+                local itemData = {
+                    Type = "Fish",
+                    Name = f.name,
+                    Data = {
+                        Mutation = f.mutation,
+                        Size = f.size or 1
+                    }
+                }
+                pcall(function()
+                    if NpcSellCtrl and NpcSellCtrl.Services and NpcSellCtrl.Services.Item then
+                        val = NpcSellCtrl.Services.Item:GetSellValue(LocalPlayer, itemData) or 0
+                    end
+                end)
+                if val <= 0 then
+                    local cfg = FishConfig:Get(f.name, true)
+                    val = (cfg and cfg.SellPrice) or 50
+                    if f.mutation then val = val * 2.5 end
+                end
+                
+                totalValue = totalValue + val
+                if val > bestVal then
+                    bestVal = val
+                    bestName = (f.mutation and ("[" .. f.mutation .. "] ") or "") .. f.name
+                end
+            end
+            
+            sessionFishCaught = sessionFishCaught + count
+            sessionMoneyEarned = sessionMoneyEarned + totalValue
+            if updateStatsHud then updateStatsHud() end
+
+            if notifyCatchValue then
+                local bestTxt = bestName and (locText(" | Best: ", " | Топ: ") .. bestName) or ""
+                showNotification(
+                    locText("🎣 Cast Complete!", "🎣 Заброс завершён!"),
+                    string.format(locText("Caught: %d fish | Revenue: %s%s", "Поймано: %d шт. | Выручка: %s%s"), count, formatMoney(totalValue), bestTxt)
+                )
+            end
+            
+            -- Ждем завершения анимаций сбора рыбы и синематика заброса
+            task.spawn(function()
+                local t0 = os.clock()
+                while ThrowCinematicCtrl and ThrowCinematicCtrl.Active and (os.clock() - t0 < 0.8) do
+                    task.wait(0.05)
+                end
+                
+                -- Очищаем абсолютно ВСЕ зависшие 3D-модели рыбы с пирса
+                cleanupStrayFishModels()
+                unfreezeCharacter()
+
+                task.wait(0.2)
+                if autoPondEnabled then
+                    putBestFishInPond()
+                end
+                task.wait(0.4) -- Даем серверу время обработать EquipBest в пруд перед продажей!
+                if autoSellEnabled then
+                    sellFishNow()
+                end
+            end)
+        end
+        return caught
+    end
+end
+
+-- ==================== ⚡ ZERO FLIGHT TIME & INSTANT PULL ANIMATION SKIP ====================
+if ThrowCinematicCtrl then
+    ThrowCinematicCtrl._rawOnServerStarted = ThrowCinematicCtrl._rawOnServerStarted or ThrowCinematicCtrl.OnServerStarted
+    local rawOnServerStarted = ThrowCinematicCtrl._rawOnServerStarted
+    ThrowCinematicCtrl.OnServerStarted = function(self, a2, ...)
+        if fastArcEnabled and type(a2) == "table" then
+            a2.arcDuration = 0.28
+            if a2.bounces then
+                for _, b in ipairs(a2.bounces) do
+                    b.duration = 0.12
+                    b.Duration = 0.12
+                end
+            end
+        end
+        return rawOnServerStarted(self, a2, ...)
+    end
+
+    ThrowCinematicCtrl._rawBeginFlight = ThrowCinematicCtrl._rawBeginFlight or ThrowCinematicCtrl.BeginFlight
+    local rawBeginFlight = ThrowCinematicCtrl._rawBeginFlight
+    ThrowCinematicCtrl.BeginFlight = function(self, ...)
+        rawBeginFlight(self, ...)
+        if fastArcEnabled then
+            self.ArcDuration = 0.28
+            if self.BounceList then
+                for _, b in ipairs(self.BounceList) do
+                    b.duration = 0.12
+                    b.Duration = 0.12
+                end
+            end
+        end
+    end
+end
+
+-- 1. Hook Auto Perfect (100% Guaranteed Perfect Throw)
+if FishingCtrl then
+    FishingCtrl._rawStopHook = FishingCtrl._rawStopHook or FishingCtrl.StopHook
+    local rawStopHook = FishingCtrl._rawStopHook
+    FishingCtrl.StopHook = function(self)
+        if autoPerfectEnabled and self.Charging then
+            local hud = self:HUD()
+            if hud and hud.GetHookSteps then
+                local steps = hud:GetHookSteps()
+                if steps and steps >= 2 then
+                    self.HookT = 9.5 / (steps - 1)
+                    self.ThrowTier = "Perfect"
+                end
+            end
+        end
+        return rawStopHook(self)
+    end
+end
+
+-- 2. Hook AutoFishing & Turbo Cast
+if AutoFishingCtrl then
+    AutoFishingCtrl.OwnsAutoSell = function() return true end
+
+    AutoFishingCtrl.DriveCast = function(self, fishing)
+        if isSelling or (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) then
+            return
+        end
+        self.DrivingThrow = true
+        equipRod()
+        fishing:StartHook()
+        if not fishing.Charging then
+            self.DrivingThrow = false
+            return
+        end
+        if turboCastEnabled then
+            task.wait(0.35)
+        else
+            task.wait(0.8)
+        end
+        if autoPerfectEnabled then
+            local steps = fishing:HUD():GetHookSteps()
+            if steps and steps >= 2 then
+                fishing.HookT = 9.5 / (steps - 1)
+                fishing.ThrowTier = "Perfect"
+            end
+        end
+        fishing:StopHook()
+        self.DrivingThrow = false
+    end
+
+    -- Мгновенный турбо-заброс: убирает 2.5-секундную паузу между забросами
+    task.spawn(function()
+        while true do
+            task.wait(0.05)
+            if getgenv()._FishyHubToken ~= myHubToken then break end
+            
+            -- Авто-заброс работает ТОЛЬКО когда пользователь включил авто-рыбалку (и в игре, и в UI)
+            local isAutoActive = autoFishEnabled and (AutoFishingCtrl and AutoFishingCtrl.On)
+            if isAutoActive and not isSelling then
+                if not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) then
+                    equipRod()
+                    if FishingCtrl and not FishingCtrl.Charging then
+                        if FishingCtrl:CanStartThrow() then
+                            AutoFishingCtrl:DriveCast(FishingCtrl)
+                        else
+                            -- Если заброс заблокирован из-за рассинхрона — вызываем экстренную разморозку
+                            unfreezeCharacter()
+                        end
+                    end
+                end
+            end
+        end
+    end)
+
+    AutoFishingCtrl.WarnFull = function(self)
+        if autoSellEnabled then
+            sellFishNow()
+        end
+    end
+
+    AutoFishingCtrl.Boost = function(self)
+        return true
+    end
+
+    AutoFishingCtrl.BoostedHookT = function(self, fishing, boost)
+        if autoPerfectEnabled then
+            local steps = fishing:HUD():GetHookSteps()
+            if steps and steps >= 2 then
+                return 9.5 / (steps - 1)
+            end
+        end
+        return 0.5
+    end
+end
+
+-- 3. Hook CatchMinigame (Auto-Clicker with Server Rate Limit Respect)
+if CatchMinigameCtrl then
+    CatchMinigameCtrl._rawBegin = CatchMinigameCtrl._rawBegin or CatchMinigameCtrl.Begin
+    local rawBegin = CatchMinigameCtrl._rawBegin
+
+    CatchMinigameCtrl.Begin = function(self, fish, boss)
+        rawBegin(self, fish, boss)
+        if autoFightEnabled and self.Fight then
+            local currentFight = self.Fight
+            local fishName = (fish and (fish.name or fish.Name)) or "Boss / Secret Fish"
+            showNotification(locText("⚔️ Boss / Secret Hooked!", "⚔️ Босс на крючке!"), locText("Catching: ", "Ловим: ") .. tostring(fishName))
+            
+            if fightThread then pcall(task.cancel, fightThread) end
+            fightThread = task.spawn(function()
+                task.wait(0.05)
+                while self.Fight and self.Fight == currentFight do
+                    pcall(function() self:Click() end)
+                    task.wait(0.088) -- ~11.36 кликов/сек, строго под серверным лимитом 12/сек
+                end
+            end)
+        end
+    end
+end
+
+local lastFishCleanup = 0
+RunService.Heartbeat:Connect(function()
+    local now = os.clock()
+    if now - lastFishCleanup > 2.5 then
+        lastFishCleanup = now
+        if not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) and not (CatchMinigameCtrl and CatchMinigameCtrl:IsActive()) then
+            cleanupStrayFishModels()
+        end
+    end
+
+    -- Если идет бой с боссом: поддерживаем автокликер и НЕ ПОДСЕКАЕМ
+    if CatchMinigameCtrl and CatchMinigameCtrl.Fight then
+        local currentFight = CatchMinigameCtrl.Fight
+        if autoFightEnabled and (not fightThread or coroutine.status(fightThread) == "dead") then
+            fightThread = task.spawn(function()
+                task.wait(0.05)
+                while CatchMinigameCtrl.Fight and CatchMinigameCtrl.Fight == currentFight do
+                    pcall(function() CatchMinigameCtrl:Click() end)
+                    task.wait(0.088)
+                end
+            end)
+        end
+        return
+    end
+
+    -- 🌊 Быстрое погружение на дно (Fast Dive)
+    if fastDiveEnabled and ThrowCinematicCtrl and ThrowCinematicCtrl.Active then
+        ThrowCinematicCtrl.DiveDuration = 0.12
+    end
+
+    -- 🚶 Свободный ход во время и после заброса (Анти-заморозка)
+    if freeWalkEnabled then
+        local char = LocalPlayer.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if hrp and hrp.Anchored and not (waterPlatform and waterPlatform.Parent and math.abs(hrp.Position.Y - waterPlatform.Position.Y) < 4) then
+            hrp.Anchored = false
+        end
+        if hum then
+            if hum.WalkSpeed <= 0 then
+                hum.WalkSpeed = (currentWalkSpeed and currentWalkSpeed > 0) and currentWalkSpeed or 16
+            end
+            if hum.PlatformStand then
+                hum.PlatformStand = false
+            end
+        end
+    end
+
+    -- 🌊 Walk On Water (Хождение по воде без плавания)
+    if waterWalkEnabled and LocalPlayer.Character then
+        local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hrp and hum then
+            if hum:GetState() == Enum.HumanoidStateType.Swimming then
+                hum:ChangeState(Enum.HumanoidStateType.Running)
+            end
+            if not waterPlatform or not waterPlatform.Parent then
+                waterPlatform = Instance.new("Part")
+                waterPlatform.Name = "FishyWaterWalk"
+                waterPlatform.Size = Vector3.new(12, 1, 12)
+                waterPlatform.Transparency = 1
+                waterPlatform.Anchored = true
+                waterPlatform.CanCollide = true
+                waterPlatform.Parent = workspace
+            end
+            local targetY = math.max(16.5, hrp.Position.Y - 3.1)
+            waterPlatform.CFrame = CFrame.new(hrp.Position.X, targetY, hrp.Position.Z)
+        end
+    elseif not waterWalkEnabled and waterPlatform then
+        pcall(function() waterPlatform:Destroy() end)
+        waterPlatform = nil
+    end
+
+    -- 🚀 Fly Mode (Плавный полёт)
+    if flyEnabled and LocalPlayer.Character then
+        local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        local cam = workspace.CurrentCamera
+        if hrp and hum and cam then
+            if not flyBodyVelocity or not flyBodyVelocity.Parent then
+                flyBodyGyro = Instance.new("BodyGyro")
+                flyBodyGyro.P = 9e4
+                flyBodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+                flyBodyGyro.CFrame = cam.CFrame
+                flyBodyGyro.Parent = hrp
+
+                flyBodyVelocity = Instance.new("BodyVelocity")
+                flyBodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+                flyBodyVelocity.Velocity = Vector3.zero
+                flyBodyVelocity.Parent = hrp
+            end
+
+            flyBodyGyro.CFrame = cam.CFrame
+            local move = Vector3.zero
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then move = move + cam.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then move = move - cam.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then move = move + cam.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then move = move - cam.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then move = move + Vector3.new(0, 1, 0) end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then move = move - Vector3.new(0, 1, 0) end
+
+            if move.Magnitude > 0 then
+                flyBodyVelocity.Velocity = move.Unit * flySpeed
+            else
+                flyBodyVelocity.Velocity = Vector3.zero
+            end
+        end
+    elseif not flyEnabled then
+        if flyBodyVelocity then pcall(function() flyBodyVelocity:Destroy() end) flyBodyVelocity = nil end
+        if flyBodyGyro then pcall(function() flyBodyGyro:Destroy() end) flyBodyGyro = nil end
+    end
+
+    -- Fast Reel: подсекаем когда забиты слоты или вся рыба в косяке поймана (не во время битвы с боссом)
+    if instantReelEnabled and ThrowCinematicCtrl and ThrowCinematicCtrl.Active and not ThrowCinematicCtrl.ReelRequested and not (CatchMinigameCtrl and CatchMinigameCtrl:IsActive()) then
+        local cap = ThrowCinematicCtrl:GetBaitCapacity()
+        local caught = ThrowCinematicCtrl:CaughtFishCount()
+        local spawned = (FishSchoolCtrl and FishSchoolCtrl.Fish and #FishSchoolCtrl.Fish) or 0
+        
+        if caught >= cap or (caught > 0 and spawned <= caught) then
+            pcall(function() ThrowCinematicCtrl:RequestReel() end)
+        end
+    end
+end)
+
+-- 5. Auto Sell & Auto Upgrade Background Loop
+task.spawn(function()
+    while true do
+        task.wait(autoSellInterval)
+        if getgenv()._FishyHubToken ~= myHubToken then break end
+        if autoSellEnabled then
+            sellFishNow()
+        end
+        if autoUpgradeCapacity or autoUpgradeAll then
+            buyUpgrade("Capacity")
+        end
+        if autoUpgradeAll then
+            buyUpgrade("Strength")
+            buyUpgrade("Weight")
+            buyUpgrade("Bounce")
+        end
+    end
+end)
+
+-- 6. Noclip Loop
+RunService.Stepped:Connect(function()
+    if noclipEnabled and LocalPlayer.Character then
+        for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+-- 7. Fish & Items ESP 2.0 (BillboardGui + Highlights)
+local function createEntityBillboard(model, info)
+    local pp = model.PrimaryPart
+    if not pp then return end
+    
+    local bg = model:FindFirstChild("FishInfoTag")
+    if not bg then
+        bg = Instance.new("BillboardGui")
+        bg.Name = "FishInfoTag"
+        bg.Adornee = pp
+        bg.Size = UDim2.new(0, 140, 0, 45)
+        bg.StudsOffset = Vector3.new(0, 2.5, 0)
+        bg.AlwaysOnTop = true
+        
+        local frame = Instance.new("Frame", bg)
+        frame.Size = UDim2.new(1, 0, 1, 0)
+        frame.BackgroundColor3 = Color3.fromRGB(10, 20, 30)
+        frame.BackgroundTransparency = 0.35
+        Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
+        
+        local nameLabel = Instance.new("TextLabel", frame)
+        nameLabel.Size = UDim2.new(1, 0, 0.5, 0)
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.TextColor3 = rarityColors[info.rarity] or Color3.fromRGB(255, 255, 255)
+        nameLabel.Font = Enum.Font.GothamBold
+        nameLabel.TextSize = 13
+        nameLabel.Text = (info.mutation and ("[" .. info.mutation .. "] ") or "") .. info.name
+        
+        local priceLabel = Instance.new("TextLabel", frame)
+        priceLabel.Size = UDim2.new(1, 0, 0.5, 0)
+        priceLabel.Position = UDim2.new(0, 0, 0.5, 0)
+        priceLabel.BackgroundTransparency = 1
+        priceLabel.TextColor3 = info.isChest and Color3.fromRGB(255, 220, 0) or Color3.fromRGB(100, 255, 120)
+        priceLabel.Font = Enum.Font.GothamMedium
+        priceLabel.TextSize = 11
+        priceLabel.Text = info.rarity .. " | $" .. tostring(info.price)
+        
+        bg.Parent = model
+    end
+end
+
+RunService.RenderStepped:Connect(function()
+    -- Watchdog камеры: если вне синематика и продажи камера застряла в Scriptable, возвращаем игроку в Custom
+    if not isSelling and not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) and not (CatchMinigameCtrl and CatchMinigameCtrl.Fight) then
+        local cam = workspace.CurrentCamera
+        if cam then
+            if cam.CameraType ~= Enum.CameraType.Custom then
+                cam.CameraType = Enum.CameraType.Custom
+            end
+            local char = LocalPlayer.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            if hum and cam.CameraSubject ~= hum then
+                cam.CameraSubject = hum
+            end
+        end
+    end
+
+    -- Отрисовка ESP ТОЛЬКО для активных (не пойманных) рыб в воде
+    if FishSchoolCtrl and FishSchoolCtrl.Fish then
+        for _, f in ipairs(FishSchoolCtrl.Fish) do
+            if f.model and f.model.Parent then
+                if f.caught or f.taken then
+                    -- Рыба уже поймана: удаляем теги и подсветки чтобы не загромождать игрока
+                    local tag = f.model:FindFirstChild("FishInfoTag")
+                    if tag then tag:Destroy() end
+                    local hl = f.model:FindFirstChild("FishESP")
+                    if hl then hl:Destroy() end
+                elseif fishEspEnabled and f.model.PrimaryPart then
+                    local _, info = getEntityScore(f, "Rarest")
+                    
+                    local hl = f.model:FindFirstChild("FishESP")
+                    if not hl then
+                        hl = Instance.new("Highlight")
+                        hl.Name = "FishESP"
+                        hl.Adornee = f.model
+                        hl.FillColor = rarityColors[info.rarity] or Color3.fromRGB(0, 240, 255)
+                        hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+                        hl.FillTransparency = 0.35
+                        hl.OutlineTransparency = 0
+                        hl.Parent = f.model
+                    end
+                    
+                    if espLabelsEnabled then
+                        createEntityBillboard(f.model, info)
+                    end
+                else
+                    local tag = f.model:FindFirstChild("FishInfoTag")
+                    if tag then tag:Destroy() end
+                    local hl = f.model:FindFirstChild("FishESP")
+                    if hl then hl:Destroy() end
+                end
+            end
+        end
+    end
+end)
+
+-- ==================== MODERN WINDUI GUI SETUP (8 TABS) ====================
+local function createTab(win, opts)
+    local ok, res = pcall(function()
+        return win:Tab(opts)
+    end)
+    if ok and res then return res end
+    if opts and opts.Icon then
+        local copy = {}
+        for k, v in pairs(opts) do if k ~= "Icon" then copy[k] = v end end
+        local ok2, res2 = pcall(function() return win:Tab(copy) end)
+        if ok2 and res2 then return res2 end
+    end
+    local dummy = {}
+    function dummy:Section(...) return dummy end
+    function dummy:Toggle(...) return dummy end
+    function dummy:Button(...) return dummy end
+    function dummy:Slider(...) return dummy end
+    function dummy:Dropdown(...) return dummy end
+    function dummy:Paragraph(...) return dummy end
+    function dummy:Keybind(...) return dummy end
+    return dummy
+end
+
+-- 1. 🎣 TAB: FISHING
+local TabFishing = createTab(Window, {
+    Title = "Fishing",
+    Icon = "fish-symbol"
+})
+
+TabFishing:Section({ Title = "Live AFK Farm Statistics" })
+
+statsParagraph = TabFishing:Paragraph({
+    Title = "Session Performance",
+    Desc = "Поймано: 0 шт. | Выручка: $0\nMoney / Min: $0/m | Money / Hour: $0/h\nВремя сессии: 00:00:00 | Темп: 0.0 рыб/мин"
+})
+
+TabFishing:Button({
+    Title = "🔄 Refresh Session Statistics",
+    Desc = "Recalculate fish count, revenue, and AFK farm rates",
+    Icon = "activity",
+    Callback = function()
+        updateStatsHud()
+        showNotification("Stats", string.format(locText("Caught: %d | Revenue: %s", "Выловлено: %d шт. | Доход: %s"), sessionFishCaught, formatMoney(sessionMoneyEarned)))
+    end
+})
+
+TabFishing:Toggle({
+    Title = "Show On-Screen AFK HUD",
+    Desc = "Display floating session statistics HUD on screen",
+    Value = hudEnabled,
+    Callback = function(state)
+        hudEnabled = state
+        if statsHudGui then
+            statsHudGui.Enabled = state
+        end
+        showNotification("HUD", state and locText("On-screen HUD enabled!", "Экранный виджет включен!") or locText("On-screen HUD hidden", "Экранный виджет скрыт"))
+    end
+})
+
+TabFishing:Section({ Title = "Auto-Fishing & Speed Hacks" })
+
+TabFishing:Toggle({
+    Title = "Enable Auto Fish (AFK Farm)",
+    Desc = "Автоматический заброс и вылов без остановок",
+    Value = autoFishEnabled,
+    Callback = function(state)
+        autoFishEnabled = state
+        if AutoFishingCtrl then
+            if state then
+                equipRod()
+                AutoFishingCtrl:SetOn(true)
+            else
+                AutoFishingCtrl:SetOn(false)
+            end
+        end
+    end
+})
+
+TabFishing:Toggle({
+    Title = "Fast Arc Skip (Zero Flight Time)",
+    Desc = "Мгновенный перелёт поплавка в воду (0.02с)",
+    Value = fastArcEnabled,
+    Callback = function(state) fastArcEnabled = state end
+})
+
+TabFishing:Toggle({
+    Title = "Fast Dive / Sink (Zero Sinking Time)",
+    Desc = "Мгновенное погружение крючка на глубину (0.05с)",
+    Value = fastDiveEnabled,
+    Callback = function(state) fastDiveEnabled = state end
+})
+
+TabFishing:Toggle({
+    Title = "Instant Pull-Up & Return (No Anim)",
+    Desc = "Пропуск 25-секундного всплытия со дна и возврата лески",
+    Value = instantPullEnabled,
+    Callback = function(state) instantPullEnabled = state end
+})
+
+TabFishing:Toggle({
+    Title = "Turbo Cast (Instant Recast)",
+    Desc = "Убирает 2.5-секундную паузу между забросами",
+    Value = turboCastEnabled,
+    Callback = function(state) turboCastEnabled = state end
+})
+
+TabFishing:Toggle({
+    Title = "100% Guaranteed Perfect Throw",
+    Desc = "Всегда идеальный заброс максимальной дальности",
+    Value = autoPerfectEnabled,
+    Callback = function(state) autoPerfectEnabled = state end
+})
+
+TabFishing:Toggle({
+    Title = "Walk While Fishing (Free Walk)",
+    Desc = "Разрешить ходить и прыгать во время и после заброса (Анти-фриз)",
+    Value = freeWalkEnabled,
+    Callback = function(state)
+        freeWalkEnabled = state
+        if state then unfreezeCharacter() end
+    end
+})
+
+TabFishing:Section({ Title = "Targeting & Catching Logic" })
+
+TabFishing:Dropdown({
+    Title = "Target Mode",
+    Desc = "Приоритет выбора рыбы в косяке",
+    Values = {
+        "Rarest (Highest Rarity)",
+        "Secret & Boss (Secret/Boss Only)",
+        "Money (Highest Sell Price)",
+        "Biggest (Largest Size/Weight)",
+        "Any (Fastest / Closest)"
+    },
+    Value = "Rarest (Highest Rarity)",
+    Callback = function(selected)
+        if selected:find("Secret") then catchMode = "Secret"
+        elseif selected:find("Rarest") then catchMode = "Rarest"
+        elseif selected:find("Money") then catchMode = "Money"
+        elseif selected:find("Biggest") then catchMode = "Biggest"
+        else catchMode = "Any" end
+        showNotification("Target Updated", "Mode: " .. catchMode)
+    end
+})
+
+TabFishing:Toggle({
+    Title = "Full Capacity Catch",
+    Desc = "Забивать все слоты крючка лучшей рыбой (7 из 7, 10 из 10)",
+    Value = instantCatchEnabled,
+    Callback = function(state) instantCatchEnabled = state end
+})
+
+TabFishing:Toggle({
+    Title = "Fallback to Best if No Secret",
+    Desc = "Ловить редкую рыбу если секретной нет в воде",
+    Value = fallbackToBest,
+    Callback = function(state) fallbackToBest = state end
+})
+
+TabFishing:Toggle({
+    Title = "Auto-Win Boss Minigame",
+    Desc = "Авто-кликер (12 кликов/с) для победы над боссами и секретками (с серверной валидацией)",
+    Value = autoFightEnabled,
+    Callback = function(state) autoFightEnabled = state end
+})
+
+TabFishing:Toggle({
+    Title = "Instant Reel (Full Hook Only)",
+    Desc = "Подсекать только при полной загрузке слотов и отсутствии предметов",
+    Value = instantReelEnabled,
+    Callback = function(state) instantReelEnabled = state end
+})
+
+
+-- 2. 💎 TAB: ITEMS
+local TabItems = createTab(Window, {
+    Title = "Items",
+    Icon = "sparkles"
+})
+
+TabItems:Section({ Title = "100% Special Items Collector" })
+
+TabItems:Toggle({
+    Title = "Collect All Items (Fragments, Keys, Chests)",
+    Desc = "100% сбор артефактов (Lava/Sand/Frozen фрагменты, ключи, сундуки)",
+    Value = collectItemsEnabled,
+    Callback = function(state) collectItemsEnabled = state end
+})
+
+TabItems:Toggle({
+    Title = "Show Landing Spot on Distance Bar",
+    Desc = "Отображение маркера цели и лучшей рыбы на шкале заброса",
+    Value = landingPredictorEnabled,
+    Callback = function(state) landingPredictorEnabled = state end
+})
+
+TabItems:Button({
+    Title = "Grab All Water Items Now",
+    Desc = "Принудительный мгновенный захват всех предметов в воде",
+    Icon = "sparkles",
+    Callback = function()
+        if FishSchoolCtrl then
+            grabAllEntities(FishSchoolCtrl)
+            showNotification("Collector", "Попытка мгновенного захвата всех предметов в воде!")
+        end
+    end
+})
+
+TabItems:Button({
+    Title = "Open All Caught Chests & Crates",
+    Desc = "Автоматическое массовое открытие сундуков из инвентаря",
+    Icon = "package",
+    Callback = function()
+        openAllChests()
+    end
+})
+
+TabItems:Section({ Title = "Special Items Tracked (Priority: 100M)" })
+TabItems:Button({ Title = "👑 Lava, Sand & Frozen Fragments", Desc = "Абсолютный наивысший приоритет (1 из 3000 в Emberdeep)", Icon = "check", Callback = function() end })
+TabItems:Button({ Title = "🔑 Lava, Sand & Frozen Keys", Desc = "Редчайшие ключи (до 1 из 125,000)", Icon = "check", Callback = function() end })
+TabItems:Button({ Title = "📦 Secret Lucky & Sunken Chests", Desc = "Секретные сундуки с ценными наградами", Icon = "check", Callback = function() end })
+TabItems:Button({ Title = "📜 Summon Scrolls & Ancient Relics", Desc = "Свитки призыва, камни энчанта и реликвии", Icon = "check", Callback = function() end })
+
+
+-- 3. 💰 TAB: ECONOMY
+local TabEconomy = createTab(Window, {
+    Title = "Economy",
+    Icon = "dollar-sign"
+})
+
+TabEconomy:Section({ Title = "Remote Auto-Sell" })
+
+TabEconomy:Toggle({
+    Title = "Remote Auto-Sell (Anywhere)",
+    Desc = "Авто-продажа рыбы торговцу из любой точки карты",
+    Value = autoSellEnabled,
+    Callback = function(state) autoSellEnabled = state end
+})
+
+TabEconomy:Toggle({
+    Title = "Notify Earnings per Cast",
+    Desc = "Тост-уведомление с заработанной суммой после каждого вылова",
+    Value = notifyCatchValue,
+    Callback = function(state) notifyCatchValue = state end
+})
+
+TabEconomy:Slider({
+    Title = "Sell Interval (seconds)",
+    Desc = "Периодичность удаленной продажи рыбы",
+    Value = { Min = 3, Max = 60, Default = 10 },
+    Step = 1,
+    Callback = function(val) autoSellInterval = val end
+})
+
+TabEconomy:Button({
+    Title = "Sell Fish Now (Filtered)",
+    Desc = "Продать рыбу выбранных редкостей торговцу прямо сейчас",
+    Icon = "dollar-sign",
+    Callback = function() sellFishNow() end
+})
+
+TabEconomy:Section({ Title = "Rarity Filter (Auto-Sell)" })
+
+TabEconomy:Toggle({
+    Title = "Sell Common",
+    Desc = "Продавать обычную рыбу (Common)",
+    Value = sellRarities.Common,
+    Callback = function(state) sellRarities.Common = state end
+})
+
+TabEconomy:Toggle({
+    Title = "Sell Uncommon",
+    Desc = "Продавать необычную рыбу (Uncommon)",
+    Value = sellRarities.Uncommon,
+    Callback = function(state) sellRarities.Uncommon = state end
+})
+
+TabEconomy:Toggle({
+    Title = "Sell Rare",
+    Desc = "Продавать редкую рыбу (Rare)",
+    Value = sellRarities.Rare,
+    Callback = function(state) sellRarities.Rare = state end
+})
+
+TabEconomy:Toggle({
+    Title = "Sell Epic",
+    Desc = "Продавать эпическую рыбу (Epic)",
+    Value = sellRarities.Epic,
+    Callback = function(state) sellRarities.Epic = state end
+})
+
+TabEconomy:Toggle({
+    Title = "Sell Legendary",
+    Desc = "Продавать легендарную рыбу (Legendary) [по умолч. выкл]",
+    Value = sellRarities.Legendary,
+    Callback = function(state) sellRarities.Legendary = state end
+})
+
+TabEconomy:Toggle({
+    Title = "Sell Mythic",
+    Desc = "Продавать мифическую рыбу (Mythic) [защита ценностей]",
+    Value = sellRarities.Mythic,
+    Callback = function(state) sellRarities.Mythic = state end
+})
+
+TabEconomy:Toggle({
+    Title = "Sell Secret",
+    Desc = "Продавать секретную рыбу (Secret) [защита ценностей]",
+    Value = sellRarities.Secret,
+    Callback = function(state) sellRarities.Secret = state end
+})
+
+TabEconomy:Toggle({
+    Title = "Sell Exotic",
+    Desc = "Продавать экзотическую рыбу (Exotic) [защита ценностей]",
+    Value = sellRarities.Exotic,
+    Callback = function(state) sellRarities.Exotic = state end
+})
+
+TabEconomy:Button({
+    Title = "Preset: Safe (Common - Epic Only)",
+    Desc = "Выбрать только обычную-эпическую (легендарки и секретки в безопасности)",
+    Icon = "shield-check",
+    Callback = function()
+        sellRarities.Common = true
+        sellRarities.Uncommon = true
+        sellRarities.Rare = true
+        sellRarities.Epic = true
+        sellRarities.Legendary = false
+        sellRarities.Mythic = false
+        sellRarities.Secret = false
+        sellRarities.Exotic = false
+        showNotification("Auto-Sell Filter", "Пресет: Безопасный (Common - Epic) активирован!")
+    end
+})
+
+TabEconomy:Button({
+    Title = "Preset: Sell All (Include High Tier)",
+    Desc = "Включить продажу всех категорий рыб без исключений",
+    Icon = "alert-triangle",
+    Callback = function()
+        for k in pairs(sellRarities) do sellRarities[k] = true end
+        showNotification("Auto-Sell Filter", "Внимание: продажа всех редкостей включена!")
+    end
+})
+
+TabEconomy:Section({ Title = "Passive Fish Pond" })
+
+TabEconomy:Toggle({
+    Title = "Auto Put Best Fish in Pond",
+    Desc = "Авто-экипировка самых дорогих рыб в пруд перед продажей",
+    Value = autoPondEnabled,
+    Callback = function(state) autoPondEnabled = state end
+})
+
+TabEconomy:Button({
+    Title = "Put Best Fish in Pond Now",
+    Desc = "Собрать пассивный доход и экипировать лучших рыб",
+    Icon = "fish",
+    Callback = function()
+        putBestFishInPond()
+        showNotification("Pond", "EquipBest вызван: лучшие рыбы отправлены в пруд!")
+    end
+})
+
+TabEconomy:Section({ Title = "Auto Upgrades" })
+
+TabEconomy:Toggle({
+    Title = "Auto-Buy Capacity (+Slots)",
+    Desc = "Авто-покупка слотов вместимости удочки при наличии денег",
+    Value = autoUpgradeCapacity,
+    Callback = function(state) autoUpgradeCapacity = state end
+})
+
+TabEconomy:Toggle({
+    Title = "Auto-Buy All Stats",
+    Desc = "Авто-покупка всех характеристик (Strength, Weight, Bounce)",
+    Value = autoUpgradeAll,
+    Callback = function(state) autoUpgradeAll = state end
+})
+
+TabEconomy:Button({
+    Title = "Buy Capacity Upgrade Now",
+    Desc = "Купить +1 слот вместимости прямо сейчас",
+    Icon = "plus-circle",
+    Callback = function()
+        buyUpgrade("Capacity")
+        showNotification("Upgrade", "Запрос на покупку слота отправлен!")
+    end
+})
+
+
+-- 4. 👁️ TAB: VISUALS
+local TabVisuals = createTab(Window, {
+    Title = "Visuals",
+    Icon = "eye"
+})
+
+TabVisuals:Section({ Title = "Fish & Items ESP" })
+
+TabVisuals:Toggle({
+    Title = "Fish & Item Highlights (Chams)",
+    Desc = "Подсветка сущностей в воде цветом их редкости",
+    Value = fishEspEnabled,
+    Callback = function(state)
+        fishEspEnabled = state
+        if not state and FishSchoolCtrl and FishSchoolCtrl.Fish then
+            for _, f in ipairs(FishSchoolCtrl.Fish) do
+                if f.model then
+                    local hl = f.model:FindFirstChild("FishESP")
+                    if hl then hl:Destroy() end
+                end
+            end
+        end
+    end
+})
+
+TabVisuals:Toggle({
+    Title = "Name, Rarity & Price Tags",
+    Desc = "3D таблички над рыбой с названием, редкостью и ценой продажи",
+    Value = espLabelsEnabled,
+    Callback = function(state)
+        espLabelsEnabled = state
+        if not state and FishSchoolCtrl and FishSchoolCtrl.Fish then
+            for _, f in ipairs(FishSchoolCtrl.Fish) do
+                if f.model then
+                    local bg = f.model:FindFirstChild("FishInfoTag")
+                    if bg then bg:Destroy() end
+                end
+            end
+        end
+    end
+})
+
+TabVisuals:Toggle({
+    Title = "Show Landing Spot Marker",
+    Desc = "Показ точки приземления поплавка на полоске дальности",
+    Value = landingPredictorEnabled,
+    Callback = function(state) landingPredictorEnabled = state end
+})
+
+
+-- 5. ⚡ TAB: PERFORMANCE & BOOST
+local TabBoost = createTab(Window, {
+    Title = "Boost",
+    Icon = "zap"
+})
+
+TabBoost:Section({ Title = "Extreme FPS Booster & Optimization" })
+
+TabBoost:Toggle({
+    Title = "Ultra FPS Boost",
+    Desc = "Disable water waves, grass, global shadows and post-effects",
+    Value = fpsBoostEnabled,
+    Callback = function(state)
+        fpsBoostEnabled = state
+        applyFpsBoost(state)
+        showNotification("FPS Boost", state and locText("Optimization enabled: lags reduced!", "Оптимизация включена: лаги убраны!") or locText("Optimization disabled", "Оптимизация отключена"))
+    end
+})
+
+TabBoost:Toggle({
+    Title = "Potato PC (No Textures & Smooth Plastic)",
+    Desc = "Convert parts to smooth plastic and remove textures for maximum FPS",
+    Value = potatoGfxEnabled,
+    Callback = function(state)
+        potatoGfxEnabled = state
+        applyPotatoGfx(state)
+        showNotification("Potato PC", state and locText("Textures removed, FPS boosted!", "Включено: текстуры убраны, FPS увеличен!") or locText("Textures restored", "Текстуры возвращены"))
+    end
+})
+
+TabBoost:Toggle({
+    Title = "Remove Fog & Atmosphere (Clear Horizon)",
+    Desc = "Remove lava haze and fog for crystal clear horizon",
+    Value = clearFogEnabled,
+    Callback = function(state)
+        clearFogEnabled = state
+        applyClearFog(state)
+        showNotification("Clear View", state and locText("Fog and atmosphere removed!", "Включено: дымка и туман убраны!") or locText("Fog restored", "Туман возвращен"))
+    end
+})
+
+TabBoost:Toggle({
+    Title = "Unlock FPS Cap (Max 999 FPS)",
+    Desc = "Remove Roblox 60 FPS cap",
+    Value = unlockFpsEnabled,
+    Callback = function(state)
+        unlockFpsEnabled = state
+        if state and setfpscap then setfpscap(999) end
+    end
+})
+
+TabBoost:Toggle({
+    Title = "GPU 0% Potato AFK (Disable 3D Rendering)",
+    Desc = "Completely disable 3D rendering to save GPU temperature during AFK",
+    Value = false,
+    Callback = function(state)
+        setGpuAfkMode(state)
+        ensureGuiLayering()
+        showNotification("GPU 0% AFK", state and locText("3D rendering disabled! GPU is cold.", "3D рендер выключен! GPU холодная.") or locText("3D rendering restored.", "3D рендер включен обратно."))
+    end
+})
+
+TabBoost:Colorpicker({
+    Title = "GPU AFK Screen Color (RGB Palette)",
+    Desc = "Choose backdrop color when 3D rendering is disabled",
+    Default = gpuScreenColor,
+    Callback = function(color)
+        gpuScreenColor = color
+        if gpuScreenFrame then
+            gpuScreenFrame.BackgroundColor3 = color
+        end
+        ensureGuiLayering()
+    end
+})
+
+TabBoost:Button({
+    Title = "Clean Up Dead Fish & ESP Tags",
+    Desc = "Принудительно очистить временный мусор и остаточные теги",
+    Icon = "trash-2",
+    Callback = function()
+        pcall(function()
+            for _, obj in ipairs(workspace:GetDescendants()) do
+                if obj.Name == "FishInfoTag" or obj.Name == "FishESP" then
+                    obj:Destroy()
+                end
+            end
+        end)
+        showNotification("Cleaner", "Теги и мусор очищены!")
+    end
+})
+
+
+-- 6. 📍 TAB: TELEPORTS
+local TabTeleports = createTab(Window, {
+    Title = "Teleports",
+    Icon = "compass"
+})
+
+TabTeleports:Section({ Title = "🏛️ Maze & Dungeon Autocomplete" })
+
+TabTeleports:Button({
+    Title = "⚡ Autocomplete Sand Maze (Temple of the Sun)",
+    Desc = "Мгновенное прохождение Песчаного Лабиринта и сбор награды у Алтаря Солнца",
+    Icon = "sun",
+    Callback = function() autocompleteSandMaze() end
+})
+
+TabTeleports:Button({
+    Title = "❄️ Autocomplete Frost Maze (Frozen Caves)",
+    Desc = "Мгновенное прохождение Ледяного Лабиринта и сбор награды у Ледяного Алтаря",
+    Icon = "snowflake",
+    Callback = function() autocompleteFrostMaze() end
+})
+
+TabTeleports:Button({
+    Title = "🚪 Unlock Sand Maze Door (Use Sand Key)",
+    Desc = "Телепорт к воротам Храма Солнца для открытия Sand Key",
+    Icon = "key",
+    Callback = function() unlockMazeDoor("Sand") end
+})
+
+TabTeleports:Button({
+    Title = "🗝️ Unlock Frost Maze Door (Use Frozen Key)",
+    Desc = "Телепорт к воротам Ледяной Пещеры для открытия Frozen Key",
+    Icon = "key-round",
+    Callback = function() unlockMazeDoor("Frost") end
+})
+
+TabTeleports:Section({ Title = "🌐 Dynamic World Detection & Quick TP" })
+
+local currentWorldParagraph = TabTeleports:Paragraph({
+    Title = "📍 Current World Detected",
+    Desc = "Нажмите кнопку ниже для сканирования мира"
+})
+
+TabTeleports:Button({
+    Title = "🔄 Scan / Update Current World",
+    Desc = "Определить текущий мир и обновить информацию",
+    Icon = "compass",
+    Callback = function()
+        local wName = getCurrentWorldName()
+        if currentWorldParagraph and currentWorldParagraph.SetDesc then
+            currentWorldParagraph:SetDesc("Вы находитесь в: " .. wName)
+        end
+        showNotification("World Scanner", "Текущий мир: " .. wName)
+    end
+})
+
+TabTeleports:Button({
+    Title = "🛒 Teleport to Current World Merchant",
+    Desc = "Мгновенно телепортирует к торговцу того мира, в котором вы стоите",
+    Icon = "store",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        local npc = getActiveSellNPC()
+        if hrp and npc then
+            hrp.CFrame = CFrame.new(npc:GetPivot().Position + Vector3.new(0, 2, 3))
+            showNotification("Teleport", "Телепортирован к торговцу мира " .. getCurrentWorldName() .. "!")
+        elseif hrp then
+            showNotification("Teleport", "Торговец в текущем мире не найден")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "🎣 Teleport to Current World Fishing Pier",
+    Desc = "Телепортирует на главный пирс/место рыбалки в текущем мире",
+    Icon = "anchor",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        local wName = getCurrentWorldName()
+        if wName:find("2") or wName:lower():find("desert") then
+            hrp.CFrame = CFrame.new(-1330, 20, 180)
+        elseif wName:find("3") or wName:lower():find("frost") or wName:lower():find("tundra") then
+            hrp.CFrame = CFrame.new(-1292.88, 28, 81.86)
+        elseif wName:find("4") or wName:lower():find("volcano") then
+            hrp.CFrame = CFrame.new(-1350, 22, 150)
+        else
+            hrp.CFrame = CFrame.new(-1218, 18, 185)
+        end
+        showNotification("Teleport", "Телепортирован на пирс " .. wName .. "!")
+    end
+})
+
+TabTeleports:Section({ Title = "🌍 World 1: Starter Sea" })
+
+TabTeleports:Button({
+    Title = "World 1 Merchant",
+    Desc = "Телепорт к торговцу World 1",
+    Icon = "store",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1226.75, 22, 144.58)
+            showNotification("Teleport", "Телепортирован к торговцу World 1!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "World 1 Fishing Pier",
+    Desc = "Главный пирс для рыбалки в World 1",
+    Icon = "anchor",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then hrp.CFrame = CFrame.new(-1218, 18, 185) end
+    end
+})
+
+TabTeleports:Button({
+    Title = "Deep Ocean Abyss Spot",
+    Desc = "Глубоководная зона бездны в World 1",
+    Icon = "waves",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then hrp.CFrame = CFrame.new(-1218, 18, 650) end
+    end
+})
+
+TabTeleports:Button({
+    Title = "World 1 Spawn Island",
+    Desc = "Телепорт на стартовый остров",
+    Icon = "home",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then hrp.CFrame = CFrame.new(-1260, 25, 80) end
+    end
+})
+
+TabTeleports:Button({
+    Title = "Stone Mage (Enchants)",
+    Desc = "Телепорт к магу зачарований удочки",
+    Icon = "sparkles",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then hrp.CFrame = CFrame.new(-1150, 20, 100) end
+    end
+})
+
+TabTeleports:Section({ Title = "🏜️ World 2: Desert & Dunes" })
+
+TabTeleports:Button({
+    Title = "World 2 Desert Merchant",
+    Desc = "Телепорт к торговцу во 2-м мире (Desert)",
+    Icon = "store",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1335.45, 20.8, 141.23)
+            showNotification("Teleport", "Телепортирован к торговцу World 2!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "World 2 Desert Pier",
+    Desc = "Пирс и место заброса удочки в World 2",
+    Icon = "anchor",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1330, 20, 180)
+            showNotification("Teleport", "Телепортирован на пирс World 2!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "Sun Temple Entrance (Sand Door)",
+    Desc = "Вход в Храм Солнца к закрытым дверям лабиринта",
+    Icon = "door-closed",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1345, 22, 85)
+            showNotification("Teleport", "Телепортирован к входу Храма Солнца!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "Desert Oasis & Dunes",
+    Desc = "Оазис и глубокие песчаные барханы",
+    Icon = "sun",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1360, 25, 220)
+            showNotification("Teleport", "Телепортирован в пустынный оазис!")
+        end
+    end
+})
+
+TabTeleports:Section({ Title = "❄️ World 3: Frostmere & Tundra" })
+
+TabTeleports:Button({
+    Title = "World 3 Frost Merchant",
+    Desc = "Телепорт к торговцу в 3-м мире (Tundra)",
+    Icon = "store",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1325.44, 23.5, 157.35)
+            showNotification("Teleport", "Телепортирован к торговцу World 3!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "World 3 Frozen Pier",
+    Desc = "Замерзший пирс для рыбалки в World 3",
+    Icon = "anchor",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1292.88, 28, 81.86)
+            showNotification("Teleport", "Телепортирован на ледяной пирс World 3!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "Frozen Caves Entrance (Frost Door)",
+    Desc = "Вход в Ледяные Пещеры к вратам лабиринта",
+    Icon = "door-closed",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1310, 25, 120)
+            showNotification("Teleport", "Телепортирован к ледяным вратам!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "Glacier Deep Frost Spot",
+    Desc = "Глубокая ледяная расщелина для редкой арктической рыбы",
+    Icon = "snowflake",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1280, 20, 250)
+            showNotification("Teleport", "Телепортирован к леднику World 3!")
+        end
+    end
+})
+
+TabTeleports:Section({ Title = "🌋 World 4: Volcano & Magma Abyss" })
+
+TabTeleports:Button({
+    Title = "World 4 Volcano Merchant",
+    Desc = "Телепорт к торговцу в лавовом мире (World 4)",
+    Icon = "store",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1340.18, 20.5, 100.98)
+            showNotification("Teleport", "Телепортирован к торговцу World 4!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "Lava Abyss Fishing Spot",
+    Desc = "Пирс над лавовой бездной для огненных рыб",
+    Icon = "flame",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1350, 22, 150)
+            showNotification("Teleport", "Телепортирован в лавовую бездну!")
+        end
+    end
+})
+
+
+-- 7. 🏃 TAB: PLAYER
+local TabPlayer = createTab(Window, {
+    Title = "Player",
+    Icon = "user"
+})
+
+TabPlayer:Section({ Title = "Movement & Physics" })
+
+TabPlayer:Button({
+    Title = "Unfreeze Character (Fix Stuck Movement)",
+    Desc = "Мгновенно разморозить персонажа и вернуть ходьбу (WASD)",
+    Icon = "unlock",
+    Callback = function()
+        unfreezeCharacter()
+        showNotification("Movement", locText("Character unfrozen! You can walk freely.", "Персонаж разморожен! Ходьба восстановлена."))
+    end
+})
+
+TabPlayer:Slider({
+    Title = "WalkSpeed",
+    Desc = "Скорость перемещения персонажа",
+    Value = { Min = 16, Max = 150, Default = 16 },
+    Step = 2,
+    Callback = function(val)
+        currentWalkSpeed = val
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if hum then hum.WalkSpeed = val end
+    end
+})
+
+TabPlayer:Slider({
+    Title = "JumpPower",
+    Desc = "Сила прыжка персонажа",
+    Value = { Min = 50, Max = 250, Default = 50 },
+    Step = 5,
+    Callback = function(val)
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.UseJumpPower = true
+            hum.JumpPower = val
+        end
+    end
+})
+
+TabPlayer:Toggle({
+    Title = "Infinite Jump",
+    Desc = "Прыжок в воздухе без земли",
+    Value = infJumpEnabled,
+    Callback = function(state) infJumpEnabled = state end
+})
+
+TabPlayer:Toggle({
+    Title = "Walk On Water (Jesus Mode)",
+    Desc = "Walk across ocean and water surfaces without swimming",
+    Value = waterWalkEnabled,
+    Callback = function(state)
+        waterWalkEnabled = state
+        showNotification("Water Walk", state and locText("Walk on water enabled!", "Хождение по воде включено!") or locText("Walk on water disabled", "Хождение по воде выключено"))
+    end
+})
+
+TabPlayer:Toggle({
+    Title = "Fly Mode (WASD Flight)",
+    Desc = "Freely fly in air (WASD + Space to ascend, Shift to descend)",
+    Value = flyEnabled,
+    Callback = function(state)
+        flyEnabled = state
+        showNotification("Fly", state and locText("Flight mode activated!", "Полёт активирован!") or locText("Flight mode disabled", "Полёт отключен"))
+    end
+})
+
+TabPlayer:Slider({
+    Title = "Flight Speed",
+    Desc = "Скорость полёта персонажа",
+    Value = { Min = 20, Max = 200, Default = 50 },
+    Step = 5,
+    Callback = function(val)
+        flySpeed = val
+    end
+})
+
+TabPlayer:Toggle({
+    Title = "Noclip (Walk Through Walls)",
+    Desc = "Проход сквозь любые препятствия и стены",
+    Value = noclipEnabled,
+    Callback = function(state) noclipEnabled = state end
+})
+
+UserInputService.JumpRequest:Connect(function()
+    if infJumpEnabled then
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
+    end
+end)
+
+
+-- 8. ⚙️ TAB: SETTINGS & THEMES
+local TabSettings = createTab(Window, {
+    Title = "Settings",
+    Icon = "settings"
+})
+
+TabSettings:Section({ Title = "Language & Interface" })
+
+local langDropdown = TabSettings:Dropdown({
+    Title = "Interface Language",
+    Desc = "Select script language (Default: English / Русский)",
+    Values = { "English", "Русский" },
+    Value = "English",
+    Callback = function(choice)
+        setScriptLanguage(choice == "Русский" and "ru" or "en")
+    end
+})
+registerLoc(langDropdown, "Interface Language", "Язык интерфейса", "Select script language (Default: English / Русский)", "Выберите язык скрипта (По умолчанию: English / Русский)")
+
+TabSettings:Section({ Title = "Interface Appearance & Themes" })
+
+local AvailableThemes = {
+    "Dark", "Midnight", "Sky", "Emerald", "Indigo",
+    "Rose", "Violet", "CottonCandy", "MonokaiPro",
+    "Crimson", "Amber", "Red", "Plant", "Mellowsi", "Light"
+}
+
+TabSettings:Dropdown({
+    Title = "UI Theme Selection",
+    Desc = "Выберите стильную цветовую тему (15 стилей)",
+    Values = AvailableThemes,
+    Value = "Dark",
+    Callback = function(theme)
+        Window:SetTheme(theme)
+    end
+})
+
+TabSettings:Toggle({
+    Title = "Acrylic Glass Blur",
+    Desc = "Эффект матового стекла на фоне меню",
+    Value = true,
+    Callback = function(state)
+        Window:ToggleAcrylic(state)
+    end
+})
+
+TabSettings:Keybind({
+    Title = "Toggle Menu Key",
+    Desc = "Бинд меню: [Insert], [RightShift], [RightControl], [F4] или круг на экране",
+    Value = Enum.KeyCode.Insert,
+    Callback = function(key)
+        if typeof(key) == "EnumItem" then
+            toggleKeys[key] = true
+            showNotification("Keybind", "Бинд изменен на " .. key.Name)
+        else
+            if Window then
+                if Window.Toggle then
+                    Window:Toggle()
+                elseif Window.Closed ~= nil then
+                    if Window.Closed then Window:Open() else Window:Close() end
+                end
+            end
+        end
+    end
+})
+
+TabSettings:Section({ Title = "Server & Network Utilities" })
+
+TabSettings:Button({
+    Title = "🔄 Rejoin Current Server",
+    Desc = "Быстро переподключиться к текущему серверу",
+    Icon = "rotate-ccw",
+    Callback = function()
+        pcall(function()
+            TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
+        end)
+    end
+})
+
+TabSettings:Button({
+    Title = "🌐 Server Hop (Change Server)",
+    Desc = "Найти другой свободный сервер и подключиться",
+    Icon = "globe",
+    Callback = function()
+        pcall(function()
+            local HttpService = game:GetService("HttpService")
+            local raw = game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100")
+            local servers = HttpService:JSONDecode(raw)
+            if servers and servers.data then
+                for _, s in ipairs(servers.data) do
+                    if s.playing < s.maxPlayers and s.id ~= game.JobId then
+                        TeleportService:TeleportToPlaceInstance(game.PlaceId, s.id, LocalPlayer)
+                        break
+                    end
+                end
+            end
+        end)
+    end
+})
+
+TabSettings:Section({ Title = "🎁 Promo Codes & Freebies" })
+
+TabSettings:Button({
+    Title = "🎟️ Redeem All Working Promo Codes",
+    Desc = "Автоматический ввод всех промокодов игры на бесплатные монеты и зелья",
+    Icon = "gift",
+    Callback = function()
+        local codes = {
+            "Release",
+            "Fishing",
+            "ThanksforPlaying",
+            "Gifting",
+            "Pond",
+            "Skins",
+            "Mutations",
+            "BigFish",
+            "Frostmere",
+            "Kraken",
+            "Keys",
+            "Update9",
+            "Volcano",
+            "Boats",
+            "SunkenCrown"
+        }
+        local redeemed = 0
+        pcall(function()
+            local ev = require(RS.Shared.Events).Client("Code")
+            if ev then
+                for _, c in ipairs(codes) do
+                    ev:Fire(c)
+                    task.wait(0.2)
+                    redeemed = redeemed + 1
+                end
+            end
+        end)
+        showNotification("Codes", string.format(locText("Checked %d promo codes. Check balance!", "Проверено промокодов: %d шт. Проверьте баланс!"), redeemed))
+    end
+})
+
+-- Anti-AFK
+pcall(function()
+    LocalPlayer.Idled:Connect(function()
+        local vu = game:GetService("VirtualUser")
+        vu:CaptureController()
+        vu:ClickButton2(Vector2.new())
+    end)
+end)
+
+showNotification("Fishy Hub Modern UI", locText("Ready! WindUI loaded with Acrylic & 15 themes.", "Готово! WindUI загружен с поддержкой акрила и 15 тем."))

@@ -925,13 +925,14 @@ local function sellFishNow()
 
             -- Возвращаемся обратно на место ловли
             hrp.CFrame = oldCF
-            task.wait(0.02)
+            task.wait(0.04)
             pcall(function()
                 cam.CameraType = Enum.CameraType.Custom
                 local hum = char:FindFirstChildOfClass("Humanoid")
                 if hum then
                     cam.CameraSubject = hum
                 end
+                equipRod()
             end)
 
             return res
@@ -1227,7 +1228,17 @@ local function unfreezeCharacter()
             cam.CameraSubject = hum
         end
 
-        -- 5. Автоудаление любой зависшей/дохлой рыбы
+        -- 5. Останавливаем зависшие анимации заброса/стойки если заброс не идет
+        if hum and hum:FindFirstChild("Animator") and not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) and not (CatchMinigameCtrl and CatchMinigameCtrl.Fight) then
+            for _, t in ipairs(hum.Animator:GetPlayingAnimationTracks()) do
+                pcall(function() t:Stop() end)
+            end
+        end
+
+        -- 6. Гарантированно берем удочку в руки
+        equipRod()
+
+        -- 7. Автоудаление любой зависшей/дохлой рыбы
         cleanupStrayFishModels()
     end)
 end
@@ -1849,8 +1860,13 @@ if AutoFishingCtrl then
             if isAutoActive and not isSelling then
                 if not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) then
                     equipRod()
-                    if FishingCtrl and FishingCtrl:CanStartThrow() and not FishingCtrl.Charging then
-                        AutoFishingCtrl:DriveCast(FishingCtrl)
+                    if FishingCtrl and not FishingCtrl.Charging then
+                        if FishingCtrl:CanStartThrow() then
+                            AutoFishingCtrl:DriveCast(FishingCtrl)
+                        else
+                            -- Если заброс заблокирован из-за рассинхрона — вызываем экстренную разморозку
+                            unfreezeCharacter()
+                        end
                     end
                 end
             end
