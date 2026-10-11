@@ -4,6 +4,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
+local TeleportService = game:GetService("TeleportService")
 local LocalPlayer = Players.LocalPlayer
 
 -- Очистка старых потоков и GUI чтобы не двоились
@@ -124,8 +125,8 @@ local fpsBoostEnabled = false         -- 🚀 Оптимизация FPS (Boost 
 local potatoGfxEnabled = false        -- 🥔 Картофельная графика (Potato PC / Smooth Plastic & No Textures)
 local clearFogEnabled = false         -- 🌫️ Удаление тумана и атмосферы (Clear Horizon / No Fog Lag)
 local unlockFpsEnabled = true         -- ⚡ Разблокировка FPS (999 FPS)
-local boatSpeedEnabled = false        -- 🚤 Турбо-скорость лодки
-local boatSpeedValue = 150            -- Скорость лодки (Studs/s)
+local infOxygenEnabled = true         -- 🤿 Бесконечный кислород / персонаж не тонет
+local infJumpEnabled = false          -- 🦘 Бесконечные прыжки в воздухе
 local autoFightEnabled = true
 local instantReelEnabled = true
 local autoSellEnabled = true
@@ -252,102 +253,6 @@ local function openAllChests()
     showNotification("🎁 Chests", "Запрос на открытие сундуков отправлен!")
 end
 
--- 🚤 Лодочные утилиты (поиск лодки, телепорт и поиск Левиафана)
-local function getBoat()
-    local char = LocalPlayer.Character
-    if not char then return nil, nil end
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    
-    if hum and hum.SeatPart then
-        local m = hum.SeatPart:FindFirstAncestorOfClass("Model")
-        if m and m ~= char then
-            return m, hum.SeatPart
-        end
-    end
-    
-    for _, obj in ipairs(char:GetDescendants()) do
-        if obj:IsA("Weld") or obj:IsA("WeldConstraint") or obj:IsA("Motor6D") then
-            local p0, p1 = obj.Part0, obj.Part1
-            if p0 and not p0:IsDescendantOf(char) then
-                local m = p0:FindFirstAncestorOfClass("Model")
-                if m then return m, p0 end
-            end
-            if p1 and not p1:IsDescendantOf(char) then
-                local m = p1:FindFirstAncestorOfClass("Model")
-                if m then return m, p1 end
-            end
-        end
-    end
-    
-    if hrp then
-        local closest = nil
-        local closestDist = 20
-        for _, obj in ipairs(workspace:GetChildren()) do
-            if obj:IsA("Model") and obj ~= char and not obj:FindFirstChildOfClass("Humanoid") then
-                local pp = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
-                if pp then
-                    local d = (pp.Position - hrp.Position).Magnitude
-                    if d < closestDist then
-                        closestDist = d
-                        closest = obj
-                    end
-                end
-            end
-        end
-        if closest then
-            local seat = closest:FindFirstChildWhichIsA("VehicleSeat", true) or closest:FindFirstChildWhichIsA("Seat", true) or closest.PrimaryPart or closest:FindFirstChildWhichIsA("BasePart")
-            return closest, seat
-        end
-    end
-    
-    return nil, nil
-end
-
-local function tpBoat(targetCFrame)
-    local char = LocalPlayer.Character
-    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-    local boat, seat = getBoat()
-    
-    if boat then
-        pcall(function()
-            if boat.PrimaryPart then
-                boat:SetPrimaryPartCFrame(targetCFrame)
-            else
-                boat:PivotTo(targetCFrame)
-            end
-        end)
-        if seat and seat:IsA("BasePart") then
-            pcall(function() seat.CFrame = targetCFrame end)
-        end
-        if hrp then
-            pcall(function() hrp.CFrame = targetCFrame + Vector3.new(0, 3, 0) end)
-        end
-        showNotification("🚤 Boat TP", "Лодка успешно перемещена!")
-        return true
-    elseif hrp then
-        hrp.CFrame = targetCFrame
-        showNotification("📍 Player TP", "Перемещен к точке!")
-        return true
-    end
-    return false
-end
-
-local function findLeviathanCFrame()
-    for _, obj in ipairs(workspace:GetDescendants()) do
-        if obj:IsA("Model") then
-            local n = obj.Name:lower()
-            if n:find("leviathan") or n:find("serpent") or n:find("boss") or n:find("megalodon") or n:find("kraken") then
-                local pp = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
-                if pp and pp.Position.Y > -300 then
-                    return CFrame.new(pp.Position + Vector3.new(35, 10, 0), pp.Position)
-                end
-            end
-        end
-    end
-    return nil
-end
-
 -- Цвета редкостей
 local rarityColors = {
     Common    = Color3.fromRGB(200, 200, 200),
@@ -435,6 +340,57 @@ local function getActiveSellNPC()
     end
 
     return bestNpc
+end
+
+-- Определение текущего мира (World 1, World 2, World 3, World 4)
+local function getCurrentWorldName()
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    local myPos = hrp and hrp.Position or Vector3.zero
+
+    local worldFolder = workspace:FindFirstChild("World")
+    if worldFolder then
+        local bestWorld = nil
+        local bestDist = math.huge
+        for _, w in ipairs(worldFolder:GetChildren()) do
+            local p = w:GetPivot().Position
+            local d = (p - myPos).Magnitude
+            if d < bestDist then
+                bestDist = d
+                bestWorld = w.Name
+            end
+        end
+        if bestWorld then
+            local bw = string.lower(bestWorld)
+            if bw:find("2") or bw:find("desert") or bw:find("sand") or bw:find("dune") then
+                return "World 2 (Desert & Dunes)"
+            elseif bw:find("3") or bw:find("frost") or bw:find("ice") or bw:find("tundra") then
+                return "World 3 (Frostmere & Tundra)"
+            elseif bw:find("4") or bw:find("volcano") or bw:find("lava") then
+                return "World 4 (Volcano Caldera)"
+            elseif bw:find("1") or bw:find("ocean") or bw:find("starter") or bw:find("main") then
+                return "World 1 (Starter Sea)"
+            else
+                return "World (" .. tostring(bestWorld) .. ")"
+            end
+        end
+    end
+
+    local npc = getActiveSellNPC()
+    if npc then
+        local pos = npc:GetPivot().Position
+        if (pos - Vector3.new(-1226.75, 22, 144.58)).Magnitude < 80 then
+            return "World 1 (Starter Sea)"
+        elseif (pos - Vector3.new(-1335.45, 20.8, 141.23)).Magnitude < 80 then
+            return "World 2 (Desert & Dunes)"
+        elseif (pos - Vector3.new(-1325.44, 23.5, 157.35)).Magnitude < 80 then
+            return "World 3 (Frostmere & Tundra)"
+        elseif (pos - Vector3.new(-1340.18, 20.5, 100.98)).Magnitude < 80 then
+            return "World 4 (Volcano Caldera)"
+        end
+    end
+
+    return "World 1 (Starter Sea)"
 end
 
 -- Авто-помещение лучших рыб в пруд
@@ -1411,29 +1367,14 @@ RunService.Heartbeat:Connect(function()
         end
     end
 
-    -- ⏩ Мгновенный подъем со дна и возврат лески (пропуск медленных анимаций)
-    if instantPullEnabled and ThrowCinematicCtrl and ThrowCinematicCtrl.Active then
-        ThrowCinematicCtrl.PullUpDuration = 0.01
-        ThrowCinematicCtrl.ReturnDuration = 0.01
-        ThrowCinematicCtrl.BreachSpeed = 2500
-        if ThrowCinematicCtrl.PullStart and (os.clock() - ThrowCinematicCtrl.PullStart < 1.0) then
-            ThrowCinematicCtrl.PullStart = os.clock() - 10
-        end
-        if ThrowCinematicCtrl.ReturnStart and (os.clock() - ThrowCinematicCtrl.ReturnStart < 1.0) then
-            ThrowCinematicCtrl.ReturnStart = os.clock() - 10
-        end
-    end
-
-    -- 🚤 Турбо-управление скоростью лодки
-    if boatSpeedEnabled then
-        local boat, seat = getBoat()
-        if seat and seat:IsA("VehicleSeat") then
-            if seat.Throttle ~= 0 then
-                seat.AssemblyLinearVelocity = seat.CFrame.LookVector * (seat.Throttle * boatSpeedValue)
-            end
-            if seat.Steer ~= 0 then
-                seat.AssemblyAngularVelocity = Vector3.new(0, -seat.Steer * 3.5, 0)
-            end
+    -- 🤿 Бесконечный кислород / Нет утопления
+    if infOxygenEnabled and LocalPlayer.Character then
+        local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then
+            pcall(function()
+                local ox = LocalPlayer.Character:FindFirstChild("Oxygen") or LocalPlayer.Character:FindFirstChild("Breath")
+                if ox and ox:IsA("ValueBase") then ox.Value = 100 end
+            end)
         end
     end
 
@@ -2028,6 +1969,18 @@ TabBoost:Toggle({
     end
 })
 
+TabBoost:Toggle({
+    Title = "GPU 0% Potato AFK (Disable 3D Rendering)",
+    Desc = "Полностью отключает 3D рендер экрана для экономии видеокарты и кулера во время ночного фарма",
+    Value = false,
+    Callback = function(state)
+        pcall(function()
+            RunService:Set3dRenderingEnabled(not state)
+        end)
+        showNotification("GPU 0% AFK", state and "3D рендер выключен! GPU холодная." or "3D рендер включен обратно.")
+    end
+})
+
 TabBoost:Button({
     Title = "Clean Up Dead Fish & ESP Tags",
     Desc = "Принудительно очистить временный мусор и остаточные теги",
@@ -2081,18 +2034,36 @@ TabTeleports:Button({
     Callback = function() unlockMazeDoor("Frost") end
 })
 
-TabTeleports:Section({ Title = "Hotspots & Islands" })
+TabTeleports:Section({ Title = "🌐 Dynamic World Detection & Quick TP" })
+
+local currentWorldParagraph = TabTeleports:Paragraph({
+    Title = "📍 Current World Detected",
+    Desc = "Нажмите кнопку ниже для сканирования мира"
+})
 
 TabTeleports:Button({
-    Title = "Merchant (Current World - Auto)",
-    Desc = "Телепорт к торговцу текущего мира (World 1, World 2 и т.д.)",
+    Title = "🔄 Scan / Update Current World",
+    Desc = "Определить текущий мир и обновить информацию",
+    Icon = "compass",
+    Callback = function()
+        local wName = getCurrentWorldName()
+        if currentWorldParagraph and currentWorldParagraph.SetDesc then
+            currentWorldParagraph:SetDesc("Вы находитесь в: " .. wName)
+        end
+        showNotification("World Scanner", "Текущий мир: " .. wName)
+    end
+})
+
+TabTeleports:Button({
+    Title = "🛒 Teleport to Current World Merchant",
+    Desc = "Мгновенно телепортирует к торговцу того мира, в котором вы стоите",
     Icon = "store",
     Callback = function()
         local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
         local npc = getActiveSellNPC()
         if hrp and npc then
             hrp.CFrame = CFrame.new(npc:GetPivot().Position + Vector3.new(0, 2, 3))
-            showNotification("Teleport", "Телепортирован к торговцу текущего мира!")
+            showNotification("Teleport", "Телепортирован к торговцу мира " .. getCurrentWorldName() .. "!")
         elseif hrp then
             showNotification("Teleport", "Торговец в текущем мире не найден")
         end
@@ -2100,21 +2071,31 @@ TabTeleports:Button({
 })
 
 TabTeleports:Button({
-    Title = "Merchant (World 2)",
-    Desc = "Телепорт к торговцу во 2-м мире",
-    Icon = "store",
+    Title = "🎣 Teleport to Current World Fishing Pier",
+    Desc = "Телепортирует на главный пирс/место рыбалки в текущем мире",
+    Icon = "anchor",
     Callback = function()
         local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if hrp then
-            hrp.CFrame = CFrame.new(-1335.45, 20.8, 141.23)
-            showNotification("Teleport", "Телепортирован к торговцу World 2!")
+        if not hrp then return end
+        local wName = getCurrentWorldName()
+        if wName:find("2") or wName:lower():find("desert") then
+            hrp.CFrame = CFrame.new(-1330, 20, 180)
+        elseif wName:find("3") or wName:lower():find("frost") or wName:lower():find("tundra") then
+            hrp.CFrame = CFrame.new(-1292.88, 28, 81.86)
+        elseif wName:find("4") or wName:lower():find("volcano") then
+            hrp.CFrame = CFrame.new(-1350, 22, 150)
+        else
+            hrp.CFrame = CFrame.new(-1218, 18, 185)
         end
+        showNotification("Teleport", "Телепортирован на пирс " .. wName .. "!")
     end
 })
 
+TabTeleports:Section({ Title = "🌍 World 1: Starter Sea" })
+
 TabTeleports:Button({
-    Title = "Merchant (World 1)",
-    Desc = "Телепорт к торговцу в 1-м мире",
+    Title = "World 1 Merchant",
+    Desc = "Телепорт к торговцу World 1",
     Icon = "store",
     Callback = function()
         local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -2126,8 +2107,8 @@ TabTeleports:Button({
 })
 
 TabTeleports:Button({
-    Title = "Fishing Pier (Deep Water)",
-    Desc = "Телепорт на главный пирс",
+    Title = "World 1 Fishing Pier",
+    Desc = "Главный пирс для рыбалки в World 1",
     Icon = "anchor",
     Callback = function()
         local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -2137,8 +2118,8 @@ TabTeleports:Button({
 
 TabTeleports:Button({
     Title = "Deep Ocean Abyss Spot",
-    Desc = "Телепорт в глубоководную бездну",
-    Icon = "compass",
+    Desc = "Глубоководная зона бездны в World 1",
+    Icon = "waves",
     Callback = function()
         local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
         if hrp then hrp.CFrame = CFrame.new(-1218, 18, 650) end
@@ -2146,7 +2127,7 @@ TabTeleports:Button({
 })
 
 TabTeleports:Button({
-    Title = "Island Spawn (World 1)",
+    Title = "World 1 Spawn Island",
     Desc = "Телепорт на стартовый остров",
     Icon = "home",
     Callback = function()
@@ -2157,7 +2138,7 @@ TabTeleports:Button({
 
 TabTeleports:Button({
     Title = "Stone Mage (Enchants)",
-    Desc = "Телепорт к магу зачарований",
+    Desc = "Телепорт к магу зачарований удочки",
     Icon = "sparkles",
     Callback = function()
         local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -2165,77 +2146,144 @@ TabTeleports:Button({
     end
 })
 
+TabTeleports:Section({ Title = "🏜️ World 2: Desert & Dunes" })
 
--- 7. 🚤 TAB: BOAT & BOSS
-local TabBoat = Window:Tab({
-    Title = "Boat",
-    Icon = "ship"
-})
-
-TabBoat:Section({ Title = "Turbo Boat Speed & Movement" })
-
-TabBoat:Toggle({
-    Title = "Boat Turbo Speed",
-    Desc = "Ускорение лодки при зажатии W/S",
-    Value = boatSpeedEnabled,
-    Callback = function(state)
-        boatSpeedEnabled = state
-        if state then showNotification("Boat Speed", "Турбо-скорость активна! Жми W/S") end
-    end
-})
-
-TabBoat:Slider({
-    Title = "Boat Speed (Studs/s)",
-    Desc = "Скорость движения лодки",
-    Value = { Min = 50, Max = 350, Default = 150 },
-    Step = 10,
-    Callback = function(val) boatSpeedValue = val end
-})
-
-TabBoat:Button({
-    Title = "Dash Forward 200m (Water Dash)",
-    Desc = "Мгновенный рывок лодки на 200 метров вперед",
-    Icon = "fast-forward",
+TabTeleports:Button({
+    Title = "World 2 Desert Merchant",
+    Desc = "Телепорт к торговцу во 2-м мире (Desert)",
+    Icon = "store",
     Callback = function()
-        local char = LocalPlayer.Character
-        local hrp = char and char:FindFirstChild("HumanoidRootPart")
-        if hrp then tpBoat(hrp.CFrame * CFrame.new(0, 0, -200)) end
-    end
-})
-
-TabBoat:Section({ Title = "Leviathan & World Boss Hunter" })
-
-TabBoat:Button({
-    Title = "TP Boat to Leviathan / World Boss",
-    Desc = "Сканирует карту на босса и телепортирует лодку вплотную",
-    Icon = "shield-alert",
-    Callback = function()
-        local levCF = findLeviathanCFrame()
-        if levCF then
-            tpBoat(levCF)
-            showNotification("Boss Hunter", "Подплыли прямо к боссу!")
-        else
-            showNotification("Boss Hunter", "Босс не найден на сервере. Жди спавна!")
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1335.45, 20.8, 141.23)
+            showNotification("Teleport", "Телепортирован к торговцу World 2!")
         end
     end
 })
 
-TabBoat:Button({
-    Title = "TP Boat to Deep Ocean Abyss",
-    Desc = "Телепортирует лодку в глубоководную зону",
-    Icon = "waves",
-    Callback = function() tpBoat(CFrame.new(-1218, 18, 650)) end
-})
-
-TabBoat:Button({
-    Title = "Return Boat to Pier",
-    Desc = "Возвращает лодку обратно к пирсу",
+TabTeleports:Button({
+    Title = "World 2 Desert Pier",
+    Desc = "Пирс и место заброса удочки в World 2",
     Icon = "anchor",
-    Callback = function() tpBoat(CFrame.new(-1218, 18, 210)) end
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1330, 20, 180)
+            showNotification("Teleport", "Телепортирован на пирс World 2!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "Sun Temple Entrance (Sand Door)",
+    Desc = "Вход в Храм Солнца к закрытым дверям лабиринта",
+    Icon = "door-closed",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1345, 22, 85)
+            showNotification("Teleport", "Телепортирован к входу Храма Солнца!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "Desert Oasis & Dunes",
+    Desc = "Оазис и глубокие песчаные барханы",
+    Icon = "sun",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1360, 25, 220)
+            showNotification("Teleport", "Телепортирован в пустынный оазис!")
+        end
+    end
+})
+
+TabTeleports:Section({ Title = "❄️ World 3: Frostmere & Tundra" })
+
+TabTeleports:Button({
+    Title = "World 3 Frost Merchant",
+    Desc = "Телепорт к торговцу в 3-м мире (Tundra)",
+    Icon = "store",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1325.44, 23.5, 157.35)
+            showNotification("Teleport", "Телепортирован к торговцу World 3!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "World 3 Frozen Pier",
+    Desc = "Замерзший пирс для рыбалки в World 3",
+    Icon = "anchor",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1292.88, 28, 81.86)
+            showNotification("Teleport", "Телепортирован на ледяной пирс World 3!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "Frozen Caves Entrance (Frost Door)",
+    Desc = "Вход в Ледяные Пещеры к вратам лабиринта",
+    Icon = "door-closed",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1310, 25, 120)
+            showNotification("Teleport", "Телепортирован к ледяным вратам!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "Glacier Deep Frost Spot",
+    Desc = "Глубокая ледяная расщелина для редкой арктической рыбы",
+    Icon = "snowflake",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1280, 20, 250)
+            showNotification("Teleport", "Телепортирован к леднику World 3!")
+        end
+    end
+})
+
+TabTeleports:Section({ Title = "🌋 World 4: Volcano & Magma Abyss" })
+
+TabTeleports:Button({
+    Title = "World 4 Volcano Merchant",
+    Desc = "Телепорт к торговцу в лавовом мире (World 4)",
+    Icon = "store",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1340.18, 20.5, 100.98)
+            showNotification("Teleport", "Телепортирован к торговцу World 4!")
+        end
+    end
+})
+
+TabTeleports:Button({
+    Title = "Lava Abyss Fishing Spot",
+    Desc = "Пирс над лавовой бездной для огненных рыб",
+    Icon = "flame",
+    Callback = function()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-1350, 22, 150)
+            showNotification("Teleport", "Телепортирован в лавовую бездну!")
+        end
+    end
 })
 
 
--- 8. 🏃 TAB: PLAYER
+-- 7. 🏃 TAB: PLAYER
 local TabPlayer = Window:Tab({
     Title = "Player",
     Icon = "user"
@@ -2270,12 +2318,21 @@ TabPlayer:Slider({
     end
 })
 
-local infJump = false
 TabPlayer:Toggle({
     Title = "Infinite Jump",
     Desc = "Прыжок в воздухе без земли",
-    Value = false,
-    Callback = function(state) infJump = state end
+    Value = infJumpEnabled,
+    Callback = function(state) infJumpEnabled = state end
+})
+
+TabPlayer:Toggle({
+    Title = "Infinite Oxygen (No Drown)",
+    Desc = "Бесконечный запас воздуха под водой (не тратится в пещерах и лабиринтах)",
+    Value = infOxygenEnabled,
+    Callback = function(state)
+        infOxygenEnabled = state
+        showNotification("Oxygen", state and "Бесконечный кислород включен!" or "Бесконечный кислород выключен")
+    end
 })
 
 TabPlayer:Toggle({
@@ -2286,7 +2343,7 @@ TabPlayer:Toggle({
 })
 
 UserInputService.JumpRequest:Connect(function()
-    if infJump then
+    if infJumpEnabled then
         local char = LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
         if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
@@ -2294,7 +2351,7 @@ UserInputService.JumpRequest:Connect(function()
 end)
 
 
--- 9. ⚙️ TAB: SETTINGS & THEMES
+-- 8. ⚙️ TAB: SETTINGS & THEMES
 local TabSettings = Window:Tab({
     Title = "Settings",
     Icon = "settings"
@@ -2344,6 +2401,40 @@ TabSettings:Keybind({
                 end
             end
         end
+    end
+})
+
+TabSettings:Section({ Title = "Server & Network Utilities" })
+
+TabSettings:Button({
+    Title = "🔄 Rejoin Current Server",
+    Desc = "Быстро переподключиться к текущему серверу",
+    Icon = "rotate-ccw",
+    Callback = function()
+        pcall(function()
+            TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
+        end)
+    end
+})
+
+TabSettings:Button({
+    Title = "🌐 Server Hop (Change Server)",
+    Desc = "Найти другой свободный сервер и подключиться",
+    Icon = "globe",
+    Callback = function()
+        pcall(function()
+            local HttpService = game:GetService("HttpService")
+            local raw = game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100")
+            local servers = HttpService:JSONDecode(raw)
+            if servers and servers.data then
+                for _, s in ipairs(servers.data) do
+                    if s.playing < s.maxPlayers and s.id ~= game.JobId then
+                        TeleportService:TeleportToPlaceInstance(game.PlaceId, s.id, LocalPlayer)
+                        break
+                    end
+                end
+            end
+        end)
     end
 })
 
