@@ -16,6 +16,15 @@ local myHubToken = os.clock()
 getgenv()._FishyHubToken = myHubToken
 getgenv()._FishyHubCleanup = function()
     getgenv()._FishyHubToken = nil
+    pcall(function() RunService:Set3dRenderingEnabled(true) end)
+    pcall(function()
+        local p = workspace:FindFirstChild("FishyWaterWalk")
+        if p then p:Destroy() end
+    end)
+    pcall(function()
+        local g = game:GetService("CoreGui"):FindFirstChild("FishyGpuAfkScreen")
+        if g then g:Destroy() end
+    end)
 end
 
 pcall(function()
@@ -125,8 +134,13 @@ local fpsBoostEnabled = false         -- 🚀 Оптимизация FPS (Boost 
 local potatoGfxEnabled = false        -- 🥔 Картофельная графика (Potato PC / Smooth Plastic & No Textures)
 local clearFogEnabled = false         -- 🌫️ Удаление тумана и атмосферы (Clear Horizon / No Fog Lag)
 local unlockFpsEnabled = true         -- ⚡ Разблокировка FPS (999 FPS)
-local infOxygenEnabled = true         -- 🤿 Бесконечный кислород / персонаж не тонет
 local infJumpEnabled = false          -- 🦘 Бесконечные прыжки в воздухе
+local waterWalkEnabled = false        -- 🌊 Хождение по воде / Jesus Mode (без плавания)
+local flyEnabled = false              -- 🚀 Плавный полёт (WASD + Space/Shift)
+local flySpeed = 50                   -- Скорость полёта
+local sessionFishCaught = 0           -- Всего поймано рыб за сессию
+local sessionMoneyEarned = 0          -- Всего заработано монет за сессию
+local sessionStartTime = os.clock()   -- Время старта скрипта
 local autoFightEnabled = true
 local instantReelEnabled = true
 local autoSellEnabled = true
@@ -230,6 +244,69 @@ local function applyClearFog(enable)
     end)
 end
 
+-- 🥔 0% GPU AFK Режим с настраиваемым цветом экрана (RGB Палетка)
+local gpuScreenGui = nil
+local gpuScreenFrame = nil
+local gpuScreenColor = Color3.fromRGB(15, 15, 22)
+local gpuAfkEnabled = false
+
+local function setGpuAfkMode(enable)
+    gpuAfkEnabled = enable
+    pcall(function()
+        RunService:Set3dRenderingEnabled(not enable)
+    end)
+    if enable then
+        if not gpuScreenGui then
+            gpuScreenGui = Instance.new("ScreenGui")
+            gpuScreenGui.Name = "FishyGpuAfkScreen"
+            gpuScreenGui.DisplayOrder = -1 -- ниже окна меню WindUI чтобы оно оставалось активным
+            gpuScreenGui.IgnoreGuiInset = true
+            gpuScreenGui.ResetOnSpawn = false
+
+            pcall(function()
+                if gethui then
+                    gpuScreenGui.Parent = gethui()
+                elseif syn and syn.protect_gui then
+                    syn.protect_gui(gpuScreenGui)
+                    gpuScreenGui.Parent = game:GetService("CoreGui")
+                else
+                    gpuScreenGui.Parent = game:GetService("CoreGui")
+                end
+            end)
+            if not gpuScreenGui.Parent then
+                gpuScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+            end
+
+            gpuScreenFrame = Instance.new("Frame")
+            gpuScreenFrame.Size = UDim2.fromScale(1, 1)
+            gpuScreenFrame.BackgroundColor3 = gpuScreenColor
+            gpuScreenFrame.BorderSizePixel = 0
+            gpuScreenFrame.Parent = gpuScreenGui
+
+            local lbl = Instance.new("TextLabel")
+            lbl.Name = "AfkStatusLabel"
+            lbl.Size = UDim2.new(1, 0, 0, 40)
+            lbl.Position = UDim2.new(0, 0, 0.92, 0)
+            lbl.BackgroundTransparency = 1
+            lbl.Text = "⚡ GPU 0% Potato AFK Active | 3D Rendering Disabled"
+            lbl.TextColor3 = Color3.fromRGB(220, 220, 220)
+            lbl.TextTransparency = 0.4
+            lbl.Font = Enum.Font.GothamMedium
+            lbl.TextSize = 14
+            lbl.Parent = gpuScreenFrame
+        else
+            gpuScreenGui.Enabled = true
+            if gpuScreenFrame then
+                gpuScreenFrame.BackgroundColor3 = gpuScreenColor
+            end
+        end
+    else
+        if gpuScreenGui then
+            gpuScreenGui.Enabled = false
+        end
+    end
+end
+
 -- 🎁 Мгновенное открытие всех пойманных сундуков
 local function openAllChests()
     pcall(function()
@@ -281,6 +358,19 @@ local function formatMoney(val)
         return string.format("$%.1fK", val / 1000)
     else
         return string.format("$%d", math.floor(val))
+    end
+end
+
+local statsParagraph = nil
+local function updateStatsHud()
+    if statsParagraph and statsParagraph.SetDesc then
+        local elapsed = os.clock() - sessionStartTime
+        local hrs = math.floor(elapsed / 3600)
+        local mins = math.floor((elapsed % 3600) / 60)
+        local secs = math.floor(elapsed % 60)
+        local timeStr = string.format("%02d:%02d:%02d", hrs, mins, secs)
+        local cpm = (elapsed > 0) and (sessionFishCaught / (elapsed / 60)) or 0
+        statsParagraph:SetDesc(string.format("🐟 Поймано: %d шт. | 💰 Выручка: %s\n⏱️ Время сессии: %s | 📈 Скорость: %.1f рыб/мин", sessionFishCaught, formatMoney(sessionMoneyEarned), timeStr, cpm))
     end
 end
 
@@ -1117,6 +1207,10 @@ if FishSchoolCtrl then
                 end
             end
             
+            sessionFishCaught = sessionFishCaught + count
+            sessionMoneyEarned = sessionMoneyEarned + totalValue
+            if updateStatsHud then updateStatsHud() end
+
             if notifyCatchValue then
                 local bestTxt = bestName and (" | Топ: " .. bestName) or ""
                 showNotification("🎣 Заброс завершён!", string.format("Поймано: %d шт. | Выручка: %s%s", count, formatMoney(totalValue), bestTxt))
@@ -1367,15 +1461,68 @@ RunService.Heartbeat:Connect(function()
         end
     end
 
-    -- 🤿 Бесконечный кислород / Нет утопления
-    if infOxygenEnabled and LocalPlayer.Character then
+    -- 🌊 Walk On Water (Хождение по воде без плавания)
+    if waterWalkEnabled and LocalPlayer.Character then
+        local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
         local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-        if hum then
-            pcall(function()
-                local ox = LocalPlayer.Character:FindFirstChild("Oxygen") or LocalPlayer.Character:FindFirstChild("Breath")
-                if ox and ox:IsA("ValueBase") then ox.Value = 100 end
-            end)
+        if hrp and hum then
+            if hum:GetState() == Enum.HumanoidStateType.Swimming then
+                hum:ChangeState(Enum.HumanoidStateType.Running)
+            end
+            if not waterPlatform or not waterPlatform.Parent then
+                waterPlatform = Instance.new("Part")
+                waterPlatform.Name = "FishyWaterWalk"
+                waterPlatform.Size = Vector3.new(12, 1, 12)
+                waterPlatform.Transparency = 1
+                waterPlatform.Anchored = true
+                waterPlatform.CanCollide = true
+                waterPlatform.Parent = workspace
+            end
+            local targetY = math.max(16.5, hrp.Position.Y - 3.1)
+            waterPlatform.CFrame = CFrame.new(hrp.Position.X, targetY, hrp.Position.Z)
         end
+    elseif not waterWalkEnabled and waterPlatform then
+        pcall(function() waterPlatform:Destroy() end)
+        waterPlatform = nil
+    end
+
+    -- 🚀 Fly Mode (Плавный полёт)
+    if flyEnabled and LocalPlayer.Character then
+        local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        local cam = workspace.CurrentCamera
+        if hrp and hum and cam then
+            if not flyBodyVelocity or not flyBodyVelocity.Parent then
+                flyBodyGyro = Instance.new("BodyGyro")
+                flyBodyGyro.P = 9e4
+                flyBodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+                flyBodyGyro.CFrame = cam.CFrame
+                flyBodyGyro.Parent = hrp
+
+                flyBodyVelocity = Instance.new("BodyVelocity")
+                flyBodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+                flyBodyVelocity.Velocity = Vector3.zero
+                flyBodyVelocity.Parent = hrp
+            end
+
+            flyBodyGyro.CFrame = cam.CFrame
+            local move = Vector3.zero
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then move = move + cam.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then move = move - cam.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then move = move + cam.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then move = move - cam.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then move = move + Vector3.new(0, 1, 0) end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then move = move - Vector3.new(0, 1, 0) end
+
+            if move.Magnitude > 0 then
+                flyBodyVelocity.Velocity = move.Unit * flySpeed
+            else
+                flyBodyVelocity.Velocity = Vector3.zero
+            end
+        end
+    elseif not flyEnabled then
+        if flyBodyVelocity then pcall(function() flyBodyVelocity:Destroy() end) flyBodyVelocity = nil end
+        if flyBodyGyro then pcall(function() flyBodyGyro:Destroy() end) flyBodyGyro = nil end
     end
 
     -- Fast Reel: подсекаем ТОЛЬКО КОГДА ВСЕ СЛОТЫ ЗАБИТЫ, НЕТ БОССФАЙТА И НЕТ НЕПОЙМАННЫХ ПРЕДМЕТОВ
@@ -1542,6 +1689,23 @@ end)
 local TabFishing = Window:Tab({
     Title = "Fishing",
     Icon = "fish-symbol"
+})
+
+TabFishing:Section({ Title = "📊 Live AFK Farm Statistics" })
+
+statsParagraph = TabFishing:Paragraph({
+    Title = "🎣 Session Performance",
+    Desc = "🐟 Поймано: 0 шт. | 💰 Выручка: $0\n⏱️ Время сессии: 00:00:00 | 📈 Скорость: 0.0 рыб/мин"
+})
+
+TabFishing:Button({
+    Title = "🔄 Refresh Session Statistics",
+    Desc = "Обновить показатели вылова, выручки и времени фарма",
+    Icon = "activity",
+    Callback = function()
+        updateStatsHud()
+        showNotification("Stats", string.format("Выловлено: %d шт. | Доход: %s", sessionFishCaught, formatMoney(sessionMoneyEarned)))
+    end
 })
 
 TabFishing:Section({ Title = "Auto-Fishing & Speed Hacks" })
@@ -1974,10 +2138,20 @@ TabBoost:Toggle({
     Desc = "Полностью отключает 3D рендер экрана для экономии видеокарты и кулера во время ночного фарма",
     Value = false,
     Callback = function(state)
-        pcall(function()
-            RunService:Set3dRenderingEnabled(not state)
-        end)
+        setGpuAfkMode(state)
         showNotification("GPU 0% AFK", state and "3D рендер выключен! GPU холодная." or "3D рендер включен обратно.")
+    end
+})
+
+TabBoost:Colorpicker({
+    Title = "GPU AFK Screen Color (RGB Palette)",
+    Desc = "Выберите цвет фона экрана при выключенном 3D рендере",
+    Default = gpuScreenColor,
+    Callback = function(color)
+        gpuScreenColor = color
+        if gpuScreenFrame then
+            gpuScreenFrame.BackgroundColor3 = color
+        end
     end
 })
 
@@ -2326,12 +2500,32 @@ TabPlayer:Toggle({
 })
 
 TabPlayer:Toggle({
-    Title = "Infinite Oxygen (No Drown)",
-    Desc = "Бесконечный запас воздуха под водой (не тратится в пещерах и лабиринтах)",
-    Value = infOxygenEnabled,
+    Title = "Walk On Water (Jesus Mode)",
+    Desc = "Позволяет ходить по воде как по суше без плавания и закидывать удочку прямо посреди океана",
+    Value = waterWalkEnabled,
     Callback = function(state)
-        infOxygenEnabled = state
-        showNotification("Oxygen", state and "Бесконечный кислород включен!" or "Бесконечный кислород выключен")
+        waterWalkEnabled = state
+        showNotification("Water Walk", state and "Хождение по воде включено!" or "Хождение по воде выключено")
+    end
+})
+
+TabPlayer:Toggle({
+    Title = "Fly Mode (WASD Flight)",
+    Desc = "Свободный полёт в воздухе (W/A/S/D + Пробел для подъема, Shift для спуска)",
+    Value = flyEnabled,
+    Callback = function(state)
+        flyEnabled = state
+        showNotification("Fly", state and "Полёт активирован!" or "Полёт отключен")
+    end
+})
+
+TabPlayer:Slider({
+    Title = "Flight Speed",
+    Desc = "Скорость полёта персонажа",
+    Value = { Min = 20, Max = 200, Default = 50 },
+    Step = 5,
+    Callback = function(val)
+        flySpeed = val
     end
 })
 
@@ -2435,6 +2629,29 @@ TabSettings:Button({
                 end
             end
         end)
+    end
+})
+
+TabSettings:Section({ Title = "🎁 Promo Codes & Freebies" })
+
+TabSettings:Button({
+    Title = "🎟️ Redeem All Working Promo Codes",
+    Desc = "Автоматический ввод всех промокодов игры на бесплатные монеты и зелья",
+    Icon = "gift",
+    Callback = function()
+        local codes = {"RELEASE", "DEEP", "FISHING", "UPDATE1", "LUCKY", "100K", "SECRET", "COINS"}
+        local redeemed = 0
+        pcall(function()
+            local ev = require(RS.Shared.Events).Client("Code")
+            if ev then
+                for _, c in ipairs(codes) do
+                    ev:Fire(c)
+                    task.wait(0.15)
+                    redeemed = redeemed + 1
+                end
+            end
+        end)
+        showNotification("Codes", string.format("Проверено промокодов: %d шт. Проверьте баланс!", redeemed))
     end
 })
 
