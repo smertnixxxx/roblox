@@ -25,6 +25,14 @@ getgenv()._FishyHubCleanup = function()
         local g = game:GetService("CoreGui"):FindFirstChild("FishyGpuAfkScreen")
         if g then g:Destroy() end
     end)
+    pcall(function()
+        local h = game:GetService("CoreGui"):FindFirstChild("FishyStatsHUD")
+        if h then h:Destroy() end
+        if LocalPlayer and LocalPlayer:FindFirstChild("PlayerGui") then
+            local ph = LocalPlayer.PlayerGui:FindFirstChild("FishyStatsHUD")
+            if ph then ph:Destroy() end
+        end
+    end)
 end
 
 pcall(function()
@@ -361,18 +369,149 @@ local function formatMoney(val)
     end
 end
 
+-- 📊 Экранный HUD и статистика AFK сессии (слева по центру экрана)
+local hudEnabled = true
+local statsHudGui = nil
+local hudFishLabel = nil
+local hudMoneyLabel = nil
+local hudTimeLabel = nil
+local hudSpeedLabel = nil
 local statsParagraph = nil
+
+local function createStatsHud()
+    if statsHudGui then return end
+    statsHudGui = Instance.new("ScreenGui")
+    statsHudGui.Name = "FishyStatsHUD"
+    statsHudGui.ResetOnSpawn = false
+    statsHudGui.DisplayOrder = 9999
+
+    pcall(function()
+        if gethui then
+            statsHudGui.Parent = gethui()
+        elseif syn and syn.protect_gui then
+            syn.protect_gui(statsHudGui)
+            statsHudGui.Parent = game:GetService("CoreGui")
+        else
+            statsHudGui.Parent = game:GetService("CoreGui")
+        end
+    end)
+    if not statsHudGui.Parent then
+        statsHudGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    end
+
+    local frame = Instance.new("Frame")
+    frame.Name = "HudFrame"
+    frame.Size = UDim2.new(0, 195, 0, 118)
+    frame.Position = UDim2.new(0, 16, 0.5, -59) -- слева по центру экрана!
+    frame.BackgroundColor3 = Color3.fromRGB(14, 18, 25)
+    frame.BackgroundTransparency = 0.22
+    frame.BorderSizePixel = 0
+    frame.Active = true
+    frame.Draggable = true
+    frame.Parent = statsHudGui
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = frame
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(0, 215, 255)
+    stroke.Transparency = 0.45
+    stroke.Thickness = 1.2
+    stroke.Parent = frame
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, -16, 0, 22)
+    title.Position = UDim2.new(0, 10, 0, 5)
+    title.BackgroundTransparency = 1
+    title.Text = "🐟 Fishy Farm HUD"
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 13
+    title.TextColor3 = Color3.fromRGB(0, 225, 255)
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Parent = frame
+
+    hudFishLabel = Instance.new("TextLabel")
+    hudFishLabel.Size = UDim2.new(1, -16, 0, 18)
+    hudFishLabel.Position = UDim2.new(0, 10, 0, 28)
+    hudFishLabel.BackgroundTransparency = 1
+    hudFishLabel.Text = "🎣 Поймано: 0 шт."
+    hudFishLabel.Font = Enum.Font.GothamMedium
+    hudFishLabel.TextSize = 12
+    hudFishLabel.TextColor3 = Color3.fromRGB(245, 245, 245)
+    hudFishLabel.TextXAlignment = Enum.TextXAlignment.Left
+    hudFishLabel.Parent = frame
+
+    hudMoneyLabel = Instance.new("TextLabel")
+    hudMoneyLabel.Size = UDim2.new(1, -16, 0, 18)
+    hudMoneyLabel.Position = UDim2.new(0, 10, 0, 49)
+    hudMoneyLabel.BackgroundTransparency = 1
+    hudMoneyLabel.Text = "💰 Доход: $0"
+    hudMoneyLabel.Font = Enum.Font.GothamMedium
+    hudMoneyLabel.TextSize = 12
+    hudMoneyLabel.TextColor3 = Color3.fromRGB(105, 255, 135)
+    hudMoneyLabel.TextXAlignment = Enum.TextXAlignment.Left
+    hudMoneyLabel.Parent = frame
+
+    hudTimeLabel = Instance.new("TextLabel")
+    hudTimeLabel.Size = UDim2.new(1, -16, 0, 18)
+    hudTimeLabel.Position = UDim2.new(0, 10, 0, 70)
+    hudTimeLabel.BackgroundTransparency = 1
+    hudTimeLabel.Text = "⏱️ Время: 00:00:00"
+    hudTimeLabel.Font = Enum.Font.Gotham
+    hudTimeLabel.TextSize = 11
+    hudTimeLabel.TextColor3 = Color3.fromRGB(190, 195, 205)
+    hudTimeLabel.TextXAlignment = Enum.TextXAlignment.Left
+    hudTimeLabel.Parent = frame
+
+    hudSpeedLabel = Instance.new("TextLabel")
+    hudSpeedLabel.Size = UDim2.new(1, -16, 0, 18)
+    hudSpeedLabel.Position = UDim2.new(0, 10, 0, 91)
+    hudSpeedLabel.BackgroundTransparency = 1
+    hudSpeedLabel.Text = "📈 Скорость: 0.0 рыб/м"
+    hudSpeedLabel.Font = Enum.Font.Gotham
+    hudSpeedLabel.TextSize = 11
+    hudSpeedLabel.TextColor3 = Color3.fromRGB(190, 195, 205)
+    hudSpeedLabel.TextXAlignment = Enum.TextXAlignment.Left
+    hudSpeedLabel.Parent = frame
+end
+
 local function updateStatsHud()
+    local elapsed = os.clock() - sessionStartTime
+    local hrs = math.floor(elapsed / 3600)
+    local mins = math.floor((elapsed % 3600) / 60)
+    local secs = math.floor(elapsed % 60)
+    local timeStr = string.format("%02d:%02d:%02d", hrs, mins, secs)
+    local cpm = (elapsed > 0) and (sessionFishCaught / (elapsed / 60)) or 0
+
     if statsParagraph and statsParagraph.SetDesc then
-        local elapsed = os.clock() - sessionStartTime
-        local hrs = math.floor(elapsed / 3600)
-        local mins = math.floor((elapsed % 3600) / 60)
-        local secs = math.floor(elapsed % 60)
-        local timeStr = string.format("%02d:%02d:%02d", hrs, mins, secs)
-        local cpm = (elapsed > 0) and (sessionFishCaught / (elapsed / 60)) or 0
         statsParagraph:SetDesc(string.format("🐟 Поймано: %d шт. | 💰 Выручка: %s\n⏱️ Время сессии: %s | 📈 Скорость: %.1f рыб/мин", sessionFishCaught, formatMoney(sessionMoneyEarned), timeStr, cpm))
     end
+
+    if hudFishLabel then
+        hudFishLabel.Text = string.format("🎣 Поймано: %d шт.", sessionFishCaught)
+    end
+    if hudMoneyLabel then
+        hudMoneyLabel.Text = string.format("💰 Доход: %s", formatMoney(sessionMoneyEarned))
+    end
+    if hudTimeLabel then
+        hudTimeLabel.Text = string.format("⏱️ Время: %s", timeStr)
+    end
+    if hudSpeedLabel then
+        hudSpeedLabel.Text = string.format("📈 Скорость: %.1f рыб/м", cpm)
+    end
 end
+
+createStatsHud()
+
+task.spawn(function()
+    while true do
+        task.wait(1)
+        if hudEnabled and statsHudGui and statsHudGui.Enabled then
+            updateStatsHud()
+        end
+    end
+end)
 
 -- Поиск активного продавца в текущем активном мире (World 1, World 2, World 3, World 4)
 local function getActiveSellNPC()
@@ -1708,6 +1847,19 @@ TabFishing:Button({
     end
 })
 
+TabFishing:Toggle({
+    Title = "Show On-Screen AFK HUD",
+    Desc = "Отображать плашку статистики слева по центру экрана поверх игры",
+    Value = hudEnabled,
+    Callback = function(state)
+        hudEnabled = state
+        if statsHudGui then
+            statsHudGui.Enabled = state
+        end
+        showNotification("HUD", state and "Экранный виджет включен!" or "Экранный виджет скрыт")
+    end
+})
+
 TabFishing:Section({ Title = "Auto-Fishing & Speed Hacks" })
 
 TabFishing:Toggle({
@@ -2639,14 +2791,30 @@ TabSettings:Button({
     Desc = "Автоматический ввод всех промокодов игры на бесплатные монеты и зелья",
     Icon = "gift",
     Callback = function()
-        local codes = {"RELEASE", "DEEP", "FISHING", "UPDATE1", "LUCKY", "100K", "SECRET", "COINS"}
+        local codes = {
+            "Release",
+            "Fishing",
+            "ThanksforPlaying",
+            "Gifting",
+            "Pond",
+            "Skins",
+            "Mutations",
+            "BigFish",
+            "Frostmere",
+            "Kraken",
+            "Keys",
+            "Update9",
+            "Volcano",
+            "Boats",
+            "SunkenCrown"
+        }
         local redeemed = 0
         pcall(function()
             local ev = require(RS.Shared.Events).Client("Code")
             if ev then
                 for _, c in ipairs(codes) do
                     ev:Fire(c)
-                    task.wait(0.15)
+                    task.wait(0.2)
                     redeemed = redeemed + 1
                 end
             end
