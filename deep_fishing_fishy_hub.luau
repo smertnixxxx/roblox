@@ -176,6 +176,8 @@ local turboCastEnabled = true
 local fastArcEnabled = true          -- ⚡ Мгновенный перелёт поплавка в воду (Arc Skip)
 local fastDiveEnabled = true         -- 🌊 Мгновенное погружение на дно (Dive Skip)
 local instantPullEnabled = true       -- ⏩ Мгновенный подъем со дна и возврат (Skip Pull-Up & Return Animations)
+local freeWalkEnabled = true          -- 🚶 Свободный ход во время и после заброса (Анти-заморозка)
+local currentWalkSpeed = 16           -- Текущая скорость ходьбы
 local fpsBoostEnabled = false         -- 🚀 Оптимизация FPS (Boost Performance)
 local potatoGfxEnabled = false        -- 🥔 Картофельная графика (Potato PC / Smooth Plastic & No Textures)
 local clearFogEnabled = false         -- 🌫️ Удаление тумана и атмосферы (Clear Horizon / No Fog Lag)
@@ -1120,6 +1122,88 @@ local function buyUpgrade(statName)
     end)
 end
 
+-- ==================== 🚶 FREE MOVEMENT & UNFREEZE WATCHDOG ====================
+local function unfreezeCharacter()
+    pcall(function()
+        local char = LocalPlayer.Character
+        if not char then return end
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        local hum = char:FindFirstChildOfClass("Humanoid")
+
+        -- 1. Снимаем Anchored со всех частей персонажа
+        if hrp and hrp.Anchored and not (waterPlatform and waterPlatform.Parent and math.abs(hrp.Position.Y - waterPlatform.Position.Y) < 4) then
+            hrp.Anchored = false
+        end
+        for _, part in ipairs(char:GetChildren()) do
+            if part:IsA("BasePart") and part.Anchored and part ~= waterPlatform then
+                part.Anchored = false
+            end
+        end
+
+        -- 2. Восстанавливаем WalkSpeed и состояние гуманоида
+        if hum then
+            if hum.WalkSpeed <= 0 then
+                hum.WalkSpeed = (currentWalkSpeed and currentWalkSpeed > 0) and currentWalkSpeed or 16
+            end
+            if hum.PlatformStand then
+                hum.PlatformStand = false
+            end
+            if hum.Sit and not (char:FindFirstChildOfClass("VehicleSeat") or (char.Parent and char.Parent:FindFirstChildOfClass("VehicleSeat"))) then
+                hum.Sit = false
+            end
+        end
+
+        -- 3. Восстанавливаем PlayerModule Controls (WASD)
+        local playerScripts = LocalPlayer:FindFirstChild("PlayerScripts")
+        local playerModuleObj = playerScripts and playerScripts:FindFirstChild("PlayerModule")
+        if playerModuleObj then
+            local PlayerModule = require(playerModuleObj)
+            local Controls = PlayerModule and PlayerModule:GetControls()
+            if Controls and Controls.Enable then
+                Controls:Enable()
+            end
+        end
+
+        -- 4. Восстанавливаем камеру если она застряла в Scriptable
+        local cam = workspace.CurrentCamera
+        if cam and cam.CameraType == Enum.CameraType.Scriptable and hum then
+            cam.CameraType = Enum.CameraType.Custom
+            cam.CameraSubject = hum
+        end
+    end)
+end
+
+-- Перехватываем попытки игры заглушить WASD управление
+pcall(function()
+    local playerScripts = LocalPlayer:WaitForChild("PlayerScripts", 5)
+    local playerModuleObj = playerScripts and playerScripts:FindFirstChild("PlayerModule")
+    if playerModuleObj then
+        local PlayerModule = require(playerModuleObj)
+        local Controls = PlayerModule and PlayerModule:GetControls()
+        if Controls then
+            Controls:Enable()
+            if not Controls._fishyHooked then
+                Controls._fishyHooked = true
+                local oldDisable = Controls.Disable
+                Controls.Disable = function(self, ...)
+                    if freeWalkEnabled then
+                        return -- Не даем игре выключать управление во время заброса!
+                    end
+                    return oldDisable(self, ...)
+                end
+            end
+        end
+    end
+end)
+
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(0.5)
+    unfreezeCharacter()
+end)
+
+-- Мгновенная разморозка при старте скрипта
+task.defer(unfreezeCharacter)
+
 -- ==================== SMART ENTITY SCORING (FISH + ITEMS) ====================
 local function getEntityScore(f, mode)
     local name = f.name or (f.model and f.model.Name) or (f.data and f.data.Name) or f.findName or ""
@@ -1583,16 +1667,16 @@ if ThrowCinematicCtrl then
     local rawOnServerStarted = ThrowCinematicCtrl._rawOnServerStarted
     ThrowCinematicCtrl.OnServerStarted = function(self, a2, ...)
         if fastArcEnabled and type(a2) == "table" then
-            a2.arcDuration = 0.02
+            a2.arcDuration = 0.15
             if a2.bounces then
                 for _, b in ipairs(a2.bounces) do
-                    b.duration = 0.01
-                    b.Duration = 0.01
+                    b.duration = 0.05
+                    b.Duration = 0.05
                 end
             end
         end
         if fastDiveEnabled and type(a2) == "table" then
-            a2.diveDuration = 0.05
+            a2.diveDuration = 0.12
         end
         if instantPullEnabled then
             pcall(function() self:SetDoubleSpeed(true) end)
@@ -1603,7 +1687,7 @@ if ThrowCinematicCtrl then
                 self.BreachSpeed = 1200
                 wasBossFight = false
             else
-                self.PullUpDuration = 0.3
+                self.PullUpDuration = 0.25
                 self.ReturnDuration = 0.2
                 self.BreachSpeed = 800
             end
@@ -1616,21 +1700,20 @@ if ThrowCinematicCtrl then
     ThrowCinematicCtrl.BeginFlight = function(self, ...)
         rawBeginFlight(self, ...)
         if fastArcEnabled then
-            self.ArcDuration = 0.02
-            self.ArcStart = os.clock() - 0.05
+            self.ArcDuration = 0.15
             if self.BounceList then
                 for _, b in ipairs(self.BounceList) do
-                    b.duration = 0.01
-                    b.Duration = 0.01
+                    b.duration = 0.05
+                    b.Duration = 0.05
                 end
             end
         end
         if fastDiveEnabled then
-            self.DiveDuration = 0.05
+            self.DiveDuration = 0.12
         end
         if instantPullEnabled then
             pcall(function() self:SetDoubleSpeed(true) end)
-            self.PullUpDuration = 0.3
+            self.PullUpDuration = 0.25
             self.ReturnDuration = 0.2
             self.BreachSpeed = 800
         end
@@ -1794,11 +1877,26 @@ RunService.Heartbeat:Connect(function()
         grabAllEntities(FishSchoolCtrl)
     end
 
-    -- 🌊 Мгновенное погружение на дно (Zero Sinking Time)
-    if fastDiveEnabled and ThrowCinematicCtrl and ThrowCinematicCtrl.Active and ThrowCinematicCtrl.DiveStart then
-        if os.clock() - ThrowCinematicCtrl.DiveStart < 0.5 then
-            ThrowCinematicCtrl.DiveDuration = 0.05
-            ThrowCinematicCtrl.DiveStart = os.clock() - 10
+    -- 🌊 Быстрое погружение на дно (Fast Dive)
+    if fastDiveEnabled and ThrowCinematicCtrl and ThrowCinematicCtrl.Active then
+        ThrowCinematicCtrl.DiveDuration = 0.12
+    end
+
+    -- 🚶 Свободный ход во время и после заброса (Анти-заморозка)
+    if freeWalkEnabled then
+        local char = LocalPlayer.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if hrp and hrp.Anchored and not (waterPlatform and waterPlatform.Parent and math.abs(hrp.Position.Y - waterPlatform.Position.Y) < 4) then
+            hrp.Anchored = false
+        end
+        if hum then
+            if hum.WalkSpeed <= 0 then
+                hum.WalkSpeed = (currentWalkSpeed and currentWalkSpeed > 0) and currentWalkSpeed or 16
+            end
+            if hum.PlatformStand then
+                hum.PlatformStand = false
+            end
         end
     end
 
@@ -2114,6 +2212,16 @@ TabFishing:Toggle({
     Desc = "Всегда идеальный заброс максимальной дальности",
     Value = autoPerfectEnabled,
     Callback = function(state) autoPerfectEnabled = state end
+})
+
+TabFishing:Toggle({
+    Title = "Walk While Fishing (Free Walk)",
+    Desc = "Разрешить ходить и прыгать во время и после заброса (Анти-фриз)",
+    Value = freeWalkEnabled,
+    Callback = function(state)
+        freeWalkEnabled = state
+        if state then unfreezeCharacter() end
+    end
 })
 
 TabFishing:Section({ Title = "Targeting & Catching Logic" })
@@ -2821,12 +2929,23 @@ local TabPlayer = Window:Tab({
 
 TabPlayer:Section({ Title = "Movement & Physics" })
 
+TabPlayer:Button({
+    Title = "Unfreeze Character (Fix Stuck Movement)",
+    Desc = "Мгновенно разморозить персонажа и вернуть ходьбу (WASD)",
+    Icon = "unlock",
+    Callback = function()
+        unfreezeCharacter()
+        showNotification("Movement", locText("Character unfrozen! You can walk freely.", "Персонаж разморожен! Ходьба восстановлена."))
+    end
+})
+
 TabPlayer:Slider({
     Title = "WalkSpeed",
     Desc = "Скорость перемещения персонажа",
     Value = { Min = 16, Max = 150, Default = 16 },
     Step = 2,
     Callback = function(val)
+        currentWalkSpeed = val
         local char = LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
         if hum then hum.WalkSpeed = val end
