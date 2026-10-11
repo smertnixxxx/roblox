@@ -1181,8 +1181,24 @@ local function unfreezeCharacter()
             fight.progress = 1
             pcall(function() CatchMinigameCtrl:Finish(true) end)
         end
-        if ThrowCinematicCtrl and ThrowCinematicCtrl.Active and not ThrowCinematicCtrl.ReelRequested then
-            pcall(function() ThrowCinematicCtrl:RequestReel() end)
+        if ThrowCinematicCtrl then
+            if ThrowCinematicCtrl.Active and not ThrowCinematicCtrl.ReelRequested then
+                pcall(function() ThrowCinematicCtrl:RequestReel() end)
+            end
+            pcall(function()
+                if ThrowCinematicCtrl.Cleanup then
+                    ThrowCinematicCtrl:Cleanup()
+                end
+            end)
+            ThrowCinematicCtrl.Active = false
+            ThrowCinematicCtrl.Catchable = false
+        end
+        if FishSchoolCtrl then
+            pcall(function()
+                if FishSchoolCtrl.Despawn then
+                    FishSchoolCtrl:Despawn()
+                end
+            end)
         end
     end)
 end
@@ -1655,12 +1671,27 @@ if FishSchoolCtrl then
                 )
             end
             
-            -- Ждем полного завершения анимаций сбора рыбы и синематика заброса
+            -- Ждем завершения анимаций сбора рыбы и синематика заброса
             task.spawn(function()
                 local t0 = os.clock()
-                while ThrowCinematicCtrl and ThrowCinematicCtrl.Active and (os.clock() - t0 < 3.0) do
+                while ThrowCinematicCtrl and ThrowCinematicCtrl.Active and (os.clock() - t0 < 0.8) do
                     task.wait(0.05)
                 end
+                
+                -- Очищаем зависшие 3D-модели рыбы с пирса
+                if ThrowCinematicCtrl and ThrowCinematicCtrl.Active then
+                    pcall(function()
+                        if ThrowCinematicCtrl.Cleanup then
+                            ThrowCinematicCtrl:Cleanup()
+                        end
+                    end)
+                    ThrowCinematicCtrl.Active = false
+                end
+                if FishSchoolCtrl and FishSchoolCtrl.Despawn then
+                    pcall(function() FishSchoolCtrl:Despawn() end)
+                end
+                unfreezeCharacter()
+
                 task.wait(0.2)
                 if autoPondEnabled then
                     putBestFishInPond()
