@@ -152,6 +152,8 @@ end
 local RS = ReplicatedStorage
 local FishConfig = require(RS.Shared.Content.Item.Fish)
 local RarityConfig = require(RS.Shared.Config.RarityConfig)
+local CatchFight
+pcall(function() CatchFight = require(RS.Shared.Modules.CatchFight) end)
 local ChestConfig = RS.Shared.Content.Item:FindFirstChild("Chest") and require(RS.Shared.Content.Item.Chest)
 local KeyConfig = RS.Shared.Content.Item:FindFirstChild("Key") and require(RS.Shared.Content.Item.Key)
 local ScrollConfig = RS.Shared.Content.Item:FindFirstChild("Scroll") and require(RS.Shared.Content.Item.Scroll)
@@ -1174,31 +1176,11 @@ local function unfreezeCharacter()
             cam.CameraSubject = hum
         end
 
-        -- 5. Если застряла мини-игра босса или висит рыба, принудительно завершаем победой и забираем рыбу
-        if CatchMinigameCtrl and CatchMinigameCtrl.Fight then
-            local fight = CatchMinigameCtrl.Fight
-            fight.made = math.max(fight.made or 0, fight.required or 30)
-            fight.progress = 1
-            pcall(function() CatchMinigameCtrl:Finish(true) end)
-        end
-        if ThrowCinematicCtrl then
-            if ThrowCinematicCtrl.Active and not ThrowCinematicCtrl.ReelRequested then
-                pcall(function() ThrowCinematicCtrl:RequestReel() end)
+        -- 5. Если заброс завершен, но в мире остались старые зависшие 3D-модели рыбы — очищаем их
+        if not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) and not (CatchMinigameCtrl and CatchMinigameCtrl:IsActive()) then
+            if FishSchoolCtrl and FishSchoolCtrl.Despawn then
+                pcall(function() FishSchoolCtrl:Despawn() end)
             end
-            pcall(function()
-                if ThrowCinematicCtrl.Cleanup then
-                    ThrowCinematicCtrl:Cleanup()
-                end
-            end)
-            ThrowCinematicCtrl.Active = false
-            ThrowCinematicCtrl.Catchable = false
-        end
-        if FishSchoolCtrl then
-            pcall(function()
-                if FishSchoolCtrl.Despawn then
-                    FishSchoolCtrl:Despawn()
-                end
-            end)
         end
     end)
 end
@@ -1365,9 +1347,40 @@ local function getEntityScore(f, mode)
 end
 
 -- ==================== FULL CAPACITY MULTI-GRAB & ITEM COLLECTOR ====================
+local function isFightingFish(f)
+    if not f then return false end
+    if f.boss == true then return true end
+    local name = f.name or (f.model and f.model.Name) or (f.data and f.data.Name) or f.findName
+    if name and FishConfig and FishConfig.Items and FishConfig.Items[name] then
+        local data = FishConfig.Items[name]
+        if CatchFight and CatchFight.Required and CatchFight.Required(data) then
+            return true
+        end
+    end
+    return false
+end
+
 local function grabAllEntities(school)
     if not (instantCatchEnabled and school and school.Fish and #school.Fish > 0 and school.Cinematic and school.Cinematic.Catchable) then
         return
+    end
+
+    -- Если уже идет мини-игра с боссом или секреткой — не вмешиваемся!
+    if CatchMinigameCtrl and CatchMinigameCtrl:IsActive() then
+        return
+    end
+
+    -- ПРОВЕРКА: Есть ли в косяке босс или секретная рыба, требующая битвы?
+    -- Если есть — не используем мульти-граб! Подсекаем только её через Offer, чтобы запустилась битва и легитимно засчиталась сервером!
+    for _, f in ipairs(school.Fish) do
+        if not f.caught and not f.escaped and not f.fighting and f.model and f.model.Parent then
+            if isFightingFish(f) then
+                if school.Cinematic.Sub and school.Cinematic.Sub.CatchMinigame then
+                    school.Cinematic.Sub.CatchMinigame:Offer(f)
+                end
+                return -- Прерываем мульти-граб, отдаем всю леску боссу/секретке!
+            end
+        end
     end
     
     local maxCap = school.Cinematic:GetBaitCapacity()
@@ -1386,13 +1399,13 @@ local function grabAllEntities(school)
         end
     end
     
-    -- ПАСС 2: Забиваем оставшиеся слоты рыбой по выбранному моду
+    -- ПАСС 2: Забиваем оставшиеся слоты обычной рыбой по выбранному моду
     if slotsFree > 0 then
         local candidates = {}
         for _, f in ipairs(school.Fish) do
             if not f.caught and not f.escaped and not f.fighting and f.model and f.model.Parent then
                 local score, info = getEntityScore(f, catchMode)
-                if not (info.isSpecial or f.bypassRoom) then
+                if not (info.isSpecial or f.bypassRoom) and not isFightingFish(f) then
                     table.insert(candidates, { fish = f, score = score, info = info })
                 end
             end
@@ -1833,18 +1846,32 @@ end
 if CatchMinigameCtrl then
     CatchMinigameCtrl._rawBegin = CatchMinigameCtrl._rawBegin or CatchMinigameCtrl.Begin
     local rawBegin = CatchMinigameCtrl._rawBegin
+    local fightThread = nil
 
     CatchMinigameCtrl.Begin = function(self, fish, boss)
         rawBegin(self, fish, boss)
         if autoFightEnabled and self.Fight then
+            local fight = self.Fight
             local fishName = (fish and (fish.name or fish.Name)) or "Boss / Secret Fish"
-            showNotification("🌟 Auto-Win Boss!", "Ловим: " .. tostring(fishName))
-            task.defer(function()
-                task.wait(0.02)
-                if self.Fight then
-                    self.Fight.made = math.max(self.Fight.made or 0, self.Fight.required or 30)
-                    self.Fight.progress = 1
-                    pcall(function() self:Finish(true) end)
+            showNotification("⚔️ Boss / Secret Hooked!", "Авто-битва: " .. tostring(fishName))
+            
+            if fightThread then
+                pcall(task.cancel, fightThread)
+                fightThread = nil
+            end
+            
+            fightThread = task.spawn(function()
+                -- CatchFight.MaxClickRate = 12 кликов/сек (интервал ~0.0833с).
+                -- Сервер СТРОГО проверяет: os.clock() - fight.started >= fightRequired / MaxClickRate!
+                -- Если завершить быстрее, сервер считает fight_3.lost = true и рыба пропадает из инвентаря!
+                -- Кликаем с интервалом 0.088с, чтобы каждый клик легитимно засчитывался, шкала росла,
+                -- и серверное условие по таймингу выполнилось на 100%.
+                local clickInterval = 0.088
+                while self.Fight and self.Fight == fight do
+                    pcall(function()
+                        self:Click()
+                    end)
+                    task.wait(clickInterval)
                 end
             end)
         end
@@ -1853,17 +1880,11 @@ end
 
 -- 4. Heartbeat Loop: Full-Capacity Fast Reel, Entity Collector & Animation Skip
 RunService.Heartbeat:Connect(function()
-    -- Safety solver for active minigame (мгновенная победа из бекапа)
-    if autoFightEnabled and CatchMinigameCtrl and CatchMinigameCtrl.Fight then
-        local fight = CatchMinigameCtrl.Fight
-        fight.made = math.max(fight.made or 0, fight.required or 30)
-        fight.progress = 1
-        pcall(function() CatchMinigameCtrl:Finish(true) end)
-    end
-
     -- Активный сбор предметов и рыбы прямо в Heartbeat пока наживка в воде
     if instantCatchEnabled and ThrowCinematicCtrl and ThrowCinematicCtrl.Active and ThrowCinematicCtrl.Catchable and FishSchoolCtrl then
-        grabAllEntities(FishSchoolCtrl)
+        if not (CatchMinigameCtrl and CatchMinigameCtrl:IsActive()) then
+            grabAllEntities(FishSchoolCtrl)
+        end
     end
 
     -- 🌊 Быстрое погружение на дно (Fast Dive)
@@ -1953,8 +1974,8 @@ RunService.Heartbeat:Connect(function()
         if flyBodyGyro then pcall(function() flyBodyGyro:Destroy() end) flyBodyGyro = nil end
     end
 
-    -- Fast Reel: подсекаем когда забиты слоты или вся рыба в косяке поймана (из бекапа)
-    if instantReelEnabled and ThrowCinematicCtrl and ThrowCinematicCtrl.Active and not ThrowCinematicCtrl.ReelRequested then
+    -- Fast Reel: подсекаем когда забиты слоты или вся рыба в косяке поймана (не во время битвы с боссом)
+    if instantReelEnabled and ThrowCinematicCtrl and ThrowCinematicCtrl.Active and not ThrowCinematicCtrl.ReelRequested and not (CatchMinigameCtrl and CatchMinigameCtrl:IsActive()) then
         local cap = ThrowCinematicCtrl:GetBaitCapacity()
         local caught = ThrowCinematicCtrl:CaughtFishCount()
         local spawned = (FishSchoolCtrl and FishSchoolCtrl.Fish and #FishSchoolCtrl.Fish) or 0
@@ -2232,7 +2253,7 @@ TabFishing:Toggle({
 
 TabFishing:Toggle({
     Title = "Auto-Win Boss Minigame",
-    Desc = "Мгновенная победа в мини-игре при вылове босса/секретки",
+    Desc = "Авто-кликер (12 кликов/с) для победы над боссами и секретками (с серверной валидацией)",
     Value = autoFightEnabled,
     Callback = function(state) autoFightEnabled = state end
 })
