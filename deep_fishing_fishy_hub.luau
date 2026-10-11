@@ -185,7 +185,7 @@ local CatchFight; pcall(function() CatchFight = require(RS.Shared.Modules.CatchF
 
 -- Контроллеры клиента
 local AutoFishingCtrl, CatchMinigameCtrl, FishingCtrl, FishSchoolCtrl, ThrowCinematicCtrl, NpcSellCtrl
-local unfreezeCharacter, forceEnableControls, equipRod, cleanupStrayFishModels
+local unfreezeCharacter, forceEnableControls, equipRod, cleanupStrayFishModels, resetCharacterAnimations
 pcall(function() AutoFishingCtrl = require(LocalPlayer.PlayerScripts.Client.Controllers.Fishing.AutoFishing) end)
 pcall(function() CatchMinigameCtrl = require(LocalPlayer.PlayerScripts.Client.Controllers.ThrowCinematic.CatchMinigame) end)
 pcall(function() FishingCtrl = require(LocalPlayer.PlayerScripts.Client.Controllers.Fishing) end)
@@ -1183,6 +1183,60 @@ function cleanupStrayFishModels()
 end
 
 -- ==================== 🚶 FREE MOVEMENT & UNFREEZE WATCHDOG ====================
+function resetCharacterAnimations()
+    pcall(function()
+        local RodAnimCtrl = ThrowCinematicCtrl and ThrowCinematicCtrl.Sub and ThrowCinematicCtrl.Sub.RodAnimations
+        if RodAnimCtrl then
+            pcall(function() RodAnimCtrl:Stop(0) end)
+            pcall(function() RodAnimCtrl:StopHold(0) end)
+        end
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        local animator = hum and hum:FindFirstChildOfClass("Animator")
+        if animator and not (FishingCtrl and FishingCtrl.Charging) and not (CatchMinigameCtrl and CatchMinigameCtrl.Fight) then
+            for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+                local name = track.Name:lower()
+                local anim = track.Animation
+                local animName = anim and anim.Name:lower() or ""
+                if name:find("rod") or name:find("fish") or name:find("throw") or name:find("cast") or name:find("hold") or name:find("reel") or
+                   animName:find("rod") or animName:find("fish") or animName:find("throw") or animName:find("cast") or animName:find("hold") or animName:find("reel") or
+                   track.Priority == Enum.AnimationPriority.Action or track.Priority == Enum.AnimationPriority.Action2 or track.Priority == Enum.AnimationPriority.Action3 or track.Priority == Enum.AnimationPriority.Action4 then
+                    pcall(function() track:Stop(0.1) end)
+                end
+            end
+        end
+    end)
+end
+
+-- Перехват CharacterLock & Character.Freeze чтобы персонаж мог свободно крутиться на 360°
+pcall(function()
+    local charLockScript = LocalPlayer.PlayerScripts.Client.Controllers.ThrowCinematic:FindFirstChild("CharacterLock")
+    if charLockScript then
+        local CharLock = require(charLockScript)
+        if CharLock then
+            local rawLock = CharLock.Lock
+            CharLock.Lock = function(self)
+                if freeWalkEnabled then return end
+                return rawLock(self)
+            end
+        end
+    end
+end)
+
+pcall(function()
+    local charScript = LocalPlayer.PlayerScripts.Client.Controllers:FindFirstChild("Character")
+    if charScript then
+        local CharCtrl = require(charScript)
+        if CharCtrl then
+            local rawFreeze = CharCtrl.Freeze
+            CharCtrl.Freeze = function(self, ...)
+                if freeWalkEnabled then return end
+                return rawFreeze(self, ...)
+            end
+        end
+    end
+end)
+
 function forceEnableControls()
     pcall(function()
         local playerScripts = LocalPlayer:FindFirstChild("PlayerScripts")
@@ -1237,8 +1291,11 @@ function unfreezeCharacter()
             end
         end
 
-        -- 2. Восстанавливаем WalkSpeed и состояние гуманоида
+        -- 2. Восстанавливаем WalkSpeed, AutoRotate (вращение) и состояние гуманоида
         if hum then
+            if not hum.AutoRotate then
+                hum.AutoRotate = true
+            end
             if hum.WalkSpeed <= 0 then
                 hum.WalkSpeed = (currentWalkSpeed and currentWalkSpeed > 0) and currentWalkSpeed or 16
             end
@@ -1247,6 +1304,13 @@ function unfreezeCharacter()
             end
             if hum.Sit and not (char:FindFirstChildOfClass("VehicleSeat") or (char.Parent and char.Parent:FindFirstChildOfClass("VehicleSeat"))) then
                 hum.Sit = false
+            end
+        end
+        if hrp then
+            for _, c in ipairs(hrp:GetChildren()) do
+                if (c:IsA("BodyGyro") or c:IsA("AlignOrientation")) and c.Name ~= "FlyGyro" and c.Name ~= "WaterWalkGyro" then
+                    pcall(function() c:Destroy() end)
+                end
             end
         end
 
@@ -1260,12 +1324,8 @@ function unfreezeCharacter()
             cam.CameraSubject = hum
         end
 
-        -- 5. Останавливаем зависшие анимации заброса/стойки если заброс не идет
-        if hum and hum:FindFirstChild("Animator") and not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) and not (CatchMinigameCtrl and CatchMinigameCtrl.Fight) then
-            for _, t in ipairs(hum.Animator:GetPlayingAnimationTracks()) do
-                pcall(function() t:Stop() end)
-            end
-        end
+        -- 5. Сбрасываем все зависшие анимации стойки/вылова удочки
+        resetCharacterAnimations()
 
         -- 6. Гарантированно берем удочку в руки
         equipRod()
@@ -1754,6 +1814,9 @@ if FishSchoolCtrl then
                 end
             end)
 
+            -- Мгновенный сброс анимации персонажа сразу после вылавливания
+            task.defer(resetCharacterAnimations)
+
             if notifyCatchValue then
                 local bestTxt = bestName and (locText(" | Best: ", " | Топ: ") .. bestName) or ""
                 showNotification(
@@ -1969,7 +2032,7 @@ RunService.Heartbeat:Connect(function()
         ThrowCinematicCtrl.DiveDuration = 0.12
     end
 
-    -- 🚶 Свободный ход во время и после заброса (Анти-заморозка)
+    -- 🚶 Свободный ход и свободный поворот (Анти-заморозка + 360° вращение)
     if freeWalkEnabled then
         forceEnableControls()
         local char = LocalPlayer.Character
@@ -1978,13 +2041,27 @@ RunService.Heartbeat:Connect(function()
         if hrp and hrp.Anchored and not (waterPlatform and waterPlatform.Parent and math.abs(hrp.Position.Y - waterPlatform.Position.Y) < 4) then
             hrp.Anchored = false
         end
+        if hrp then
+            for _, c in ipairs(hrp:GetChildren()) do
+                if (c:IsA("BodyGyro") or c:IsA("AlignOrientation")) and c.Name ~= "FlyGyro" and c.Name ~= "WaterWalkGyro" then
+                    pcall(function() c:Destroy() end)
+                end
+            end
+        end
         if hum then
+            if not hum.AutoRotate then
+                hum.AutoRotate = true
+            end
             if hum.WalkSpeed <= 0 then
                 hum.WalkSpeed = (currentWalkSpeed and currentWalkSpeed > 0) and currentWalkSpeed or 16
             end
             if hum.PlatformStand then
                 hum.PlatformStand = false
             end
+        end
+        -- Постоянный сброс застрявших анимаций вылова вне заброса
+        if not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) and not (CatchMinigameCtrl and CatchMinigameCtrl.Fight) and not (FishingCtrl and FishingCtrl.Charging) then
+            resetCharacterAnimations()
         end
     end
 
