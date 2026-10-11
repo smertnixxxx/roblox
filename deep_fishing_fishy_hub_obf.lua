@@ -939,6 +939,7 @@ local function sellFishNow()
         end)
 
         isSelling = false
+        unfreezeCharacter()
 
         if success and result then
             local count = (type(result) == "table" and (result.Amount or result.Count)) or nil
@@ -1162,17 +1163,18 @@ local function cleanupStrayFishModels()
             end
         end
         -- 2. Сканируем Workspace на брошенные 3D-модели рыбы вне активного заброса
-        if not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) and not (CatchMinigameCtrl and CatchMinigameCtrl:IsActive()) then
+        if not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) and not (CatchMinigameCtrl and CatchMinigameCtrl.Fight) then
             for _, m in ipairs(workspace:GetChildren()) do
-                if m:IsA("Model") and (
-                    m:FindFirstChild("Fish") or
-                    m:FindFirstChild("BaitAttachment") or
-                    m:FindFirstChild("FishESP") or
-                    m:FindFirstChild("FishInfoTag") or
-                    m:GetAttribute("Fish") or
-                    (m.PrimaryPart and m.PrimaryPart:FindFirstChild("BaitAttachment"))
-                ) then
-                    pcall(function() m:Destroy() end)
+                if m:IsA("Model") and not m:FindFirstChildOfClass("Humanoid") then
+                    if m:FindFirstChild("Fish") or
+                       m:FindFirstChild("BaitAttachment") or
+                       m:FindFirstChild("FishESP") or
+                       m:FindFirstChild("FishInfoTag") or
+                       m:GetAttribute("Fish") or
+                       (m.PrimaryPart and m.PrimaryPart:FindFirstChild("BaitAttachment")) or
+                       (FishConfig and FishConfig.Items and FishConfig.Items[m.Name]) then
+                        pcall(function() m:Destroy() end)
+                    end
                 end
             end
         end
@@ -1180,6 +1182,43 @@ local function cleanupStrayFishModels()
 end
 
 -- ==================== 🚶 FREE MOVEMENT & UNFREEZE WATCHDOG ====================
+local function forceEnableControls()
+    pcall(function()
+        local playerScripts = LocalPlayer:FindFirstChild("PlayerScripts")
+        local playerModuleObj = playerScripts and playerScripts:FindFirstChild("PlayerModule")
+        if playerModuleObj then
+            local PlayerModule = require(playerModuleObj)
+            local Controls = PlayerModule and PlayerModule:GetControls()
+            if Controls then
+                Controls:Enable(true)
+                local active = Controls:GetActiveController()
+                if active then
+                    active.enabled = true
+                    if not active._fishyHooked then
+                        active._fishyHooked = true
+                        active.Disable = function(self, ...)
+                            if freeWalkEnabled then return end
+                        end
+                    end
+                end
+                if not Controls._fishyHooked then
+                    Controls._fishyHooked = true
+                    local oldDisable = Controls.Disable
+                    Controls.Disable = function(self, ...)
+                        if freeWalkEnabled then return end
+                        return oldDisable(self, ...)
+                    end
+                end
+            end
+        end
+        if not (CatchMinigameCtrl and CatchMinigameCtrl.Fight) then
+            pcall(function()
+                game:GetService("ContextActionService"):UnbindAction("CatchFightMash")
+            end)
+        end
+    end)
+end
+
 local function unfreezeCharacter()
     pcall(function()
         local char = LocalPlayer.Character
@@ -1210,16 +1249,8 @@ local function unfreezeCharacter()
             end
         end
 
-        -- 3. Восстанавливаем PlayerModule Controls (WASD)
-        local playerScripts = LocalPlayer:FindFirstChild("PlayerScripts")
-        local playerModuleObj = playerScripts and playerScripts:FindFirstChild("PlayerModule")
-        if playerModuleObj then
-            local PlayerModule = require(playerModuleObj)
-            local Controls = PlayerModule and PlayerModule:GetControls()
-            if Controls and Controls.Enable then
-                Controls:Enable()
-            end
-        end
+        -- 3. Восстанавливаем PlayerModule Controls (WASD) и активный контроллер
+        forceEnableControls()
 
         -- 4. Восстанавливаем камеру если она застряла в Scriptable
         local cam = workspace.CurrentCamera
@@ -1243,28 +1274,8 @@ local function unfreezeCharacter()
     end)
 end
 
--- Перехватываем попытки игры заглушить WASD управление
-pcall(function()
-    local playerScripts = LocalPlayer:WaitForChild("PlayerScripts", 5)
-    local playerModuleObj = playerScripts and playerScripts:FindFirstChild("PlayerModule")
-    if playerModuleObj then
-        local PlayerModule = require(playerModuleObj)
-        local Controls = PlayerModule and PlayerModule:GetControls()
-        if Controls then
-            Controls:Enable()
-            if not Controls._fishyHooked then
-                Controls._fishyHooked = true
-                local oldDisable = Controls.Disable
-                Controls.Disable = function(self, ...)
-                    if freeWalkEnabled then
-                        return -- Не даем игре выключать управление во время заброса!
-                    end
-                    return oldDisable(self, ...)
-                end
-            end
-        end
-    end
-end)
+-- Мгновенная инициализация перехвата управления
+forceEnableControls()
 
 LocalPlayer.CharacterAdded:Connect(function()
     task.wait(0.5)
@@ -1733,6 +1744,15 @@ if FishSchoolCtrl then
             sessionMoneyEarned = sessionMoneyEarned + totalValue
             if updateStatsHud then updateStatsHud() end
 
+            -- Автоудаление 3D-моделей пойманной рыбы чтобы не зависали в воздухе/воде
+            task.delay(0.35, function()
+                for _, f in ipairs(caught) do
+                    if f.model and f.model.Parent then
+                        pcall(function() f.model:Destroy() end)
+                    end
+                end
+            end)
+
             if notifyCatchValue then
                 local bestTxt = bestName and (locText(" | Best: ", " | Топ: ") .. bestName) or ""
                 showNotification(
@@ -1950,6 +1970,7 @@ RunService.Heartbeat:Connect(function()
 
     -- 🚶 Свободный ход во время и после заброса (Анти-заморозка)
     if freeWalkEnabled then
+        forceEnableControls()
         local char = LocalPlayer.Character
         local hrp = char and char:FindFirstChild("HumanoidRootPart")
         local hum = char and char:FindFirstChildOfClass("Humanoid")
