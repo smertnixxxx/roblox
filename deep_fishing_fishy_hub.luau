@@ -400,18 +400,43 @@ local rarityColors = {
 
 local CollectionService = game:GetService("CollectionService")
 
--- Форматирование чисел в валюту ($1.25M, $45.2K)
+-- Форматирование чисел в валюту ($1.25M, $45.2K, $6.36T, $1Qa, $1Qi)
+local moneySuffixes = {"", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"}
 local function formatMoney(val)
     if not val or val <= 0 then return "$0" end
-    if val >= 1000000000 then
-        return string.format("$%.2fB", val / 1000000000)
-    elseif val >= 1000000 then
-        return string.format("$%.2fM", val / 1000000)
-    elseif val >= 1000 then
-        return string.format("$%.1fK", val / 1000)
-    else
+    if val < 1000 then
         return string.format("$%d", math.floor(val))
     end
+    local exp = math.floor(math.log10(val) / 3)
+    if exp > #moneySuffixes - 1 then
+        exp = #moneySuffixes - 1
+    end
+    local num = val / (10 ^ (exp * 3))
+    if num >= 999.995 and exp < #moneySuffixes - 1 then
+        num = num / 1000
+        exp = exp + 1
+    end
+    return string.format("$%.2f%s", num, moneySuffixes[exp + 1])
+end
+
+-- 🌐 Двуязычная локализация скрипта (English дефолтный / Русский)
+local currentLanguage = "en"
+local locElements = {}
+
+local function registerLoc(element, enTitle, ruTitle, enDesc, ruDesc)
+    if not element then return end
+    table.insert(locElements, {
+        element = element,
+        enTitle = enTitle,
+        ruTitle = ruTitle,
+        enDesc = enDesc,
+        ruDesc = ruDesc,
+    })
+    return element
+end
+
+local function locText(enStr, ruStr)
+    return (currentLanguage == "ru") and ruStr or enStr
 end
 
 -- 📊 Экранный HUD и статистика AFK сессии (слева по центру экрана)
@@ -421,6 +446,8 @@ local hudTotalValue = nil
 local hudMpmValue = nil
 local hudMphValue = nil
 local hudSpeedValue = nil
+local hudHeaderTitleLabel = nil
+local hudRowTitles = {}
 local statsParagraph = nil
 
 local function createStatsHud()
@@ -480,17 +507,17 @@ local function createStatsHud()
     headerIcon.ImageColor3 = Color3.fromRGB(220, 225, 235)
     headerIcon.Parent = frame
 
-    local headerTitle = Instance.new("TextLabel")
-    headerTitle.Name = "HeaderTitle"
-    headerTitle.Size = UDim2.new(0, 80, 0, 20)
-    headerTitle.Position = UDim2.new(0, 28, 0, 4)
-    headerTitle.BackgroundTransparency = 1
-    headerTitle.Text = "AFK STATS"
-    headerTitle.Font = Enum.Font.GothamBold
-    headerTitle.TextSize = 10
-    headerTitle.TextColor3 = Color3.fromRGB(220, 225, 235)
-    headerTitle.TextXAlignment = Enum.TextXAlignment.Left
-    headerTitle.Parent = frame
+    hudHeaderTitleLabel = Instance.new("TextLabel")
+    hudHeaderTitleLabel.Name = "HeaderTitle"
+    hudHeaderTitleLabel.Size = UDim2.new(0, 105, 0, 20)
+    hudHeaderTitleLabel.Position = UDim2.new(0, 28, 0, 4)
+    hudHeaderTitleLabel.BackgroundTransparency = 1
+    hudHeaderTitleLabel.Text = (currentLanguage == "ru") and "AFK СТАТИСТИКА" or "AFK STATS"
+    hudHeaderTitleLabel.Font = Enum.Font.GothamBold
+    hudHeaderTitleLabel.TextSize = 10
+    hudHeaderTitleLabel.TextColor3 = Color3.fromRGB(220, 225, 235)
+    hudHeaderTitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    hudHeaderTitleLabel.Parent = frame
 
     -- Правая часть хедера: часы и время сессии
     local clockIcon = Instance.new("ImageLabel")
@@ -525,7 +552,7 @@ local function createStatsHud()
     divider.Parent = frame
 
     -- Конструктор строк статистики (монохромная иконка + заголовок + белое значение справа)
-    local function createHudRow(yPos, iconAsset, labelText)
+    local function createHudRow(yPos, iconAsset, key, defaultLabel)
         local rowIcon = Instance.new("ImageLabel")
         rowIcon.Size = UDim2.new(0, 13, 0, 13)
         rowIcon.Position = UDim2.new(0, 12, 0, yPos + 3)
@@ -538,12 +565,13 @@ local function createStatsHud()
         rowTitle.Size = UDim2.new(0, 85, 0, 20)
         rowTitle.Position = UDim2.new(0, 30, 0, yPos)
         rowTitle.BackgroundTransparency = 1
-        rowTitle.Text = labelText
+        rowTitle.Text = defaultLabel
         rowTitle.Font = Enum.Font.GothamMedium
         rowTitle.TextSize = 11
         rowTitle.TextColor3 = Color3.fromRGB(160, 165, 180)
         rowTitle.TextXAlignment = Enum.TextXAlignment.Left
         rowTitle.Parent = frame
+        hudRowTitles[key] = rowTitle
 
         local rowValue = Instance.new("TextLabel")
         rowValue.Size = UDim2.new(1, -125, 0, 20)
@@ -560,19 +588,19 @@ local function createStatsHud()
     end
 
     -- Строка 1: Всего заработано монет и рыб
-    hudTotalValue = createHudRow(30, "rbxassetid://116510979641930", "Total Earned")
+    hudTotalValue = createHudRow(30, "rbxassetid://116510979641930", "total", (currentLanguage == "ru") and "Всего доход" or "Total Earned")
     hudTotalValue.Text = "$0 (0 fish)"
 
     -- Строка 2: Доход в минуту
-    hudMpmValue = createHudRow(54, "rbxassetid://130551565616516", "Money / Min")
+    hudMpmValue = createHudRow(54, "rbxassetid://130551565616516", "mpm", (currentLanguage == "ru") and "Доход / Мин" or "Money / Min")
     hudMpmValue.Text = "$0/m"
 
     -- Строка 3: Доход в час
-    hudMphValue = createHudRow(78, "rbxassetid://81819858538839", "Money / Hour")
+    hudMphValue = createHudRow(78, "rbxassetid://81819858538839", "mph", (currentLanguage == "ru") and "Доход / Час" or "Money / Hour")
     hudMphValue.Text = "$0/h"
 
     -- Строка 4: Скорость вылова в минуту
-    hudSpeedValue = createHudRow(102, "rbxassetid://124360663785796", "Catch Rate")
+    hudSpeedValue = createHudRow(102, "rbxassetid://124360663785796", "speed", (currentLanguage == "ru") and "Темп вылова" or "Catch Rate")
     hudSpeedValue.Text = "0.0 / min"
 
     ensureGuiLayering()
@@ -594,33 +622,83 @@ local function updateStatsHud()
         cpm = (sessionFishCaught / elapsed) * 60
     end
 
+    local isRu = (currentLanguage == "ru")
     if statsParagraph and statsParagraph.SetDesc then
-        statsParagraph:SetDesc(string.format(
-            "Поймано: %d шт. | Выручка: %s\nMoney / Min: %s/m | Money / Hour: %s/h\nВремя сессии: %s | Скорость: %.1f рыб/мин",
-            sessionFishCaught,
-            formatMoney(sessionMoneyEarned),
-            formatMoney(mpm),
-            formatMoney(mph),
-            timeStr,
-            cpm
-        ))
+        if isRu then
+            statsParagraph:SetDesc(string.format(
+                "Поймано: %d шт. | Общая выручка: %s\nДоход / Мин: %s/мин | Доход / Час: %s/час\nВремя сессии: %s | Скорость: %.1f / мин",
+                sessionFishCaught,
+                formatMoney(sessionMoneyEarned),
+                formatMoney(mpm),
+                formatMoney(mph),
+                timeStr,
+                cpm
+            ))
+        else
+            statsParagraph:SetDesc(string.format(
+                "Fish Caught: %d | Total Revenue: %s\nMoney / Min: %s/m | Money / Hour: %s/h\nSession Time: %s | Catch Rate: %.1f / min",
+                sessionFishCaught,
+                formatMoney(sessionMoneyEarned),
+                formatMoney(mpm),
+                formatMoney(mph),
+                timeStr,
+                cpm
+            ))
+        end
     end
 
     if hudTimeLabel then
         hudTimeLabel.Text = timeStr
     end
     if hudTotalValue then
-        hudTotalValue.Text = string.format("%s (%d fish)", formatMoney(sessionMoneyEarned), sessionFishCaught)
+        hudTotalValue.Text = string.format(isRu and "%s (%d рыб)" or "%s (%d fish)", formatMoney(sessionMoneyEarned), sessionFishCaught)
     end
     if hudMpmValue then
-        hudMpmValue.Text = string.format("%s/m", formatMoney(mpm))
+        hudMpmValue.Text = string.format(isRu and "%s/мин" or "%s/m", formatMoney(mpm))
     end
     if hudMphValue then
-        hudMphValue.Text = string.format("%s/h", formatMoney(mph))
+        hudMphValue.Text = string.format(isRu and "%s/час" or "%s/h", formatMoney(mph))
     end
     if hudSpeedValue then
-        hudSpeedValue.Text = string.format("%.1f / min", cpm)
+        hudSpeedValue.Text = string.format(isRu and "%.1f / мин" or "%.1f / min", cpm)
     end
+end
+
+local function setScriptLanguage(lang)
+    currentLanguage = lang
+    local isRu = (lang == "ru")
+    if hudHeaderTitleLabel then
+        hudHeaderTitleLabel.Text = isRu and "AFK СТАТИСТИКА" or "AFK STATS"
+    end
+    if hudRowTitles.total then
+        hudRowTitles.total.Text = isRu and "Всего доход" or "Total Earned"
+    end
+    if hudRowTitles.mpm then
+        hudRowTitles.mpm.Text = isRu and "Доход / Мин" or "Money / Min"
+    end
+    if hudRowTitles.mph then
+        hudRowTitles.mph.Text = isRu and "Доход / Час" or "Money / Hour"
+    end
+    if hudRowTitles.speed then
+        hudRowTitles.speed.Text = isRu and "Темп вылова" or "Catch Rate"
+    end
+    if updateStatsHud then
+        updateStatsHud()
+    end
+    for _, item in ipairs(locElements) do
+        pcall(function()
+            if item.element then
+                local title = isRu and item.ruTitle or item.enTitle
+                local desc = isRu and item.ruDesc or item.enDesc
+                if title and item.element.SetTitle then item.element:SetTitle(title) end
+                if desc and item.element.SetDesc then item.element:SetDesc(desc) end
+            end
+        end)
+    end
+    showNotification(
+        isRu and "Язык" or "Language",
+        isRu and "Установлен русский язык интерфейса" or "Interface language set to English"
+    )
 end
 
 createStatsHud()
@@ -836,11 +914,11 @@ local function sellFishNow()
             local count = (type(result) == "table" and (result.Amount or result.Count)) or nil
             local val = (type(result) == "table" and (result.Value or result.Money or result.Price)) or nil
             if count and count > 0 then
-                showNotification("💰 Auto-Sell", string.format("Продано: %d рыб за %s", count, formatMoney(val or 0)))
+                showNotification("💰 Auto-Sell", string.format(locText("Sold: %d fish for %s", "Продано: %d рыб за %s"), count, formatMoney(val or 0)))
             elseif type(result) == "number" and result > 0 then
-                showNotification("💰 Auto-Sell", string.format("Выручка: %s", formatMoney(result)))
+                showNotification("💰 Auto-Sell", string.format(locText("Revenue: %s", "Выручка: %s"), formatMoney(result)))
             else
-                showNotification("💰 Auto-Sell", "Рыба успешно продана торговцу!")
+                showNotification("💰 Auto-Sell", locText("Fish successfully sold to merchant!", "Рыба успешно продана торговцу!"))
             end
         end
     end)
@@ -1472,8 +1550,11 @@ if FishSchoolCtrl then
             if updateStatsHud then updateStatsHud() end
 
             if notifyCatchValue then
-                local bestTxt = bestName and (" | Топ: " .. bestName) or ""
-                showNotification("🎣 Заброс завершён!", string.format("Поймано: %d шт. | Выручка: %s%s", count, formatMoney(totalValue), bestTxt))
+                local bestTxt = bestName and (locText(" | Best: ", " | Топ: ") .. bestName) or ""
+                showNotification(
+                    locText("🎣 Cast Complete!", "🎣 Заброс завершён!"),
+                    string.format(locText("Caught: %d fish | Revenue: %s%s", "Поймано: %d шт. | Выручка: %s%s"), count, formatMoney(totalValue), bestTxt)
+                )
             end
             
             -- Ждем полного завершения анимаций сбора рыбы и синематика заброса
@@ -1960,24 +2041,24 @@ statsParagraph = TabFishing:Paragraph({
 
 TabFishing:Button({
     Title = "🔄 Refresh Session Statistics",
-    Desc = "Обновить показатели вылова, выручки и времени фарма",
+    Desc = "Recalculate fish count, revenue, and AFK farm rates",
     Icon = "activity",
     Callback = function()
         updateStatsHud()
-        showNotification("Stats", string.format("Выловлено: %d шт. | Доход: %s", sessionFishCaught, formatMoney(sessionMoneyEarned)))
+        showNotification("Stats", string.format(locText("Caught: %d | Revenue: %s", "Выловлено: %d шт. | Доход: %s"), sessionFishCaught, formatMoney(sessionMoneyEarned)))
     end
 })
 
 TabFishing:Toggle({
     Title = "Show On-Screen AFK HUD",
-    Desc = "Отображать плашку статистики слева по центру экрана поверх игры",
+    Desc = "Display floating session statistics HUD on screen",
     Value = hudEnabled,
     Callback = function(state)
         hudEnabled = state
         if statsHudGui then
             statsHudGui.Enabled = state
         end
-        showNotification("HUD", state and "Экранный виджет включен!" or "Экранный виджет скрыт")
+        showNotification("HUD", state and locText("On-screen HUD enabled!", "Экранный виджет включен!") or locText("On-screen HUD hidden", "Экранный виджет скрыт"))
     end
 })
 
@@ -2365,40 +2446,40 @@ TabBoost:Section({ Title = "Extreme FPS Booster & Optimization" })
 
 TabBoost:Toggle({
     Title = "Ultra FPS Boost",
-    Desc = "Отключает волны воды, траву, глобальные тени и пост-эффекты",
+    Desc = "Disable water waves, grass, global shadows and post-effects",
     Value = fpsBoostEnabled,
     Callback = function(state)
         fpsBoostEnabled = state
         applyFpsBoost(state)
-        showNotification("FPS Boost", state and "Оптимизация включена: лаги убраны!" or "Оптимизация отключена")
+        showNotification("FPS Boost", state and locText("Optimization enabled: lags reduced!", "Оптимизация включена: лаги убраны!") or locText("Optimization disabled", "Оптимизация отключена"))
     end
 })
 
 TabBoost:Toggle({
     Title = "Potato PC (No Textures & Smooth Plastic)",
-    Desc = "Превращает блоки в пластик и убирает текстуры для максимального FPS",
+    Desc = "Convert parts to smooth plastic and remove textures for maximum FPS",
     Value = potatoGfxEnabled,
     Callback = function(state)
         potatoGfxEnabled = state
         applyPotatoGfx(state)
-        showNotification("Potato PC", state and "Включено: текстуры убраны, FPS увеличен!" or "Текстуры возвращены")
+        showNotification("Potato PC", state and locText("Textures removed, FPS boosted!", "Включено: текстуры убраны, FPS увеличен!") or locText("Textures restored", "Текстуры возвращены"))
     end
 })
 
 TabBoost:Toggle({
     Title = "Remove Fog & Atmosphere (Clear Horizon)",
-    Desc = "Убирает дымку лавы и туман, даёт кристальную видимость горизонта",
+    Desc = "Remove lava haze and fog for crystal clear horizon",
     Value = clearFogEnabled,
     Callback = function(state)
         clearFogEnabled = state
         applyClearFog(state)
-        showNotification("Clear View", state and "Включено: дымка и туман убраны!" or "Туман возвращен")
+        showNotification("Clear View", state and locText("Fog and atmosphere removed!", "Включено: дымка и туман убраны!") or locText("Fog restored", "Туман возвращен"))
     end
 })
 
 TabBoost:Toggle({
     Title = "Unlock FPS Cap (Max 999 FPS)",
-    Desc = "Снимает лимит 60 кадров Роблокса",
+    Desc = "Remove Roblox 60 FPS cap",
     Value = unlockFpsEnabled,
     Callback = function(state)
         unlockFpsEnabled = state
@@ -2408,18 +2489,18 @@ TabBoost:Toggle({
 
 TabBoost:Toggle({
     Title = "GPU 0% Potato AFK (Disable 3D Rendering)",
-    Desc = "Полностью отключает 3D рендер экрана для экономии видеокарты и кулера во время ночного фарма",
+    Desc = "Completely disable 3D rendering to save GPU temperature during AFK",
     Value = false,
     Callback = function(state)
         setGpuAfkMode(state)
         ensureGuiLayering()
-        showNotification("GPU 0% AFK", state and "3D рендер выключен! GPU холодная." or "3D рендер включен обратно.")
+        showNotification("GPU 0% AFK", state and locText("3D rendering disabled! GPU is cold.", "3D рендер выключен! GPU холодная.") or locText("3D rendering restored.", "3D рендер включен обратно."))
     end
 })
 
 TabBoost:Colorpicker({
     Title = "GPU AFK Screen Color (RGB Palette)",
-    Desc = "Выберите цвет фона экрана при выключенном 3D рендере",
+    Desc = "Choose backdrop color when 3D rendering is disabled",
     Default = gpuScreenColor,
     Callback = function(color)
         gpuScreenColor = color
@@ -2776,21 +2857,21 @@ TabPlayer:Toggle({
 
 TabPlayer:Toggle({
     Title = "Walk On Water (Jesus Mode)",
-    Desc = "Позволяет ходить по воде как по суше без плавания и закидывать удочку прямо посреди океана",
+    Desc = "Walk across ocean and water surfaces without swimming",
     Value = waterWalkEnabled,
     Callback = function(state)
         waterWalkEnabled = state
-        showNotification("Water Walk", state and "Хождение по воде включено!" or "Хождение по воде выключено")
+        showNotification("Water Walk", state and locText("Walk on water enabled!", "Хождение по воде включено!") or locText("Walk on water disabled", "Хождение по воде выключено"))
     end
 })
 
 TabPlayer:Toggle({
     Title = "Fly Mode (WASD Flight)",
-    Desc = "Свободный полёт в воздухе (W/A/S/D + Пробел для подъема, Shift для спуска)",
+    Desc = "Freely fly in air (WASD + Space to ascend, Shift to descend)",
     Value = flyEnabled,
     Callback = function(state)
         flyEnabled = state
-        showNotification("Fly", state and "Полёт активирован!" or "Полёт отключен")
+        showNotification("Fly", state and locText("Flight mode activated!", "Полёт активирован!") or locText("Flight mode disabled", "Полёт отключен"))
     end
 })
 
@@ -2825,6 +2906,19 @@ local TabSettings = Window:Tab({
     Title = "Settings",
     Icon = "settings"
 })
+
+TabSettings:Section({ Title = "Language & Interface" })
+
+local langDropdown = TabSettings:Dropdown({
+    Title = "Interface Language",
+    Desc = "Select script language (Default: English / Русский)",
+    Values = { "English", "Русский" },
+    Value = "English",
+    Callback = function(choice)
+        setScriptLanguage(choice == "Русский" and "ru" or "en")
+    end
+})
+registerLoc(langDropdown, "Interface Language", "Язык интерфейса", "Select script language (Default: English / Русский)", "Выберите язык скрипта (По умолчанию: English / Русский)")
 
 TabSettings:Section({ Title = "Interface Appearance & Themes" })
 
@@ -2942,7 +3036,7 @@ TabSettings:Button({
                 end
             end
         end)
-        showNotification("Codes", string.format("Проверено промокодов: %d шт. Проверьте баланс!", redeemed))
+        showNotification("Codes", string.format(locText("Checked %d promo codes. Check balance!", "Проверено промокодов: %d шт. Проверьте баланс!"), redeemed))
     end
 })
 
@@ -2955,4 +3049,4 @@ pcall(function()
     end)
 end)
 
-showNotification("Fishy Hub Modern UI", "Готово! WindUI загружен с поддержкой акрила и 15 тем.")
+showNotification("Fishy Hub Modern UI", locText("Ready! WindUI loaded with Acrylic & 15 themes.", "Готово! WindUI загружен с поддержкой акрила и 15 тем."))
