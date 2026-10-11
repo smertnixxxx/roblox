@@ -1,5 +1,10 @@
 -- [[ Deep Fishing - Fishy Hub v6.3 (Full Capacity + Item Collector + Landing Predictor) ]] --
 -- Совместимо с Real Executor
+pcall(function()
+    if setthreadidentity then setthreadidentity(8) end
+    if setidentity then setidentity(8) end
+end)
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -33,18 +38,32 @@ getgenv()._FishyHubCleanup = function()
             if ph then ph:Destroy() end
         end
     end)
+    pcall(function()
+        if gethui then
+            for _, g in ipairs(gethui():GetChildren()) do
+                if g.Name:find("WindUI") or g.Name:find("Fishy") then
+                    g:Destroy()
+                end
+            end
+        end
+        for _, g in ipairs(game:GetService("CoreGui"):GetChildren()) do
+            if g.Name:find("WindUI") or g.Name:find("Fishy") then
+                g:Destroy()
+            end
+        end
+    end)
 end
 
 pcall(function()
     local cg = game:GetService("CoreGui")
     for _, g in ipairs(cg:GetChildren()) do
-        if g.Name:find("Fishy Hub") or g.Name == "FishyStatsHUD" or g.Name == "FishyGpuAfkScreen" then
+        if g.Name:find("Fishy") or g.Name:find("WindUI") or g.Name == "FishyStatsHUD" or g.Name == "FishyGpuAfkScreen" then
             g:Destroy()
         end
     end
     if gethui then
         for _, g in ipairs(gethui():GetChildren()) do
-            if g.Name:find("Fishy Hub") or g.Name == "FishyStatsHUD" or g.Name == "FishyGpuAfkScreen" then
+            if g.Name:find("Fishy") or g.Name:find("WindUI") or g.Name == "FishyStatsHUD" or g.Name == "FishyGpuAfkScreen" then
                 g:Destroy()
             end
         end
@@ -1127,6 +1146,35 @@ local function buyUpgrade(statName)
     end)
 end
 
+-- ==================== 🧹 AUTO-CLEANUP STRAY & FROZEN FISH MODELS ====================
+local function cleanupStrayFishModels()
+    pcall(function()
+        -- 1. Очищаем все модели в косяке (включая помеченные taken)
+        if FishSchoolCtrl and FishSchoolCtrl.Fish then
+            for _, f in ipairs(FishSchoolCtrl.Fish) do
+                if f.model and f.model.Parent then
+                    pcall(function() f.model:Destroy() end)
+                end
+            end
+        end
+        -- 2. Сканируем Workspace на брошенные 3D-модели рыбы вне активного заброса
+        if not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) and not (CatchMinigameCtrl and CatchMinigameCtrl:IsActive()) then
+            for _, m in ipairs(workspace:GetChildren()) do
+                if m:IsA("Model") and (
+                    m:FindFirstChild("Fish") or
+                    m:FindFirstChild("BaitAttachment") or
+                    m:FindFirstChild("FishESP") or
+                    m:FindFirstChild("FishInfoTag") or
+                    m:GetAttribute("Fish") or
+                    (m.PrimaryPart and m.PrimaryPart:FindFirstChild("BaitAttachment"))
+                ) then
+                    pcall(function() m:Destroy() end)
+                end
+            end
+        end
+    end)
+end
+
 -- ==================== 🚶 FREE MOVEMENT & UNFREEZE WATCHDOG ====================
 local function unfreezeCharacter()
     pcall(function()
@@ -1176,12 +1224,8 @@ local function unfreezeCharacter()
             cam.CameraSubject = hum
         end
 
-        -- 5. Если заброс завершен, но в мире остались старые зависшие 3D-модели рыбы — очищаем их
-        if not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) and not (CatchMinigameCtrl and CatchMinigameCtrl:IsActive()) then
-            if FishSchoolCtrl and FishSchoolCtrl.Despawn then
-                pcall(function() FishSchoolCtrl:Despawn() end)
-            end
-        end
+        -- 5. Автоудаление любой зависшей/дохлой рыбы
+        cleanupStrayFishModels()
     end)
 end
 
@@ -1435,6 +1479,19 @@ if FishSchoolCtrl then
             return
         end
         return rawTryGrab(self, point)
+    end
+
+    FishSchoolCtrl._rawDespawn = FishSchoolCtrl._rawDespawn or FishSchoolCtrl.Despawn
+    local rawDespawn = FishSchoolCtrl._rawDespawn
+    FishSchoolCtrl.Despawn = function(self)
+        if self.Fish then
+            for _, f in ipairs(self.Fish) do
+                if f.model and f.model.Parent then
+                    pcall(function() f.model:Destroy() end)
+                end
+            end
+        end
+        return rawDespawn(self)
     end
 end
 
@@ -1691,18 +1748,8 @@ if FishSchoolCtrl then
                     task.wait(0.05)
                 end
                 
-                -- Очищаем зависшие 3D-модели рыбы с пирса
-                if ThrowCinematicCtrl and ThrowCinematicCtrl.Active then
-                    pcall(function()
-                        if ThrowCinematicCtrl.Cleanup then
-                            ThrowCinematicCtrl:Cleanup()
-                        end
-                    end)
-                    ThrowCinematicCtrl.Active = false
-                end
-                if FishSchoolCtrl and FishSchoolCtrl.Despawn then
-                    pcall(function() FishSchoolCtrl:Despawn() end)
-                end
+                -- Очищаем абсолютно ВСЕ зависшие 3D-модели рыбы с пирса
+                cleanupStrayFishModels()
                 unfreezeCharacter()
 
                 task.wait(0.2)
@@ -1725,11 +1772,11 @@ if ThrowCinematicCtrl then
     local rawOnServerStarted = ThrowCinematicCtrl._rawOnServerStarted
     ThrowCinematicCtrl.OnServerStarted = function(self, a2, ...)
         if fastArcEnabled and type(a2) == "table" then
-            a2.arcDuration = 0.05
+            a2.arcDuration = 0.28
             if a2.bounces then
                 for _, b in ipairs(a2.bounces) do
-                    b.duration = 0.02
-                    b.Duration = 0.02
+                    b.duration = 0.12
+                    b.Duration = 0.12
                 end
             end
         end
@@ -1741,11 +1788,11 @@ if ThrowCinematicCtrl then
     ThrowCinematicCtrl.BeginFlight = function(self, ...)
         rawBeginFlight(self, ...)
         if fastArcEnabled then
-            self.ArcDuration = 0.05
+            self.ArcDuration = 0.28
             if self.BounceList then
                 for _, b in ipairs(self.BounceList) do
-                    b.duration = 0.02
-                    b.Duration = 0.02
+                    b.duration = 0.12
+                    b.Duration = 0.12
                 end
             end
         end
@@ -1787,7 +1834,7 @@ if AutoFishingCtrl then
             return
         end
         if turboCastEnabled then
-            task.wait(0.06)
+            task.wait(0.35)
         else
             task.wait(0.8)
         end
@@ -1878,8 +1925,16 @@ if CatchMinigameCtrl then
     end
 end
 
--- 4. Heartbeat Loop: Full-Capacity Fast Reel, Entity Collector & Animation Skip
+local lastFishCleanup = 0
 RunService.Heartbeat:Connect(function()
+    local now = os.clock()
+    if now - lastFishCleanup > 2.5 then
+        lastFishCleanup = now
+        if not (ThrowCinematicCtrl and ThrowCinematicCtrl.Active) and not (CatchMinigameCtrl and CatchMinigameCtrl:IsActive()) then
+            cleanupStrayFishModels()
+        end
+    end
+
     -- Активный сбор предметов и рыбы прямо в Heartbeat пока наживка в воде
     if instantCatchEnabled and ThrowCinematicCtrl and ThrowCinematicCtrl.Active and ThrowCinematicCtrl.Catchable and FishSchoolCtrl then
         if not (CatchMinigameCtrl and CatchMinigameCtrl:IsActive()) then
@@ -2112,10 +2167,27 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- ==================== MODERN WINDUI GUI SETUP (9 TABS) ====================
+-- ==================== MODERN WINDUI GUI SETUP (8 TABS) ====================
+local function createTab(win, opts)
+    pcall(function()
+        if setthreadidentity then setthreadidentity(8) end
+        if setidentity then setidentity(8) end
+    end)
+    local ok, res = pcall(function()
+        return win:Tab(opts)
+    end)
+    if ok and res then return res end
+    if opts and opts.Icon then
+        local copy = {}
+        for k, v in pairs(opts) do if k ~= "Icon" then copy[k] = v end end
+        local ok2, res2 = pcall(function() return win:Tab(copy) end)
+        if ok2 and res2 then return res2 end
+    end
+    return win:Tab(opts)
+end
 
 -- 1. 🎣 TAB: FISHING
-local TabFishing = Window:Tab({
+local TabFishing = createTab(Window, {
     Title = "Fishing",
     Icon = "fish-symbol"
 })
@@ -2267,7 +2339,7 @@ TabFishing:Toggle({
 
 
 -- 2. 💎 TAB: ITEMS
-local TabItems = Window:Tab({
+local TabItems = createTab(Window, {
     Title = "Items",
     Icon = "sparkles"
 })
@@ -2317,7 +2389,7 @@ TabItems:Button({ Title = "📜 Summon Scrolls & Ancient Relics", Desc = "Сви
 
 
 -- 3. 💰 TAB: ECONOMY
-local TabEconomy = Window:Tab({
+local TabEconomy = createTab(Window, {
     Title = "Economy",
     Icon = "dollar-sign"
 })
@@ -2485,7 +2557,7 @@ TabEconomy:Button({
 
 
 -- 4. 👁️ TAB: VISUALS
-local TabVisuals = Window:Tab({
+local TabVisuals = createTab(Window, {
     Title = "Visuals",
     Icon = "eye"
 })
@@ -2535,7 +2607,7 @@ TabVisuals:Toggle({
 
 
 -- 5. ⚡ TAB: PERFORMANCE & BOOST
-local TabBoost = Window:Tab({
+local TabBoost = createTab(Window, {
     Title = "Boost",
     Icon = "zap"
 })
@@ -2627,7 +2699,7 @@ TabBoost:Button({
 
 
 -- 6. 📍 TAB: TELEPORTS
-local TabTeleports = Window:Tab({
+local TabTeleports = createTab(Window, {
     Title = "Teleports",
     Icon = "compass"
 })
@@ -2912,7 +2984,7 @@ TabTeleports:Button({
 
 
 -- 7. 🏃 TAB: PLAYER
-local TabPlayer = Window:Tab({
+local TabPlayer = createTab(Window, {
     Title = "Player",
     Icon = "user"
 })
@@ -3011,7 +3083,7 @@ end)
 
 
 -- 8. ⚙️ TAB: SETTINGS & THEMES
-local TabSettings = Window:Tab({
+local TabSettings = createTab(Window, {
     Title = "Settings",
     Icon = "settings"
 })
