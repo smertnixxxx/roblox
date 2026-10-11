@@ -372,9 +372,10 @@ end
 -- 📊 Экранный HUD и статистика AFK сессии (слева по центру экрана)
 local hudEnabled = true
 local statsHudGui = nil
-local hudFishLabel = nil
-local hudMoneyLabel = nil
 local hudTimeLabel = nil
+local hudTotalLabel = nil
+local hudMpmLabel = nil
+local hudMphLabel = nil
 local hudSpeedLabel = nil
 local statsParagraph = nil
 
@@ -401,9 +402,9 @@ local function createStatsHud()
 
     local frame = Instance.new("Frame")
     frame.Name = "HudFrame"
-    frame.Size = UDim2.new(0, 195, 0, 118)
-    frame.Position = UDim2.new(0, 16, 0.5, -59) -- слева по центру экрана!
-    frame.BackgroundColor3 = Color3.fromRGB(14, 18, 25)
+    frame.Size = UDim2.new(0, 205, 0, 116)
+    frame.Position = UDim2.new(0, 16, 0.5, -58) -- слева по центру экрана
+    frame.BackgroundColor3 = Color3.fromRGB(16, 17, 23)
     frame.BackgroundTransparency = 0.22
     frame.BorderSizePixel = 0
     frame.Active = true
@@ -415,63 +416,89 @@ local function createStatsHud()
     corner.Parent = frame
 
     local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(0, 215, 255)
-    stroke.Transparency = 0.45
+    stroke.Color = Color3.fromRGB(48, 52, 68)
+    stroke.Transparency = 0.35
     stroke.Thickness = 1.2
     stroke.Parent = frame
 
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, -16, 0, 22)
-    title.Position = UDim2.new(0, 10, 0, 5)
-    title.BackgroundTransparency = 1
-    title.Text = "🐟 Fishy Farm HUD"
-    title.Font = Enum.Font.GothamBold
-    title.TextSize = 13
-    title.TextColor3 = Color3.fromRGB(0, 225, 255)
-    title.TextXAlignment = Enum.TextXAlignment.Left
-    title.Parent = frame
+    -- Хедер: зелёная точка + заголовок слева
+    local headerLeft = Instance.new("TextLabel")
+    headerLeft.Size = UDim2.new(0, 110, 0, 20)
+    headerLeft.Position = UDim2.new(0, 10, 0, 4)
+    headerLeft.BackgroundTransparency = 1
+    headerLeft.Text = "● AFK TRACKER"
+    headerLeft.Font = Enum.Font.GothamBold
+    headerLeft.TextSize = 10
+    headerLeft.TextColor3 = Color3.fromRGB(0, 220, 255)
+    headerLeft.TextXAlignment = Enum.TextXAlignment.Left
+    headerLeft.Parent = frame
 
-    hudFishLabel = Instance.new("TextLabel")
-    hudFishLabel.Size = UDim2.new(1, -16, 0, 18)
-    hudFishLabel.Position = UDim2.new(0, 10, 0, 28)
-    hudFishLabel.BackgroundTransparency = 1
-    hudFishLabel.Text = "🎣 Поймано: 0 шт."
-    hudFishLabel.Font = Enum.Font.GothamMedium
-    hudFishLabel.TextSize = 12
-    hudFishLabel.TextColor3 = Color3.fromRGB(245, 245, 245)
-    hudFishLabel.TextXAlignment = Enum.TextXAlignment.Left
-    hudFishLabel.Parent = frame
-
-    hudMoneyLabel = Instance.new("TextLabel")
-    hudMoneyLabel.Size = UDim2.new(1, -16, 0, 18)
-    hudMoneyLabel.Position = UDim2.new(0, 10, 0, 49)
-    hudMoneyLabel.BackgroundTransparency = 1
-    hudMoneyLabel.Text = "💰 Доход: $0"
-    hudMoneyLabel.Font = Enum.Font.GothamMedium
-    hudMoneyLabel.TextSize = 12
-    hudMoneyLabel.TextColor3 = Color3.fromRGB(105, 255, 135)
-    hudMoneyLabel.TextXAlignment = Enum.TextXAlignment.Left
-    hudMoneyLabel.Parent = frame
-
+    -- Таймер сессии справа в хедере
     hudTimeLabel = Instance.new("TextLabel")
-    hudTimeLabel.Size = UDim2.new(1, -16, 0, 18)
-    hudTimeLabel.Position = UDim2.new(0, 10, 0, 70)
+    hudTimeLabel.Size = UDim2.new(0, 75, 0, 20)
+    hudTimeLabel.Position = UDim2.new(1, -85, 0, 4)
     hudTimeLabel.BackgroundTransparency = 1
-    hudTimeLabel.Text = "⏱️ Время: 00:00:00"
-    hudTimeLabel.Font = Enum.Font.Gotham
+    hudTimeLabel.Text = "00:00:00"
+    hudTimeLabel.Font = Enum.Font.GothamMedium
     hudTimeLabel.TextSize = 11
-    hudTimeLabel.TextColor3 = Color3.fromRGB(190, 195, 205)
-    hudTimeLabel.TextXAlignment = Enum.TextXAlignment.Left
+    hudTimeLabel.TextColor3 = Color3.fromRGB(145, 150, 170)
+    hudTimeLabel.TextXAlignment = Enum.TextXAlignment.Right
     hudTimeLabel.Parent = frame
 
+    -- Тонкий разделитель
+    local divider = Instance.new("Frame")
+    divider.Size = UDim2.new(1, -20, 0, 1)
+    divider.Position = UDim2.new(0, 10, 0, 25)
+    divider.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    divider.BackgroundTransparency = 0.92
+    divider.BorderSizePixel = 0
+    divider.Parent = frame
+
+    -- Строка 1: Всего заработано и поймано рыб
+    hudTotalLabel = Instance.new("TextLabel")
+    hudTotalLabel.Size = UDim2.new(1, -20, 0, 18)
+    hudTotalLabel.Position = UDim2.new(0, 10, 0, 29)
+    hudTotalLabel.BackgroundTransparency = 1
+    hudTotalLabel.Text = "💰 Всего: $0 (0 рыб)"
+    hudTotalLabel.Font = Enum.Font.GothamMedium
+    hudTotalLabel.TextSize = 12
+    hudTotalLabel.TextColor3 = Color3.fromRGB(240, 240, 245)
+    hudTotalLabel.TextXAlignment = Enum.TextXAlignment.Left
+    hudTotalLabel.Parent = frame
+
+    -- Строка 2: Доход в минуту ($/min)
+    hudMpmLabel = Instance.new("TextLabel")
+    hudMpmLabel.Size = UDim2.new(1, -20, 0, 18)
+    hudMpmLabel.Position = UDim2.new(0, 10, 0, 49)
+    hudMpmLabel.BackgroundTransparency = 1
+    hudMpmLabel.Text = "⚡ $/мин: $0/m"
+    hudMpmLabel.Font = Enum.Font.GothamMedium
+    hudMpmLabel.TextSize = 12
+    hudMpmLabel.TextColor3 = Color3.fromRGB(105, 255, 140)
+    hudMpmLabel.TextXAlignment = Enum.TextXAlignment.Left
+    hudMpmLabel.Parent = frame
+
+    -- Строка 3: Доход в час ($/hour)
+    hudMphLabel = Instance.new("TextLabel")
+    hudMphLabel.Size = UDim2.new(1, -20, 0, 18)
+    hudMphLabel.Position = UDim2.new(0, 10, 0, 69)
+    hudMphLabel.BackgroundTransparency = 1
+    hudMphLabel.Text = "🚀 $/час: $0/h"
+    hudMphLabel.Font = Enum.Font.GothamMedium
+    hudMphLabel.TextSize = 12
+    hudMphLabel.TextColor3 = Color3.fromRGB(0, 220, 255)
+    hudMphLabel.TextXAlignment = Enum.TextXAlignment.Left
+    hudMphLabel.Parent = frame
+
+    -- Строка 4: Скорость вылова в минуту
     hudSpeedLabel = Instance.new("TextLabel")
-    hudSpeedLabel.Size = UDim2.new(1, -16, 0, 18)
-    hudSpeedLabel.Position = UDim2.new(0, 10, 0, 91)
+    hudSpeedLabel.Size = UDim2.new(1, -20, 0, 18)
+    hudSpeedLabel.Position = UDim2.new(0, 10, 0, 89)
     hudSpeedLabel.BackgroundTransparency = 1
-    hudSpeedLabel.Text = "📈 Скорость: 0.0 рыб/м"
+    hudSpeedLabel.Text = "📈 Темп: 0.0 рыб/мин"
     hudSpeedLabel.Font = Enum.Font.Gotham
     hudSpeedLabel.TextSize = 11
-    hudSpeedLabel.TextColor3 = Color3.fromRGB(190, 195, 205)
+    hudSpeedLabel.TextColor3 = Color3.fromRGB(180, 185, 200)
     hudSpeedLabel.TextXAlignment = Enum.TextXAlignment.Left
     hudSpeedLabel.Parent = frame
 end
@@ -482,23 +509,42 @@ local function updateStatsHud()
     local mins = math.floor((elapsed % 3600) / 60)
     local secs = math.floor(elapsed % 60)
     local timeStr = string.format("%02d:%02d:%02d", hrs, mins, secs)
-    local cpm = (elapsed > 0) and (sessionFishCaught / (elapsed / 60)) or 0
+
+    local mpm = 0
+    local mph = 0
+    local cpm = 0
+    if elapsed > 2 then
+        mpm = (sessionMoneyEarned / elapsed) * 60
+        mph = (sessionMoneyEarned / elapsed) * 3600
+        cpm = (sessionFishCaught / elapsed) * 60
+    end
 
     if statsParagraph and statsParagraph.SetDesc then
-        statsParagraph:SetDesc(string.format("🐟 Поймано: %d шт. | 💰 Выручка: %s\n⏱️ Время сессии: %s | 📈 Скорость: %.1f рыб/мин", sessionFishCaught, formatMoney(sessionMoneyEarned), timeStr, cpm))
+        statsParagraph:SetDesc(string.format(
+            "🐟 Поймано: %d шт. | 💰 Выручка: %s\n⚡ В минуту: %s/m | 🚀 В час: %s/h\n⏱️ Время сессии: %s | 📈 Темп: %.1f рыб/мин",
+            sessionFishCaught,
+            formatMoney(sessionMoneyEarned),
+            formatMoney(mpm),
+            formatMoney(mph),
+            timeStr,
+            cpm
+        ))
     end
 
-    if hudFishLabel then
-        hudFishLabel.Text = string.format("🎣 Поймано: %d шт.", sessionFishCaught)
-    end
-    if hudMoneyLabel then
-        hudMoneyLabel.Text = string.format("💰 Доход: %s", formatMoney(sessionMoneyEarned))
-    end
     if hudTimeLabel then
-        hudTimeLabel.Text = string.format("⏱️ Время: %s", timeStr)
+        hudTimeLabel.Text = timeStr
+    end
+    if hudTotalLabel then
+        hudTotalLabel.Text = string.format("💰 Всего: %s (%d рыб)", formatMoney(sessionMoneyEarned), sessionFishCaught)
+    end
+    if hudMpmLabel then
+        hudMpmLabel.Text = string.format("⚡ $/мин: %s/m", formatMoney(mpm))
+    end
+    if hudMphLabel then
+        hudMphLabel.Text = string.format("🚀 $/час: %s/h", formatMoney(mph))
     end
     if hudSpeedLabel then
-        hudSpeedLabel.Text = string.format("📈 Скорость: %.1f рыб/м", cpm)
+        hudSpeedLabel.Text = string.format("📈 Темп: %.1f рыб/мин", cpm)
     end
 end
 
