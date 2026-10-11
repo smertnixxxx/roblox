@@ -2201,14 +2201,11 @@ local function createTab(win, opts)
         local ok2, res2 = pcall(function() return win:Tab(copy) end)
         if ok2 and res2 then return res2 end
     end
-    local dummy = {}
-    function dummy:Section(...) return dummy end
-    function dummy:Toggle(...) return dummy end
-    function dummy:Button(...) return dummy end
-    function dummy:Slider(...) return dummy end
-    function dummy:Dropdown(...) return dummy end
-    function dummy:Paragraph(...) return dummy end
-    function dummy:Keybind(...) return dummy end
+    local dummy = setmetatable({}, {
+        __index = function(self, key)
+            return function(...) return dummy end
+        end
+    })
     return dummy
 end
 
