@@ -23,6 +23,10 @@ getgenv()._FishyHubToken = myHubToken
 getgenv()._FishyHubCleanup = function()
     getgenv()._FishyHubToken = nil
     if fightThread then pcall(task.cancel, fightThread) end
+    pcall(function()
+        if restoreAllOriginalTexts then restoreAllOriginalTexts() end
+        if restoreOriginalSkin then restoreOriginalSkin() end
+    end)
     pcall(function() RunService:Set3dRenderingEnabled(true) end)
     pcall(function()
         local p = workspace:FindFirstChild("FishyWaterWalk")
@@ -227,6 +231,16 @@ local autoUpgradeAll = false       -- Авто-покупка всех стат�
 local fishEspEnabled = true
 local espLabelsEnabled = true
 local noclipEnabled = false
+local identityHiderEnabled = false
+local currentFakeName = "Anonymous"
+local fakeLevelMode = "???" -- "???", "Random", "Custom"
+local customFakeLevel = "999"
+local fakeMoneyMode = "$???" -- "$???", "Random", "Custom"
+local customFakeMoney = "$999,999,999"
+local currentSkinPreset = "Random Preset" -- "Random Preset", "Classic Noob", "Bacon Hair", "Robloxian", "Builderman", "Custom UserID", "Keep Original"
+local customSkinUserId = "1"
+local randomGeneratedLevel = tostring(math.random(50, 999))
+local randomGeneratedMoney = "$" .. tostring(math.random(10, 999)) .. "," .. string.format("%03d", math.random(0, 999)) .. "," .. string.format("%03d", math.random(0, 999))
 local fallbackToBest = true
 local catchMode = "Rarest" -- "Secret", "Rarest", "Money", "Biggest", "Any"
 local activeBossFight = false
@@ -1338,9 +1352,287 @@ end
 -- Мгновенная инициализация перехвата управления
 forceEnableControls()
 
+-- ==================== IDENTITY HIDER / STREAMER MODE SYSTEM ====================
+local RANDOM_SKIN_IDS = {
+    1,          -- Roblox
+    156,        -- Builderman
+    261,        -- Shedletsky
+    1240160,    -- Telamon
+    198877,     -- Clockwork
+    430030,     -- ReeseMcBlox
+    2470764,    -- Bacon Hair
+    16039474,   -- Stickmasterluke
+    20150372,   -- DenisDaily
+    18442032,   -- DanTDM
+    3064883,    -- KreekCraft
+    55319808,   -- Flamingo
+    834045,     -- Asimo3089
+    18059049,   -- Badcc
+}
+
+local RANDOM_NAMES = {
+    "Anonymous", "GhostFisher", "Guest_4821", "ShadowAngler",
+    "AquaMaster", "DeepDrifter", "OceanPhantom", "SilentReeler",
+    "HydroHunter", "WaveWhisperer", "AbyssDiver", "NoobFisherman",
+    "LuckyCaster", "TideSeeker", "GlitchWalker", "VoidCaster",
+    "BlobFish", "SeaKing_99", "ReelLegend", "PixelAngler"
+}
+
+local originalHumanoidDescription = nil
+local originalTextMap = setmetatable({}, { __mode = "k" })
+
+local function getEffectiveFakeLevel()
+    if not identityHiderEnabled then return nil end
+    if fakeLevelMode == "???" then
+        return "???"
+    elseif fakeLevelMode == "Random" then
+        return randomGeneratedLevel
+    elseif fakeLevelMode == "Custom" then
+        return (customFakeLevel ~= "" and customFakeLevel) or "999"
+    end
+    return "???"
+end
+
+local function getEffectiveFakeMoney()
+    if not identityHiderEnabled then return nil end
+    if fakeMoneyMode == "$???" then
+        return "$???"
+    elseif fakeMoneyMode == "Random" then
+        return randomGeneratedMoney
+    elseif fakeMoneyMode == "Custom" then
+        return (customFakeMoney ~= "" and customFakeMoney) or "$999,999,999"
+    end
+    return "$???"
+end
+
+local function backupOriginalAppearance()
+    pcall(function()
+        if not originalHumanoidDescription and LocalPlayer.UserId then
+            originalHumanoidDescription = Players:GetHumanoidDescriptionFromUserId(LocalPlayer.UserId)
+        end
+    end)
+end
+
+local function applyFakeSkin()
+    if not identityHiderEnabled then return end
+    local char = LocalPlayer.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if not hum then return end
+    
+    backupOriginalAppearance()
+    
+    if currentSkinPreset == "Keep Original" then
+        return
+    elseif currentSkinPreset == "Classic Noob" then
+        pcall(function()
+            for _, item in ipairs(char:GetChildren()) do
+                if item:IsA("Accessory") or item:IsA("Shirt") or item:IsA("Pants") or item:IsA("ShirtGraphic") then
+                    pcall(function() item:Destroy() end)
+                end
+            end
+            local bc = char:FindFirstChildOfClass("BodyColors") or Instance.new("BodyColors", char)
+            bc.HeadColor3 = Color3.fromRGB(245, 205, 47)
+            bc.LeftArmColor3 = Color3.fromRGB(245, 205, 47)
+            bc.RightArmColor3 = Color3.fromRGB(245, 205, 47)
+            bc.TorsoColor3 = Color3.fromRGB(13, 105, 172)
+            bc.LeftLegColor3 = Color3.fromRGB(164, 189, 71)
+            bc.RightLegColor3 = Color3.fromRGB(164, 189, 71)
+        end)
+    else
+        local targetUserId = 1
+        if currentSkinPreset == "Bacon Hair" then
+            targetUserId = 2470764
+        elseif currentSkinPreset == "Builderman" then
+            targetUserId = 156
+        elseif currentSkinPreset == "Robloxian" then
+            targetUserId = 1
+        elseif currentSkinPreset == "Custom UserID" then
+            targetUserId = tonumber(customSkinUserId) or 1
+        elseif currentSkinPreset == "Random Preset" then
+            targetUserId = RANDOM_SKIN_IDS[math.random(1, #RANDOM_SKIN_IDS)]
+        end
+        
+        pcall(function()
+            local desc = Players:GetHumanoidDescriptionFromUserId(targetUserId)
+            if desc and hum then
+                hum:ApplyDescription(desc)
+            end
+        end)
+    end
+end
+
+local function restoreOriginalSkin()
+    pcall(function()
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            local desc = originalHumanoidDescription or Players:GetHumanoidDescriptionFromUserId(LocalPlayer.UserId)
+            if desc then
+                hum:ApplyDescription(desc)
+            end
+        end
+    end)
+end
+
+local function processTextElement(el)
+    if not identityHiderEnabled then return end
+    if not (el:IsA("TextLabel") or el:IsA("TextButton") or el:IsA("TextBox")) then return end
+    
+    local txt = el.Text
+    if not txt or txt == "" then return end
+    
+    if not originalTextMap[el] then
+        originalTextMap[el] = txt
+    end
+    
+    local orig = originalTextMap[el] or txt
+    local updated = orig
+    
+    local rName = LocalPlayer.Name
+    local rDisp = LocalPlayer.DisplayName
+    local fName = currentFakeName
+    
+    if fName and fName ~= "" then
+        if rName and rName ~= "" and updated:find(rName) then
+            updated = updated:gsub(rName, fName)
+        end
+        if rDisp and rDisp ~= "" and updated:find(rDisp) then
+            updated = updated:gsub(rDisp, fName)
+        end
+    end
+    
+    local fLvl = getEffectiveFakeLevel()
+    if fLvl then
+        updated = updated:gsub("([Ll][Vv][Ll]%.?%s*)%d+", "%1" .. tostring(fLvl))
+        updated = updated:gsub("([Ll][Ee][Vv][Ee][Ll]:?%s*)%d+", "%1" .. tostring(fLvl))
+    end
+    
+    local fMoney = getEffectiveFakeMoney()
+    if fMoney then
+        updated = updated:gsub("%$[%d,]+%.?%d*[KkMmBb]?", fMoney)
+    end
+    
+    if updated ~= el.Text then
+        el.Text = updated
+    end
+end
+
+local function restoreAllOriginalTexts()
+    for el, orig in pairs(originalTextMap) do
+        pcall(function()
+            if el and el.Parent then
+                el.Text = orig
+            end
+        end)
+    end
+    table.clear(originalTextMap)
+end
+
+local function runIdentitySpoofPass()
+    if not identityHiderEnabled then return end
+    
+    pcall(function()
+        local pg = LocalPlayer:FindFirstChild("PlayerGui")
+        if pg then
+            for _, desc in ipairs(pg:GetDescendants()) do
+                processTextElement(desc)
+            end
+        end
+    end)
+    
+    pcall(function()
+        local char = LocalPlayer.Character
+        if char then
+            for _, desc in ipairs(char:GetDescendants()) do
+                processTextElement(desc)
+            end
+        end
+    end)
+    
+    pcall(function()
+        local coreGui = game:GetService("CoreGui")
+        local pl = coreGui:FindFirstChild("PlayerList")
+        if pl then
+            for _, desc in ipairs(pl:GetDescendants()) do
+                processTextElement(desc)
+            end
+        end
+    end)
+end
+
+local function spoofLeaderstats()
+    if not identityHiderEnabled then return end
+    pcall(function()
+        local ls = LocalPlayer:FindFirstChild("leaderstats")
+        if not ls then return end
+        
+        local lvlObj = ls:FindFirstChild("Level") or ls:FindFirstChild("Lvl")
+        if lvlObj then
+            local effLvl = getEffectiveFakeLevel()
+            local numLvl = tonumber(effLvl) or 999
+            if lvlObj:IsA("IntValue") or lvlObj:IsA("NumberValue") then
+                lvlObj.Value = numLvl
+            elseif lvlObj:IsA("StringValue") then
+                lvlObj.Value = tostring(effLvl)
+            end
+        end
+        
+        local coinsObj = ls:FindFirstChild("Coins") or ls:FindFirstChild("Gold") or ls:FindFirstChild("Money") or ls:FindFirstChild("Cash")
+        if coinsObj then
+            local effMoney = getEffectiveFakeMoney()
+            local numMoney = tonumber((effMoney:gsub("[^%d]", ""))) or 999999999
+            if coinsObj:IsA("IntValue") or coinsObj:IsA("NumberValue") then
+                coinsObj.Value = numMoney
+            elseif coinsObj:IsA("StringValue") then
+                coinsObj.Value = tostring(effMoney)
+            end
+        end
+    end)
+end
+
+local function randomizeEverything()
+    currentFakeName = RANDOM_NAMES[math.random(1, #RANDOM_NAMES)] .. "_" .. tostring(math.random(100, 999))
+    randomGeneratedLevel = tostring(math.random(50, 999))
+    randomGeneratedMoney = "$" .. tostring(math.random(10, 999)) .. "," .. string.format("%03d", math.random(0, 999)) .. "," .. string.format("%03d", math.random(0, 999))
+    currentSkinPreset = "Random Preset"
+    
+    if identityHiderEnabled then
+        applyFakeSkin()
+        runIdentitySpoofPass()
+        spoofLeaderstats()
+    end
+    
+    showNotification("🎭 Identity Hider", string.format(locText("Randomized: %s | Lvl: %s | Money: %s", "Сгенерировано: %s | Ур: %s | Монеты: %s"), currentFakeName, randomGeneratedLevel, randomGeneratedMoney))
+end
+
+-- Реактивное обновление при добавлении UI
+pcall(function()
+    LocalPlayer.PlayerGui.DescendantAdded:Connect(function(desc)
+        if identityHiderEnabled then
+            task.defer(processTextElement, desc)
+        end
+    end)
+end)
+
+-- Фоновый тикер проверки и подмены (раз в 0.35с)
+task.spawn(function()
+    while true do
+        task.wait(0.35)
+        if getgenv()._FishyHubToken ~= myHubToken then break end
+        if identityHiderEnabled then
+            runIdentitySpoofPass()
+            spoofLeaderstats()
+        end
+    end
+end)
+
 LocalPlayer.CharacterAdded:Connect(function()
     task.wait(0.5)
     unfreezeCharacter()
+    if identityHiderEnabled then
+        task.defer(applyFakeSkin)
+        task.defer(runIdentitySpoofPass)
+    end
 end)
 
 -- Мгновенная разморозка при старте скрипта
@@ -3242,6 +3534,149 @@ TabPlayer:Toggle({
     Desc = "Проход сквозь любые препятствия и стены",
     Value = noclipEnabled,
     Callback = function(state) noclipEnabled = state end
+})
+
+TabPlayer:Section({ Title = locText("Identity Hider (Streamer Mode)", "Скрытие Личности (Streamer Mode)") })
+
+TabPlayer:Toggle({
+    Title = locText("Enable Identity Hider", "Включить Скрытие Личности"),
+    Desc = locText("Hide real name, skin, level & coins from streams and screenshots", "Скрыть реальный ник, скин, уровень и монеты от стримов и скриншотов"),
+    Value = identityHiderEnabled,
+    Callback = function(state)
+        identityHiderEnabled = state
+        if state then
+            applyFakeSkin()
+            runIdentitySpoofPass()
+            spoofLeaderstats()
+            showNotification("🎭 Identity Hider", locText("Identity Hider enabled! You are now anonymous.", "Скрытие личности включено! Ваши данные скрыты."))
+        else
+            restoreAllOriginalTexts()
+            restoreOriginalSkin()
+            showNotification("🎭 Identity Hider", locText("Identity Hider disabled. Original identity restored.", "Скрытие личности выключено. Данные восстановлены."))
+        end
+    end
+})
+
+TabPlayer:Button({
+    Title = locText("🎲 Randomize All (Name, Skin, Lvl, Coins)", "🎲 Рандомизировать всё (Ник, Скин, Ур, Монеты)"),
+    Desc = locText("Generate fresh random identity in one click", "Сгенерировать случайную личность в один клик"),
+    Icon = "shuffle",
+    Callback = function()
+        randomizeEverything()
+    end
+})
+
+TabPlayer:Input({
+    Title = locText("Fake Nickname / Display Name", "Фейковый Никнейм / Имя"),
+    Desc = locText("Custom name shown everywhere (Default: Anonymous)", "Свой никнейм для отображения (по умолч.: Anonymous)"),
+    Value = currentFakeName,
+    Placeholder = "Anonymous",
+    Callback = function(val)
+        if val and val ~= "" then
+            currentFakeName = val
+            if identityHiderEnabled then
+                runIdentitySpoofPass()
+            end
+        end
+    end
+})
+
+TabPlayer:Dropdown({
+    Title = locText("Fake Level Mode", "Режим Фейкового Уровня"),
+    Desc = locText("Choose how player level appears (???, Random or Custom)", "Выберите формат отображения уровня (???, Random или Custom)"),
+    Values = { "???", "Random", "Custom" },
+    Value = fakeLevelMode,
+    Callback = function(choice)
+        fakeLevelMode = choice
+        if identityHiderEnabled then
+            runIdentitySpoofPass()
+            spoofLeaderstats()
+        end
+    end
+})
+
+TabPlayer:Input({
+    Title = locText("Custom Fake Level", "Свой Фейковый Уровень"),
+    Desc = locText("Enter custom level number (when Mode is 'Custom')", "Число уровня для режима Custom (напр. 999)"),
+    Value = customFakeLevel,
+    Placeholder = "999",
+    Callback = function(val)
+        if val and val ~= "" then
+            customFakeLevel = val
+            if identityHiderEnabled and fakeLevelMode == "Custom" then
+                runIdentitySpoofPass()
+                spoofLeaderstats()
+            end
+        end
+    end
+})
+
+TabPlayer:Dropdown({
+    Title = locText("Fake Coins / Balance Mode", "Режим Фейкового Баланса"),
+    Desc = locText("Choose how money appears in HUD & stats", "Выберите формат отображения баланса"),
+    Values = { "$???", "Random", "Custom" },
+    Value = fakeMoneyMode,
+    Callback = function(choice)
+        fakeMoneyMode = choice
+        if identityHiderEnabled then
+            runIdentitySpoofPass()
+            spoofLeaderstats()
+        end
+    end
+})
+
+TabPlayer:Input({
+    Title = locText("Custom Fake Coins", "Свой Фейковый Баланс"),
+    Desc = locText("Enter custom coins string (when Mode is 'Custom')", "Текст баланса для режима Custom (напр. $999,999,999)"),
+    Value = customFakeMoney,
+    Placeholder = "$999,999,999",
+    Callback = function(val)
+        if val and val ~= "" then
+            customFakeMoney = val
+            if identityHiderEnabled and fakeMoneyMode == "Custom" then
+                runIdentitySpoofPass()
+                spoofLeaderstats()
+            end
+        end
+    end
+})
+
+TabPlayer:Dropdown({
+    Title = locText("Skin Changer Preset", "Пресет Скина Персонажа"),
+    Desc = locText("Change character avatar locally", "Сменить скин персонажа локально"),
+    Values = { "Random Preset", "Classic Noob", "Bacon Hair", "Robloxian", "Builderman", "Custom UserID", "Keep Original" },
+    Value = currentSkinPreset,
+    Callback = function(choice)
+        currentSkinPreset = choice
+        if identityHiderEnabled then
+            applyFakeSkin()
+        end
+    end
+})
+
+TabPlayer:Input({
+    Title = locText("Custom Skin UserID", "UserID для Своего Скина"),
+    Desc = locText("Enter any Roblox UserID to copy their avatar", "ID игрока для копирования скина (режим Custom UserID)"),
+    Value = customSkinUserId,
+    Placeholder = "1",
+    Callback = function(val)
+        if val and val ~= "" then
+            customSkinUserId = val
+            if identityHiderEnabled and currentSkinPreset == "Custom UserID" then
+                applyFakeSkin()
+            end
+        end
+    end
+})
+
+TabPlayer:Button({
+    Title = locText("👕 Reapply Skin Now", "👕 Применить Скин Сейчас"),
+    Desc = locText("Force update character skin to selected preset", "Принудительно обновить скин на персонаже"),
+    Icon = "shirt",
+    Callback = function()
+        applyFakeSkin()
+        showNotification("👕 Skin Changer", locText("Skin refreshed!", "Скин персонажа обновлен!"))
+    end
 })
 
 UserInputService.JumpRequest:Connect(function()
