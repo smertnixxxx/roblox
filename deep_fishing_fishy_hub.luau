@@ -666,45 +666,55 @@ local function updateStatsHud()
     end
 
     local isRu = (currentLanguage == "ru")
-    if statsParagraph and statsParagraph.SetDesc then
-        if isRu then
-            statsParagraph:SetDesc(string.format(
-                "Поймано: %d шт. | Общая выручка: %s\nДоход / Мин: %s/мин | Доход / Час: %s/час\nВремя сессии: %s | Скорость: %.1f / мин",
-                sessionFishCaught,
-                formatMoney(sessionMoneyEarned),
-                formatMoney(mpm),
-                formatMoney(mph),
-                timeStr,
-                cpm
-            ))
-        else
-            statsParagraph:SetDesc(string.format(
-                "Fish Caught: %d | Total Revenue: %s\nMoney / Min: %s/m | Money / Hour: %s/h\nSession Time: %s | Catch Rate: %.1f / min",
-                sessionFishCaught,
-                formatMoney(sessionMoneyEarned),
-                formatMoney(mpm),
-                formatMoney(mph),
-                timeStr,
-                cpm
-            ))
+    pcall(function()
+        if statsParagraph and statsParagraph.SetDesc then
+            local moneyDisplay = (identityHiderEnabled and getEffectiveFakeMoney and getEffectiveFakeMoney()) or formatMoney(sessionMoneyEarned)
+            local mpmDisplay = identityHiderEnabled and "$???/m" or formatMoney(mpm)
+            local mphDisplay = identityHiderEnabled and "$???/h" or formatMoney(mph)
+            if isRu then
+                statsParagraph:SetDesc(string.format(
+                    "Поймано: %d шт. | Общая выручка: %s\nДоход / Мин: %s/мин | Доход / Час: %s/час\nВремя сессии: %s | Скорость: %.1f / мин",
+                    sessionFishCaught,
+                    moneyDisplay,
+                    mpmDisplay,
+                    mphDisplay,
+                    timeStr,
+                    cpm
+                ))
+            else
+                statsParagraph:SetDesc(string.format(
+                    "Fish Caught: %d | Total Revenue: %s\nMoney / Min: %s/m | Money / Hour: %s/h\nSession Time: %s | Catch Rate: %.1f / min",
+                    sessionFishCaught,
+                    moneyDisplay,
+                    mpmDisplay,
+                    mphDisplay,
+                    timeStr,
+                    cpm
+                ))
+            end
         end
-    end
+    end)
 
-    if hudTimeLabel then
-        hudTimeLabel.Text = timeStr
-    end
-    if hudTotalValue then
-        hudTotalValue.Text = string.format(isRu and "%s (%d рыб)" or "%s (%d fish)", formatMoney(sessionMoneyEarned), sessionFishCaught)
-    end
-    if hudMpmValue then
-        hudMpmValue.Text = string.format(isRu and "%s/мин" or "%s/m", formatMoney(mpm))
-    end
-    if hudMphValue then
-        hudMphValue.Text = string.format(isRu and "%s/час" or "%s/h", formatMoney(mph))
-    end
-    if hudSpeedValue then
-        hudSpeedValue.Text = string.format(isRu and "%.1f / мин" or "%.1f / min", cpm)
-    end
+    pcall(function()
+        if hudTimeLabel then
+            hudTimeLabel.Text = timeStr
+        end
+        if hudTotalValue then
+            local moneyDisplay = (identityHiderEnabled and getEffectiveFakeMoney and getEffectiveFakeMoney()) or formatMoney(sessionMoneyEarned)
+            hudTotalValue.Text = string.format(isRu and "%s (%d рыб)" or "%s (%d fish)", moneyDisplay, sessionFishCaught)
+        end
+        if hudMpmValue then
+            local mpmDisplay = identityHiderEnabled and (isRu and "$???/мин" or "$???/m") or (formatMoney(mpm) .. (isRu and "/мин" or "/m"))
+            hudMpmValue.Text = mpmDisplay
+        end
+        if hudMphValue then
+            local mphDisplay = identityHiderEnabled and (isRu and "$???/час" or "$???/h") or (formatMoney(mph) .. (isRu and "/час" or "/h"))
+            hudMphValue.Text = mphDisplay
+        end
+        if hudSpeedValue then
+            hudSpeedValue.Text = string.format(isRu and "%.1f / мин" or "%.1f / min", cpm)
+        end
+    end)
 end
 
 local function setScriptLanguage(lang)
@@ -1474,9 +1484,13 @@ local function restoreOriginalSkin()
     end)
 end
 
+local isProcessingText = false
+local hookedElements = setmetatable({}, { __mode = "k" })
+
 local function processTextElement(el)
     if not identityHiderEnabled then return end
     if not (el:IsA("TextLabel") or el:IsA("TextButton") or el:IsA("TextBox")) then return end
+    if isProcessingText then return end
     
     local txt = el.Text
     if not txt or txt == "" then return end
@@ -1487,6 +1501,24 @@ local function processTextElement(el)
     
     local orig = originalTextMap[el] or txt
     local updated = orig
+    
+    -- Мгновенный перехват любых изменений текста игрой (0 задержки, без ожидания таймера)
+    if not hookedElements[el] then
+        hookedElements[el] = true
+        pcall(function()
+            el:GetPropertyChangedSignal("Text"):Connect(function()
+                if identityHiderEnabled and not isProcessingText then
+                    local cur = el.Text
+                    local curFakeLvl = getEffectiveFakeLevel()
+                    local curFakeMon = getEffectiveFakeMoney()
+                    if cur ~= updated and cur ~= currentFakeName and cur ~= curFakeLvl and cur ~= curFakeMon then
+                        originalTextMap[el] = cur
+                    end
+                    task.defer(processTextElement, el)
+                end
+            end)
+        end)
+    end
     
     local rName = LocalPlayer.Name
     local rDisp = LocalPlayer.DisplayName
@@ -1502,18 +1534,50 @@ local function processTextElement(el)
     end
     
     local fLvl = getEffectiveFakeLevel()
+    local fMoney = getEffectiveFakeMoney()
+    local elName = el.Name:lower()
+    local parentName = el.Parent and el.Parent.Name:lower() or ""
+    
+    -- 2. Уровень и XP (включая окна вылова рыбы и полоски опыта)
     if fLvl then
         updated = updated:gsub("([Ll][Vv][Ll]%.?%s*)%d+", "%1" .. tostring(fLvl))
         updated = updated:gsub("([Ll][Ee][Vv][Ee][Ll]:?%s*)%d+", "%1" .. tostring(fLvl))
+        updated = updated:gsub("([Уу][Рр][Оо][Вв][Ее][Нн][Ьь]:?%s*)%d+", "%1" .. tostring(fLvl))
+        updated = updated:gsub("([Уу][Рр]%.?%s*)%d+", "%1" .. tostring(fLvl))
+        
+        local isLvlContainer = elName:find("level") or elName:find("lvl") or parentName:find("level") or parentName:find("lvl") or elName:find("rank") or parentName:find("rank")
+        if isLvlContainer and (updated:match("^%d+$") or updated:match("^%d+/%d+$")) then
+            updated = tostring(fLvl)
+        end
+        
+        updated = updated:gsub("%d+[%d,]*%s*/%s*[%d,]+%s*[Xx][Pp]", "??? / ??? XP")
+        updated = updated:gsub("%+?%d+[%d,]*%s*[Xx][Pp]", "+??? XP")
     end
     
-    local fMoney = getEffectiveFakeMoney()
+    -- 3. Монеты и Баланс (включая формат 58.3M, +12.5K, всплывашки улова)
     if fMoney then
-        updated = updated:gsub("%$[%d,]+%.?%d*[KkMmBb]?", fMoney)
+        updated = updated:gsub("%+?%$[%d,]+%.?%d*[KkMmBb]?", fMoney)
+        
+        local isMoneyContainer = elName:find("coin") or elName:find("money") or elName:find("cash") or elName:find("gold") 
+                               or elName:find("balance") or elName:find("currency") or elName:find("price") or elName:find("cost") 
+                               or elName:find("reward") or elName:find("revenue") or elName:find("earn") or elName:find("amount")
+                               or elName:find("val") or elName:find("value")
+                               or parentName:find("coin") or parentName:find("money") or parentName:find("cash") or parentName:find("gold") 
+                               or parentName:find("balance") or parentName:find("currency") or parentName:find("price") or parentName:find("reward")
+                               or parentName:find("caught") or parentName:find("popup") or parentName:find("header") or parentName:find("topbar")
+        
+        -- Числа с суффиксами без знака доллара (как 58.3M на экране)
+        if updated:match("^%+?[%d,]+%.?%d*[KkMmBb]$") then
+            updated = fMoney
+        elseif isMoneyContainer and (updated:match("^%+?[%d,]+%.?%d*$") or updated:match("^%+?%$?[%d,]+%.?%d*[KkMmBb]?$")) then
+            updated = fMoney
+        end
     end
     
     if updated ~= el.Text then
-        el.Text = updated
+        isProcessingText = true
+        pcall(function() el.Text = updated end)
+        isProcessingText = false
     end
 end
 
@@ -2129,7 +2193,14 @@ if FishSchoolCtrl then
             
             sessionFishCaught = sessionFishCaught + count
             sessionMoneyEarned = sessionMoneyEarned + totalValue
-            if updateStatsHud then updateStatsHud() end
+            task.defer(function()
+                if updateStatsHud then pcall(updateStatsHud) end
+            end)
+
+            if identityHiderEnabled then
+                task.defer(runIdentitySpoofPass)
+                task.defer(spoofLeaderstats)
+            end
 
             -- Автоудаление 3D-моделей пойманной рыбы чтобы не зависали в воздухе/воде
             task.delay(0.35, function()
@@ -2145,9 +2216,10 @@ if FishSchoolCtrl then
 
             if notifyCatchValue then
                 local bestTxt = bestName and (locText(" | Best: ", " | Топ: ") .. bestName) or ""
+                local revText = identityHiderEnabled and (getEffectiveFakeMoney and getEffectiveFakeMoney() or "$???") or formatMoney(totalValue)
                 showNotification(
                     locText("🎣 Cast Complete!", "🎣 Заброс завершён!"),
-                    string.format(locText("Caught: %d fish | Revenue: %s%s", "Поймано: %d шт. | Выручка: %s%s"), count, formatMoney(totalValue), bestTxt)
+                    string.format(locText("Caught: %d fish | Revenue: %s%s", "Поймано: %d шт. | Выручка: %s%s"), count, revText, bestTxt)
                 )
             end
             
