@@ -390,14 +390,16 @@ end
 -- 🎁 Мгновенное открытие всех пойманных сундуков
 local function openAllChests()
     pcall(function()
-        local ev = require(RS.Shared.Events).Client("Chest")
-        if ev then
-            ev:Fire("OpenAll")
-            ev:Fire("Open")
+        local chestCtrl = LocalPlayer.PlayerScripts.Client.Controllers:FindFirstChild("ChestOpen")
+        if chestCtrl then
+            local mod = require(chestCtrl)
+            if mod and mod.OpenAll then mod:OpenAll() end
         end
-        local evItem = require(RS.Shared.Events).Client("Item")
-        if evItem then
-            evItem:Fire("OpenChests")
+        local re = ReplicatedStorage:FindFirstChild("Events")
+        if re and re:FindFirstChild("RemoteEvents") then
+            if re.RemoteEvents:FindFirstChild("OpenChests") then
+                re.RemoteEvents.OpenChests:FireServer()
+            end
         end
     end)
     pcall(function()
@@ -407,7 +409,7 @@ local function openAllChests()
             if btn and firesignal then firesignal(btn.MouseButton1Click) end
         end
     end)
-    showNotification("🎁 Chests", "Запрос на открытие сундуков отправлен!")
+    showNotification("🎁 Chests", locText("Chests open request sent!", "Запрос на открытие сундуков отправлен!"))
 end
 
 -- Цвета редкостей
@@ -1052,8 +1054,7 @@ local function autocompleteSandMaze()
                 if fireproximityprompt then fireproximityprompt(p) end
             end
         end
-        local evChest = require(RS.Shared.Events).Client("Chest")
-        if evChest then evChest:Fire("OpenAll") end
+        openAllChests()
     end)
 
     showNotification("Sand Maze", "🏆 Песчаный лабиринт пройден! Награды собраны.")
@@ -1114,8 +1115,7 @@ local function autocompleteFrostMaze()
                 if fireproximityprompt then fireproximityprompt(p) end
             end
         end
-        local evChest = require(RS.Shared.Events).Client("Chest")
-        if evChest then evChest:Fire("OpenAll") end
+        openAllChests()
     end)
 
     showNotification("Frost Maze", "🏆 Ледяной лабиринт пройден! Награды собраны.")
@@ -1382,13 +1382,15 @@ local function getEntityScore(f, mode)
            or lower:find("orb") or lower:find("pearl") or lower:find("coin")
            or lower:find("gem") or lower:find("crystal") or lower:find("fossil")
            or lower:find("totem") or lower:find("skull") or lower:find("egg")
-           or lower:find("ancient") or lower:find("runic") or lower:find("enchant") then
+           or lower:find("ancient") or lower:find("runic") or lower:find("enchant") or lower:find("admin") then
             isSpecialItem = true
             itemType = "Special"
         end
     end
     
-    if isSpecialItem or f.bypassRoom then
+    if isSpecialItem or f.bypassRoom or f.special then
+        f.bypassRoom = true
+        f.special = true
         local info = {
             name = (name ~= "" and name) or "Special Item",
             rarity = "Special",
@@ -1495,6 +1497,11 @@ if FishSchoolCtrl then
     local rawTryGrab = FishSchoolCtrl._rawTryGrab
     
     FishSchoolCtrl.TryGrab = function(self, point)
+        -- 1. Если уже идет мини-игра (битва с боссом/секреткой) — не трогаем ничего и не пытаемся повторно подсекать!
+        if CatchMinigameCtrl and (CatchMinigameCtrl.Fight or (CatchMinigameCtrl.IsActive and CatchMinigameCtrl:IsActive())) then
+            return
+        end
+
         if instantCatchEnabled and self.Fish and #self.Fish > 0 and self.Cinematic and self.Cinematic.Catchable and self.Cinematic.PullStart then
             local maxCap = self.Cinematic:GetBaitCapacity()
             local currentCaught = self.Cinematic:CaughtFishCount()
@@ -1518,30 +1525,57 @@ if FishSchoolCtrl then
                 end)
                 
                 if #candidates > 0 then
+                    -- Проверяем, есть ли среди кандидатов босс или секретная рыба
+                    local fightingCand = nil
+                    for _, cand in ipairs(candidates) do
+                        local f = cand.fish
+                        if f.boss == true or isFightingFish(f) or (CatchFight and CatchFight.Required and CatchFight.Required(FishConfig:Get(f.name, true))) then
+                            fightingCand = cand
+                            break
+                        end
+                    end
+
                     for _, cand in ipairs(candidates) do
                         local target = cand.fish
-                        local isSpecial = cand.info and cand.info.isSpecial
+                        local isSpecial = (cand.info and cand.info.isSpecial) or target.special or target.bypassRoom
                         local isBypass = target.bypassRoom == true or isSpecial
-                        local isFighting = target.boss == true or isFightingFish(target) or (CatchFight and CatchFight.Required and CatchFight.Required(FishConfig:Get(target.name, true)))
-                        
-                        if catchMode == "Secret" and cand.score <= 0 then
+
+                        if isSpecial then
+                            target.bypassRoom = true
+                            target.special = true
+                            if target.model and not target.model.PrimaryPart then
+                                target.model.PrimaryPart = target.model:FindFirstChildWhichIsA("BasePart")
+                            end
+                        end
+
+                        if catchMode == "Secret" and cand.score <= 0 and not isSpecial then
                             if not fallbackToBest then
                                 break
                             end
                         end
-                        
-                        if isFighting then
-                            -- Босс / Секретная рыба: начинаем бой в одиночку, не смешивая с другими рыбами
-                            self.Cinematic.Sub.CatchMinigame:Offer(target)
-                            return
-                        end
-                        
-                        if slotsFree > 0 or isBypass then
-                            if not isBypass then
-                                slotsFree = slotsFree - 1
-                            end
-                            if not self.Cinematic.Sub.CatchMinigame:Offer(target) then
+
+                        if fightingCand then
+                            -- Если в косяке есть босс/секретка: цепляем спец-предметы (сундуки не занимают слот)
+                            if isSpecial then
                                 self:CompleteGrab(target)
+                                target.caught = true
+                            elseif cand == fightingCand then
+                                -- Эксклюзивный запуск боя: обычных рыб не цепляем, сохраняем слот на крючке!
+                                self.Cinematic.Sub.CatchMinigame:Offer(target)
+                                return
+                            end
+                        else
+                            -- Обычный вылов (боссов в косяке нет)
+                            if slotsFree > 0 or isBypass then
+                                if not isBypass then
+                                    slotsFree = slotsFree - 1
+                                end
+                                if not self.Cinematic.Sub.CatchMinigame:Offer(target) then
+                                    self:CompleteGrab(target)
+                                    target.caught = true
+                                else
+                                    return
+                                end
                             end
                         end
                     end
@@ -1978,8 +2012,28 @@ if AutoFishingCtrl then
     end
 end
 
--- 3. Hook CatchMinigame (Auto-Clicker with Server Rate Limit Respect)
+-- 3. Hook CatchMinigame (Auto-Clicker with Server Rate Limit Respect + Guaranteed Catch)
 if CatchMinigameCtrl then
+    CatchMinigameCtrl._rawFinish = CatchMinigameCtrl._rawFinish or CatchMinigameCtrl.Finish
+    local rawFinish = CatchMinigameCtrl._rawFinish
+
+    CatchMinigameCtrl.Finish = function(self, won, ...)
+        local fight = self.Fight
+        local targetFish = fight and (fight.fish or fight.Fish)
+        local res = rawFinish(self, won, ...)
+        if won and targetFish then
+            targetFish.caught = true
+            targetFish.fighting = false
+            -- Мгновенная подсечка на лодку после победы над секреткой / боссом
+            task.defer(function()
+                if ThrowCinematicCtrl and ThrowCinematicCtrl.Active and not ThrowCinematicCtrl.ReelRequested then
+                    pcall(function() ThrowCinematicCtrl:RequestReel() end)
+                end
+            end)
+        end
+        return res
+    end
+
     CatchMinigameCtrl._rawBegin = CatchMinigameCtrl._rawBegin or CatchMinigameCtrl.Begin
     local rawBegin = CatchMinigameCtrl._rawBegin
 
@@ -1996,6 +2050,10 @@ if CatchMinigameCtrl then
                 while self.Fight and self.Fight == currentFight do
                     pcall(function() self:Click() end)
                     task.wait(0.088) -- ~11.36 кликов/сек, строго под серверным лимитом 12/сек
+                end
+                task.wait(0.1)
+                if ThrowCinematicCtrl and ThrowCinematicCtrl.Active and not ThrowCinematicCtrl.ReelRequested then
+                    pcall(function() ThrowCinematicCtrl:RequestReel() end)
                 end
             end)
         end
@@ -2129,13 +2187,25 @@ RunService.Heartbeat:Connect(function()
         if flyBodyGyro then pcall(function() flyBodyGyro:Destroy() end) flyBodyGyro = nil end
     end
 
-    -- Fast Reel: подсекаем когда забиты слоты или вся рыба в косяке поймана (не во время битвы с боссом)
-    if instantReelEnabled and ThrowCinematicCtrl and ThrowCinematicCtrl.Active and not ThrowCinematicCtrl.ReelRequested and not (CatchMinigameCtrl and CatchMinigameCtrl:IsActive()) then
+    -- Fast Reel: подсекаем когда забиты слоты, пойманы сундуки/спец-предметы или вся рыба в косяке поймана
+    if instantReelEnabled and ThrowCinematicCtrl and ThrowCinematicCtrl.Active and not ThrowCinematicCtrl.ReelRequested and not (CatchMinigameCtrl and (CatchMinigameCtrl.Fight or (CatchMinigameCtrl.IsActive and CatchMinigameCtrl:IsActive()))) then
         local cap = ThrowCinematicCtrl:GetBaitCapacity()
         local caught = ThrowCinematicCtrl:CaughtFishCount()
         local spawned = (FishSchoolCtrl and FishSchoolCtrl.Fish and #FishSchoolCtrl.Fish) or 0
-        
-        if caught >= cap or (caught > 0 and spawned <= caught) then
+        local totalCaught = (FishSchoolCtrl and FishSchoolCtrl.Caught and #FishSchoolCtrl.Caught) or caught
+
+        local hasSpecialCaught = false
+        if FishSchoolCtrl and FishSchoolCtrl.Caught then
+            for _, item in ipairs(FishSchoolCtrl.Caught) do
+                local nm = item.name or (item.model and item.model.Name) or ""
+                if item.special or item.bypassRoom or nm:lower():find("admin") or nm:lower():find("chest") then
+                    hasSpecialCaught = true
+                    break
+                end
+            end
+        end
+
+        if caught >= cap or totalCaught >= cap or hasSpecialCaught or (totalCaught > 0 and spawned <= totalCaught) or (totalCaught > 0 and catchMode == "Secret") then
             pcall(function() ThrowCinematicCtrl:RequestReel() end)
         end
     end
@@ -3292,6 +3362,10 @@ TabSettings:Button({
     Callback = function()
         local codes = {
             "Release",
+            "update10",
+            "pets",
+            "Update10",
+            "Pets",
             "Fishing",
             "ThanksforPlaying",
             "Gifting",
@@ -3309,13 +3383,19 @@ TabSettings:Button({
         }
         local redeemed = 0
         pcall(function()
-            local ev = require(RS.Shared.Events).Client("Code")
-            if ev then
-                for _, c in ipairs(codes) do
-                    ev:Fire(c)
-                    task.wait(0.2)
-                    redeemed = redeemed + 1
-                end
+            for _, c in ipairs(codes) do
+                pcall(function()
+                    local ev = require(RS.Shared.Events).Client("Code")
+                    if ev then ev:Fire(c) end
+                end)
+                pcall(function()
+                    local re = ReplicatedStorage:FindFirstChild("Events")
+                    if re and re:FindFirstChild("RemoteEvents") and re.RemoteEvents:FindFirstChild("Codes") then
+                        re.RemoteEvents.Codes:FireServer(c)
+                    end
+                end)
+                task.wait(0.15)
+                redeemed = redeemed + 1
             end
         end)
         showNotification("Codes", string.format(locText("Checked %d promo codes. Check balance!", "Проверено промокодов: %d шт. Проверьте баланс!"), redeemed))
