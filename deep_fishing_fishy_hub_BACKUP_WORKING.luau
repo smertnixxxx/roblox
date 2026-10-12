@@ -1388,7 +1388,6 @@ local RANDOM_NAMES = {
     "BlobFish", "SeaKing_99", "ReelLegend", "PixelAngler"
 }
 
-local originalHumanoidDescription = nil
 local originalTextMap = setmetatable({}, { __mode = "k" })
 
 local function getEffectiveFakeLevel()
@@ -1415,73 +1414,376 @@ local function getEffectiveFakeMoney()
     return "$???"
 end
 
+local isSkinDisguised = false
+local originalAppearanceBackup = {
+    parts = {},
+    bodyColors = nil,
+    shirtTemplate = nil,
+    pantsTemplate = nil,
+    tshirtGraphic = nil,
+    faceTexture = nil,
+    accessories = {}
+}
+
+local backupStorage = Instance.new("Folder")
+backupStorage.Name = "FishyHub_SkinBackup"
+pcall(function()
+    if gethui then
+        backupStorage.Parent = gethui()
+    elseif CoreGui then
+        backupStorage.Parent = CoreGui
+    end
+end)
+
 local function backupOriginalAppearance()
-    pcall(function()
-        if not originalHumanoidDescription and LocalPlayer.UserId then
-            originalHumanoidDescription = Players:GetHumanoidDescriptionFromUserId(LocalPlayer.UserId)
+    if isSkinDisguised then return end
+    local char = LocalPlayer.Character
+    if not char then return end
+    
+    local head = char:FindFirstChild("Head")
+    local face = head and (head:FindFirstChild("face") or head:FindFirstChildOfClass("Decal"))
+    local shirt = char:FindFirstChildOfClass("Shirt")
+    local pants = char:FindFirstChildOfClass("Pants")
+    local tshirt = char:FindFirstChildOfClass("ShirtGraphic")
+    local bc = char:FindFirstChildOfClass("BodyColors")
+    
+    originalAppearanceBackup.faceTexture = face and face.Texture or "rbxasset://textures/face.png"
+    originalAppearanceBackup.shirtTemplate = shirt and shirt.ShirtTemplate or nil
+    originalAppearanceBackup.pantsTemplate = pants and pants.PantsTemplate or nil
+    originalAppearanceBackup.tshirtGraphic = tshirt and tshirt.Graphic or nil
+    
+    if bc then
+        originalAppearanceBackup.bodyColors = {
+            HeadColor3 = bc.HeadColor3,
+            TorsoColor3 = bc.TorsoColor3,
+            LeftArmColor3 = bc.LeftArmColor3,
+            RightArmColor3 = bc.RightArmColor3,
+            LeftLegColor3 = bc.LeftLegColor3,
+            RightLegColor3 = bc.RightLegColor3,
+        }
+    else
+        originalAppearanceBackup.bodyColors = nil
+    end
+    
+    originalAppearanceBackup.parts = {}
+    for _, part in ipairs(char:GetChildren()) do
+        if part:IsA("BasePart") then
+            local pData = { Color = part.Color }
+            if part:IsA("MeshPart") then
+                pData.TextureID = part.TextureID
+            end
+            originalAppearanceBackup.parts[part.Name] = pData
         end
+    end
+    
+    backupStorage:ClearAllChildren()
+    table.clear(originalAppearanceBackup.accessories)
+    for _, item in ipairs(char:GetChildren()) do
+        if item:IsA("Accessory") then
+            local s, clone = pcall(function() return item:Clone() end)
+            if s and clone then
+                clone.Parent = backupStorage
+                table.insert(originalAppearanceBackup.accessories, clone)
+            end
+        end
+    end
+    
+    isSkinDisguised = true
+end
+
+local function stripWearables(char)
+    for _, item in ipairs(char:GetChildren()) do
+        if item:IsA("Accessory") or item:IsA("Shirt") or item:IsA("Pants") or item:IsA("ShirtGraphic") then
+            pcall(function() item:Destroy() end)
+        end
+    end
+end
+
+local function applyLimbColors(char, headCol, torsoCol, leftArmCol, rightArmCol, leftLegCol, rightLegCol, clearMeshTextures)
+    local bc = char:FindFirstChildOfClass("BodyColors") or Instance.new("BodyColors", char)
+    bc.HeadColor3 = headCol
+    bc.TorsoColor3 = torsoCol
+    bc.LeftArmColor3 = leftArmCol
+    bc.RightArmColor3 = rightArmCol
+    bc.LeftLegColor3 = leftLegCol
+    bc.RightLegColor3 = rightLegCol
+    
+    for _, p in ipairs(char:GetChildren()) do
+        if p:IsA("BasePart") then
+            local n = p.Name
+            local col = nil
+            if n == "Head" then
+                col = headCol
+            elseif n == "Torso" or n == "UpperTorso" or n == "LowerTorso" then
+                col = torsoCol
+            elseif n == "Left Arm" or n == "LeftUpperArm" or n == "LeftLowerArm" or n == "LeftHand" then
+                col = leftArmCol
+            elseif n == "Right Arm" or n == "RightUpperArm" or n == "RightLowerArm" or n == "RightHand" then
+                col = rightArmCol
+            elseif n == "Left Leg" or n == "LeftUpperLeg" or n == "LeftLowerLeg" or n == "LeftFoot" then
+                col = leftLegCol
+            elseif n == "Right Leg" or n == "RightUpperLeg" or n == "RightLowerLeg" or n == "RightFoot" then
+                col = rightLegCol
+            end
+            
+            if col then
+                p.Color = col
+                if clearMeshTextures and p:IsA("MeshPart") then
+                    p.TextureID = ""
+                end
+            end
+        end
+    end
+end
+
+local function setFaceTexture(char, textureUrl)
+    local head = char:FindFirstChild("Head")
+    if head then
+        local face = head:FindFirstChild("face") or head:FindFirstChildOfClass("Decal")
+        if not face then
+            face = Instance.new("Decal", head)
+            face.Name = "face"
+        end
+        face.Texture = textureUrl or "rbxasset://textures/face.png"
+    end
+end
+
+local function attachAccessoryAsset(hum, char, assetId)
+    if not assetId or assetId <= 0 then return end
+    task.spawn(function()
+        pcall(function()
+            local getObj = (typeof(game.GetObjects) == "function" and function(u) return game:GetObjects(u) end)
+                or (typeof(getobjects) == "function" and getobjects)
+            if not getObj then return end
+            local objs = getObj("rbxassetid://" .. tostring(assetId))
+            if objs and #objs > 0 then
+                for _, obj in ipairs(objs) do
+                    if obj:IsA("Accessory") then
+                        local added = pcall(function() hum:AddAccessory(obj) end)
+                        if not added then
+                            pcall(function()
+                                obj.Parent = char
+                                local handle = obj:FindFirstChild("Handle")
+                                if handle then
+                                    local att = handle:FindFirstChildOfClass("Attachment")
+                                    if att then
+                                        local charAtt = nil
+                                        for _, limb in ipairs(char:GetChildren()) do
+                                            if limb:IsA("BasePart") then
+                                                charAtt = limb:FindFirstChild(att.Name)
+                                                if charAtt then break end
+                                            end
+                                        end
+                                        if charAtt then
+                                            local weld = Instance.new("Weld")
+                                            weld.Name = "AccessoryWeld"
+                                            weld.Part0 = handle
+                                            weld.Part1 = charAtt.Parent
+                                            weld.C0 = att.CFrame
+                                            weld.C1 = charAtt.CFrame
+                                            weld.Parent = handle
+                                        end
+                                    end
+                                end
+                            end)
+                        end
+                    end
+                end
+            end
+        end)
     end)
+end
+
+local function applyDescriptionDirectly(char, hum, desc)
+    applyLimbColors(char, desc.HeadColor, desc.TorsoColor, desc.LeftArmColor, desc.RightArmColor, desc.LeftLegColor, desc.RightLegColor, false)
+    
+    if desc.Shirt and desc.Shirt > 0 then
+        local s = Instance.new("Shirt", char)
+        s.ShirtTemplate = "rbxassetid://" .. tostring(desc.Shirt)
+    end
+    
+    if desc.Pants and desc.Pants > 0 then
+        local p = Instance.new("Pants", char)
+        p.PantsTemplate = "rbxassetid://" .. tostring(desc.Pants)
+    end
+    
+    if desc.GraphicTShirt and desc.GraphicTShirt > 0 then
+        local ts = Instance.new("ShirtGraphic", char)
+        ts.Graphic = "rbxassetid://" .. tostring(desc.GraphicTShirt)
+    end
+    
+    if desc.Face and desc.Face > 0 then
+        setFaceTexture(char, "rbxassetid://" .. tostring(desc.Face))
+    else
+        setFaceTexture(char, "rbxasset://textures/face.png")
+    end
+    
+    local accIds = {}
+    local sAcc, accList = pcall(function() return desc:GetAccessories(true) end)
+    if sAcc and typeof(accList) == "table" then
+        for _, item in ipairs(accList) do
+            if item.AssetId and tonumber(item.AssetId) and tonumber(item.AssetId) > 0 then
+                table.insert(accIds, tonumber(item.AssetId))
+            end
+        end
+    end
+    
+    if #accIds == 0 then
+        local propList = { desc.HatAccessory, desc.HairAccessory, desc.FaceAccessory, desc.NeckAccessory, desc.ShoulderAccessory, desc.FrontAccessory, desc.BackAccessory, desc.WaistAccessory }
+        for _, str in ipairs(propList) do
+            if typeof(str) == "string" and str ~= "" then
+                for id in str:gmatch("%d+") do
+                    table.insert(accIds, tonumber(id))
+                end
+            end
+        end
+    end
+    
+    for _, id in ipairs(accIds) do
+        attachAccessoryAsset(hum, char, id)
+    end
+end
+
+local function restoreOriginalSkin()
+    if not isSkinDisguised then return end
+    pcall(function()
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if not char or not hum then return end
+        
+        stripWearables(char)
+        
+        if originalAppearanceBackup.bodyColors then
+            local bc = char:FindFirstChildOfClass("BodyColors") or Instance.new("BodyColors", char)
+            local b = originalAppearanceBackup.bodyColors
+            bc.HeadColor3 = b.HeadColor3
+            bc.TorsoColor3 = b.TorsoColor3
+            bc.LeftArmColor3 = b.LeftArmColor3
+            bc.RightArmColor3 = b.RightArmColor3
+            bc.LeftLegColor3 = b.LeftLegColor3
+            bc.RightLegColor3 = b.RightLegColor3
+        end
+        
+        for partName, pData in pairs(originalAppearanceBackup.parts) do
+            local part = char:FindFirstChild(partName)
+            if part and part:IsA("BasePart") then
+                part.Color = pData.Color
+                if part:IsA("MeshPart") and pData.TextureID then
+                    part.TextureID = pData.TextureID
+                end
+            end
+        end
+        
+        if originalAppearanceBackup.shirtTemplate then
+            local s = Instance.new("Shirt", char)
+            s.ShirtTemplate = originalAppearanceBackup.shirtTemplate
+        end
+        
+        if originalAppearanceBackup.pantsTemplate then
+            local p = Instance.new("Pants", char)
+            p.PantsTemplate = originalAppearanceBackup.pantsTemplate
+        end
+        
+        if originalAppearanceBackup.tshirtGraphic then
+            local ts = Instance.new("ShirtGraphic", char)
+            ts.Graphic = originalAppearanceBackup.tshirtGraphic
+        end
+        
+        if originalAppearanceBackup.faceTexture then
+            setFaceTexture(char, originalAppearanceBackup.faceTexture)
+        end
+        
+        for _, savedAcc in ipairs(originalAppearanceBackup.accessories) do
+            if savedAcc and savedAcc:IsA("Accessory") then
+                local clone = savedAcc:Clone()
+                pcall(function() hum:AddAccessory(clone) end)
+            end
+        end
+        
+        backupStorage:ClearAllChildren()
+        table.clear(originalAppearanceBackup.accessories)
+    end)
+    isSkinDisguised = false
 end
 
 local function applyFakeSkin()
     if not identityHiderEnabled then return end
     local char = LocalPlayer.Character
     local hum = char and char:FindFirstChildOfClass("Humanoid")
-    if not hum then return end
-    
-    backupOriginalAppearance()
+    if not char or not hum then return end
     
     if currentSkinPreset == "Keep Original" then
+        restoreOriginalSkin()
         return
-    elseif currentSkinPreset == "Classic Noob" then
-        pcall(function()
-            for _, item in ipairs(char:GetChildren()) do
-                if item:IsA("Accessory") or item:IsA("Shirt") or item:IsA("Pants") or item:IsA("ShirtGraphic") then
-                    pcall(function() item:Destroy() end)
-                end
-            end
-            local bc = char:FindFirstChildOfClass("BodyColors") or Instance.new("BodyColors", char)
-            bc.HeadColor3 = Color3.fromRGB(245, 205, 47)
-            bc.LeftArmColor3 = Color3.fromRGB(245, 205, 47)
-            bc.RightArmColor3 = Color3.fromRGB(245, 205, 47)
-            bc.TorsoColor3 = Color3.fromRGB(13, 105, 172)
-            bc.LeftLegColor3 = Color3.fromRGB(164, 189, 71)
-            bc.RightLegColor3 = Color3.fromRGB(164, 189, 71)
-        end)
+    end
+    
+    backupOriginalAppearance()
+    stripWearables(char)
+    
+    if currentSkinPreset == "Classic Noob" then
+        applyLimbColors(
+            char,
+            Color3.fromRGB(245, 205, 47),
+            Color3.fromRGB(13, 105, 172),
+            Color3.fromRGB(245, 205, 47),
+            Color3.fromRGB(245, 205, 47),
+            Color3.fromRGB(164, 189, 71),
+            Color3.fromRGB(164, 189, 71),
+            true
+        )
+        setFaceTexture(char, "rbxasset://textures/face.png")
+    elseif currentSkinPreset == "Bacon Hair" then
+        local skinTone = Color3.fromRGB(218, 134, 122)
+        applyLimbColors(char, skinTone, skinTone, skinTone, skinTone, skinTone, skinTone, true)
+        setFaceTexture(char, "rbxasset://textures/face.png")
+        local s = Instance.new("Shirt", char)
+        s.ShirtTemplate = "rbxassetid://144076358"
+        local p = Instance.new("Pants", char)
+        p.PantsTemplate = "rbxassetid://144076760"
+        attachAccessoryAsset(hum, char, 62234425)
+    elseif currentSkinPreset == "Robloxian" then
+        local yel = Color3.fromRGB(245, 205, 47)
+        local dark = Color3.fromRGB(27, 42, 53)
+        applyLimbColors(char, yel, dark, yel, yel, dark, dark, true)
+        setFaceTexture(char, "rbxasset://textures/face.png")
+        attachAccessoryAsset(hum, char, 1028859)
+    elseif currentSkinPreset == "Builderman" then
+        local skinTone = Color3.fromRGB(218, 134, 122)
+        applyLimbColors(char, skinTone, skinTone, skinTone, skinTone, skinTone, skinTone, true)
+        setFaceTexture(char, "rbxasset://textures/face.png")
+        local s = Instance.new("Shirt", char)
+        s.ShirtTemplate = "rbxassetid://85153288"
+        local p = Instance.new("Pants", char)
+        p.PantsTemplate = "rbxassetid://85153408"
+        attachAccessoryAsset(hum, char, 1031419)
     else
         local targetUserId = 1
-        if currentSkinPreset == "Bacon Hair" then
-            targetUserId = 2470764
-        elseif currentSkinPreset == "Builderman" then
-            targetUserId = 156
-        elseif currentSkinPreset == "Robloxian" then
-            targetUserId = 1
-        elseif currentSkinPreset == "Custom UserID" then
+        if currentSkinPreset == "Custom UserID" then
             targetUserId = tonumber(customSkinUserId) or 1
         elseif currentSkinPreset == "Random Preset" then
             targetUserId = RANDOM_SKIN_IDS[math.random(1, #RANDOM_SKIN_IDS)]
         end
         
-        pcall(function()
-            local desc = Players:GetHumanoidDescriptionFromUserId(targetUserId)
-            if desc and hum then
-                hum:ApplyDescription(desc)
-            end
+        local success, desc = pcall(function()
+            return Players:GetHumanoidDescriptionFromUserId(targetUserId)
         end)
-    end
-end
-
-local function restoreOriginalSkin()
-    pcall(function()
-        local char = LocalPlayer.Character
-        local hum = char and char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            local desc = originalHumanoidDescription or Players:GetHumanoidDescriptionFromUserId(LocalPlayer.UserId)
-            if desc then
-                hum:ApplyDescription(desc)
-            end
+        
+        if success and desc then
+            applyDescriptionDirectly(char, hum, desc)
+        else
+            applyLimbColors(
+                char,
+                Color3.fromRGB(245, 205, 47),
+                Color3.fromRGB(13, 105, 172),
+                Color3.fromRGB(245, 205, 47),
+                Color3.fromRGB(245, 205, 47),
+                Color3.fromRGB(164, 189, 71),
+                Color3.fromRGB(164, 189, 71),
+                true
+            )
+            setFaceTexture(char, "rbxasset://textures/face.png")
         end
-    end)
+    end
 end
 
 local isProcessingText = false
@@ -1694,8 +1996,11 @@ LocalPlayer.CharacterAdded:Connect(function()
     task.wait(0.5)
     unfreezeCharacter()
     if identityHiderEnabled then
+        isSkinDisguised = false
         task.defer(applyFakeSkin)
         task.defer(runIdentitySpoofPass)
+    else
+        isSkinDisguised = false
     end
 end)
 
