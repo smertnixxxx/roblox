@@ -1856,23 +1856,52 @@ local function processTextElement(el)
         updated = updated:gsub("%+?%d+[%d,]*%s*[Xx][Pp]", "+??? XP")
     end
     
-    -- 3. Монеты и Баланс (включая формат 58.3M, +12.5K, всплывашки улова)
+    -- 3. Монеты и Баланс (включая 14.5T, 58.3M, +12.5K, всплывашки улова, автопродажу и HUD)
     if fMoney then
-        updated = updated:gsub("%+?%$[%d,]+%.?%d*[KkMmBb]?", fMoney)
+        local parent = el.Parent
+        local grandParentName = (parent and parent.Parent and parent.Parent.Name:lower()) or ""
         
         local isMoneyContainer = elName:find("coin") or elName:find("money") or elName:find("cash") or elName:find("gold") 
                                or elName:find("balance") or elName:find("currency") or elName:find("price") or elName:find("cost") 
                                or elName:find("reward") or elName:find("revenue") or elName:find("earn") or elName:find("amount")
-                               or elName:find("val") or elName:find("value")
+                               or elName:find("val") or elName:find("value") or elName:find("sell") or elName:find("counter")
                                or parentName:find("coin") or parentName:find("money") or parentName:find("cash") or parentName:find("gold") 
                                or parentName:find("balance") or parentName:find("currency") or parentName:find("price") or parentName:find("reward")
                                or parentName:find("caught") or parentName:find("popup") or parentName:find("header") or parentName:find("topbar")
+                               or parentName:find("sell") or parentName:find("autosell") or parentName:find("fish") or parentName:find("hud")
+                               or grandParentName:find("sell") or grandParentName:find("coin") or grandParentName:find("hud")
         
-        -- Числа с суффиксами без знака доллара (как 58.3M на экране)
-        if updated:match("^%+?[%d,]+%.?%d*[KkMmBb]$") then
-            updated = fMoney
-        elseif isMoneyContainer and (updated:match("^%+?[%d,]+%.?%d*$") or updated:match("^%+?%$?[%d,]+%.?%d*[KkMmBb]?$")) then
-            updated = fMoney
+        local hasMoneySibling = false
+        if parent then
+            for _, sib in ipairs(parent:GetChildren()) do
+                if sib ~= el then
+                    local sName = sib.Name:lower()
+                    if sName:find("coin") or sName:find("gold") or sName:find("money") or sName:find("cash") or sName:find("sell") then
+                        hasMoneySibling = true
+                        break
+                    end
+                    if sib:IsA("ImageLabel") or sib:IsA("ImageButton") then
+                        local img = tostring(sib.Image):lower()
+                        if img:find("coin") or img:find("gold") or img:find("currency") then
+                            hasMoneySibling = true
+                            break
+                        end
+                    end
+                end
+            end
+        end
+        
+        local displayFakeMoney = fMoney
+        if fakeMoneyMode == "$???" and not orig:find("%$") then
+            displayFakeMoney = "???"
+        end
+        
+        updated = updated:gsub("%+?%$[%d,]+%.?%d*%s*[A-Za-z]*", displayFakeMoney)
+        
+        if updated:match("^%s*[%$🪙💰]?%s*%+?[%d,]+%.?%d*%s*[KkMmBbTtQqSsOoNnDdА-Яа-яЁё]%a*%s*$") then
+            updated = displayFakeMoney
+        elseif (isMoneyContainer or hasMoneySibling) and (updated:match("^%s*%+?[%d,]+%.?%d*%s*$") or updated:match("^%s*[%$🪙💰]?%s*%+?[%d,]+%.?%d*%s*%a*%s*$")) then
+            updated = displayFakeMoney
         end
     end
     
